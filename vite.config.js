@@ -1,4 +1,4 @@
-import { fileURLToPath, URL } from 'node:url'
+import { URL, fileURLToPath } from 'node:url'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -6,13 +6,29 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueDevTools(),
-  ],
+  plugins: [vue(), vueDevTools()],
+  publicDir: false,
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
+  build: {
+    lib: {
+      entry: fileURLToPath(new URL('./src/index.js', import.meta.url)),
+      name: 'J1nn0VueModalDialog',
+      formats: ['es', 'umd'],
+      fileName: (format) => `j1nn0-vue-modal-dialog.${format}.js`,
+    },
+    rollupOptions: {
+      external: ['vue', '@vueuse/core', '@vueuse/integrations'], // 外部依存
+      output: {
+        globals: {
+          vue: 'Vue',
+          '@vueuse/core': 'VueUse',
+          '@vueuse/integrations': 'VueUseIntegrations',
+        },
+      },
     },
   },
 })

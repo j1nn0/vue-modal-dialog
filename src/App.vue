@@ -1,23 +1,23 @@
 <script setup>
-import { ref } from 'vue'
-import ModalDialog from './components/ModalDialog.vue'
+import { ref } from 'vue';
+import ModalDialog from '@/components/ModalDialog.vue';
 
-const isOpened = ref(false)
+const isOpened = ref(false);
 
 const openDialog = () => {
-  isOpened.value = true
-}
+  isOpened.value = true;
+};
 const closeDialog = () => {
-  isOpened.value = false
-}
+  isOpened.value = false;
+};
 
 const opened = () => {
-  console.log('opened')
-}
+  console.log('opened');
+};
 
 const closed = () => {
-  console.log('closed')
-}
+  console.log('closed');
+};
 </script>
 
 <template>

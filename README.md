@@ -1,35 +1,115 @@
-# vue-modal-dialog
+# j1nn0-vue-modal-dialog
 
-This template should help get you started developing with Vue 3 in Vite.
+A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility support.
 
-## Recommended IDE Setup
+---
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Features
 
-## Customize configuration
+- Vue 3 + `<script setup>` support
+- Focus trap inside the modal
+- Keyboard accessibility (Escape to close)
+- Backdrop with blur and fade animation
+- Header, body, and footer slots
+- Optional footer slot
+- Close button in the header
+- Auto scroll reset when opened
+- Supports dynamic content and word wrapping
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+---
 
-## Project Setup
+## Installation
 
-```sh
-yarn
+```bash
+npm install j1nn0-vue-modal-dialog
 ```
 
-### Compile and Hot-Reload for Development
+or
 
-```sh
-yarn dev
+```bash
+yarn add j1nn0-vue-modal-dialog
 ```
 
-### Compile and Minify for Production
+---
 
-```sh
-yarn build
+## Usage
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import { J1nn0ModalDialog } from 'j1nn0-vue-modal-dialog'
+import 'j1nn0-vue-modal-dialog/dist/j1nn0-vue-modal-dialog.css'
+
+const isOpen = ref(false)
+
+const submitForm = () => {
+  alert('Form submitted!')
+  isOpen.value = false
+}
+</script>
+
+<template>
+  <button @click="isOpen = true">Open Dialog</button>
+
+  <J1nn0ModalDialog v-model="isOpen">
+    <!-- Header slot -->
+    <template #header> Dialog Title </template>
+
+    <!-- Body slot (default) -->
+    <p>
+      This is the body content of the dialog. It supports long text and will wrap automatically.
+    </p>
+
+    <!-- Footer slot (optional) -->
+    <template #footer>
+      <button @click="isOpen = false">Cancel</button>
+      <button @click="submitForm">Submit</button>
+    </template>
+  </J1nn0ModalDialog>
+</template>
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+---
 
-```sh
-yarn lint
-```
+## Props
+
+| Prop       | Type                | Default | Description                                                                  |
+| ---------- | ------------------- | ------- | ---------------------------------------------------------------------------- |
+| `backdrop` | `Boolean \| String` | `true`  | `true` = click on backdrop closes dialog, `"static"` = backdrop does nothing |
+| `escape`   | `Boolean`           | `true`  | Pressing Escape key closes the dialog                                        |
+
+---
+
+## Slots
+
+| Slot     | Description                                               |
+| -------- | --------------------------------------------------------- |
+| `header` | Optional. Content for the header. × button always present |
+| default  | Content for the body of the dialog                        |
+| `footer` | Optional. Content for footer, not rendered if empty       |
+
+---
+
+## Accessibility
+
+- `role="dialog"` + `aria-modal="true"`
+- `aria-labelledby` points to header slot
+- `aria-describedby` points to body slot
+- Close button has `aria-label="閉じる"`
+- Focus trap inside the dialog ensures keyboard navigation
+- Escape key closes the dialog if enabled
+
+---
+
+## Styles
+
+- Dialog width: `90%` up to `600px` max
+- Dialog height: auto, max `80vh`, scrollable if content overflows
+- Word wrapping enabled in header and body
+- Backdrop has fade-in/out animation with blur effect
+
+---
+
+## License
+
+MIT
