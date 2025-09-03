@@ -6,15 +6,13 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 
 ## Features
 
-- Vue 3 + `<script setup>` support
+- Vue 3 support
 - Focus trap inside the modal
 - Keyboard accessibility (Escape to close)
 - Backdrop with blur and fade animation
 - Header, body, and footer slots
 - Optional footer slot
 - Close button in the header
-- Auto scroll reset when opened
-- Supports dynamic content and word wrapping
 
 ---
 
@@ -36,16 +34,16 @@ yarn add j1nn0-vue-modal-dialog
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { J1nn0ModalDialog } from 'j1nn0-vue-modal-dialog'
-import 'j1nn0-vue-modal-dialog/dist/j1nn0-vue-modal-dialog.css'
+import { ref } from 'vue';
+import { J1nn0ModalDialog } from 'j1nn0-vue-modal-dialog';
+import 'j1nn0-vue-modal-dialog/dist/j1nn0-vue-modal-dialog.css';
 
-const isOpen = ref(false)
+const isOpen = ref(false);
 
 const submitForm = () => {
-  alert('Form submitted!')
-  isOpen.value = false
-}
+  alert('Form submitted!');
+  isOpen.value = false;
+};
 </script>
 
 <template>
