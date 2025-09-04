@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import ModalDialog from '@/components/ModalDialog.vue';
+import J1nn0VueModalDialog from '@/components/J1nn0VueModalDialog.vue';
 
 const isOpened = ref(false);
 
@@ -27,7 +27,7 @@ const closed = () => {
     documentation
   </p>
   <button type="button" @click="openDialog">開く</button>
-  <ModalDialog v-model="isOpened" @opened="opened" @closed="closed">
+  <J1nn0VueModalDialog v-model="isOpened" @opened="opened" @closed="closed">
     <template #header>ダイアログタイトル</template>
 
     ボディ
@@ -36,7 +36,7 @@ const closed = () => {
       <span>フッター</span>
       <button type="button" @click="closeDialog">閉じる</button>
     </template>
-  </ModalDialog>
+  </J1nn0VueModalDialog>
 </template>
 
 <style scoped></style>

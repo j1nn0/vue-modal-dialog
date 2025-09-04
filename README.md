@@ -35,7 +35,7 @@ yarn add j1nn0-vue-modal-dialog
 ```vue
 <script setup>
 import { ref } from 'vue';
-import { J1nn0ModalDialog } from 'j1nn0-vue-modal-dialog';
+import { J1nn0VueModalDialog } from 'j1nn0-vue-modal-dialog';
 import 'j1nn0-vue-modal-dialog/dist/j1nn0-vue-modal-dialog.css';
 
 const isOpen = ref(false);
@@ -49,7 +49,7 @@ const submitForm = () => {
 <template>
   <button @click="isOpen = true">Open Dialog</button>
 
-  <J1nn0ModalDialog v-model="isOpen">
+  <J1nn0VueModalDialog v-model="isOpen">
     <!-- Header slot -->
     <template #header> Dialog Title </template>
 
@@ -63,7 +63,7 @@ const submitForm = () => {
       <button @click="isOpen = false">Cancel</button>
       <button @click="submitForm">Submit</button>
     </template>
-  </J1nn0ModalDialog>
+  </J1nn0VueModalDialog>
 </template>
 ```
 
