@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import J1nn0VueModalDialog from '../J1nn0VueModalDialog.vue';
+import * as vueUseCore from '@vueuse/core';
 
 vi.mock('@vueuse/core', () => ({
   onClickOutside: vi.fn(),
@@ -77,5 +78,102 @@ describe('J1nn0VueModalDialog', () => {
     await wrapper.setProps({ modelValue: true });
     await nextTick();
     expect(wrapper.emitted('opened')).toBeTruthy();
+  });
+
+  it('does not close when backdrop is static', () => {
+    const mockCallback = vi.fn();
+    vueUseCore.onClickOutside.mockImplementation((ref, callback) => {
+      mockCallback.mockImplementation(callback);
+    });
+    
+    const wrapper = mount(J1nn0VueModalDialog, {
+      props: { modelValue: true, backdrop: 'static' }
+    });
+    
+    mockCallback();
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy();
+  });
+
+  it('closes when backdrop is true', () => {
+    const mockCallback = vi.fn();
+    vueUseCore.onClickOutside.mockImplementation((ref, callback) => {
+      mockCallback.mockImplementation(callback);
+    });
+    
+    const wrapper = mount(J1nn0VueModalDialog, {
+      props: { modelValue: true, backdrop: true }
+    });
+    
+    mockCallback();
+    expect(wrapper.emitted('update:modelValue')[0]).toEqual([false]);
+  });
+
+  it('does not close when escape is disabled', () => {
+    const mockCallback = vi.fn();
+    vueUseCore.onKeyStroke.mockImplementation((key, callback) => {
+      mockCallback.mockImplementation(callback);
+    });
+    
+    const wrapper = mount(J1nn0VueModalDialog, {
+      props: { modelValue: true, escape: false }
+    });
+    
+    const mockEvent = { preventDefault: vi.fn() };
+    mockCallback(mockEvent);
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy();
+  });
+
+  it('closes when escape is enabled', () => {
+    const mockCallback = vi.fn();
+    vueUseCore.onKeyStroke.mockImplementation((key, callback) => {
+      mockCallback.mockImplementation(callback);
+    });
+    
+    const wrapper = mount(J1nn0VueModalDialog, {
+      props: { modelValue: true, escape: true }
+    });
+    
+    const mockEvent = { preventDefault: vi.fn() };
+    mockCallback(mockEvent);
+    expect(mockEvent.preventDefault).toHaveBeenCalled();
+    expect(wrapper.emitted('update:modelValue')[0]).toEqual([false]);
+  });
+
+  it('emits closed event', async () => {
+    const wrapper = mount(J1nn0VueModalDialog, {
+      props: { modelValue: true }
+    });
+    await wrapper.setProps({ modelValue: false });
+    await nextTick();
+    expect(wrapper.emitted('closed')).toBeTruthy();
+  });
+
+  it('does not trigger callback when dialog is closed - onClickOutside', () => {
+    const mockCallback = vi.fn();
+    vueUseCore.onClickOutside.mockImplementation((ref, callback) => {
+      mockCallback.mockImplementation(callback);
+    });
+    
+    const wrapper = mount(J1nn0VueModalDialog, {
+      props: { modelValue: false }
+    });
+    
+    mockCallback();
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy();
+  });
+
+  it('does not trigger callback when dialog is closed - onKeyStroke', () => {
+    const mockCallback = vi.fn();
+    vueUseCore.onKeyStroke.mockImplementation((key, callback) => {
+      mockCallback.mockImplementation(callback);
+    });
+    
+    const wrapper = mount(J1nn0VueModalDialog, {
+      props: { modelValue: false }
+    });
+    
+    const mockEvent = { preventDefault: vi.fn() };
+    mockCallback(mockEvent);
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy();
   });
 });
