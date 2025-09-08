@@ -59,14 +59,22 @@
     "focus-trap": "^7.6.5",
     "vue": "^3.5.18"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "packageManager": "pnpm@10.15.1",
   "pnpm": {
     "onlyBuiltDependencies": [
       "@parcel/watcher",
       "esbuild"
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/j1nn0/vue-modal-dialog.git"
+  },
+  "bugs": {
+    "url": "https://github.com/j1nn0/vue-modal-dialog/issues"
+  },
+  "homepage": "https://github.com/j1nn0/vue-modal-dialog#readme",
+  "publishConfig": {
+    "access": "public"
   }
 }
