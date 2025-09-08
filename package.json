@@ -1,10 +1,10 @@
 {
-  "name": "j1nn0-vue-modal-dialog",
+  "name": "@j1nn0/vue-modal-dialog",
   "version": "0.1.0",
   "description": "A reusable Vue 3 modal dialog component with focus trap and ARIA support",
-  "main": "dist/j1nn0-vue-modal-dialog.umd.js",
-  "module": "dist/j1nn0-vue-modal-dialog.es.js",
-  "style": "dist/j1nn0-vue-modal-dialog.css",
+  "main": "dist/vue-modal-dialog.umd.js",
+  "module": "dist/vue-modal-dialog.es.js",
+  "style": "dist/vue-modal-dialog.css",
   "type": "module",
   "files": [
     "dist"
@@ -58,6 +58,9 @@
     "@vueuse/integrations": "^13.9.0",
     "focus-trap": "^7.6.5",
     "vue": "^3.5.18"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "packageManager": "pnpm@10.15.1",
   "pnpm": {

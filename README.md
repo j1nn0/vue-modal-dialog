@@ -1,4 +1,4 @@
-# j1nn0-vue-modal-dialog
+# vue-modal-dialog
 
 A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility support.
 
@@ -19,24 +19,33 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 ## Installation
 
 ```bash
-npm install j1nn0-vue-modal-dialog
+npm install @j1nn0/vue-modal-dialog
 ```
 
 or
 
 ```bash
-yarn add j1nn0-vue-modal-dialog
+yarn add @j1nn0/vue-modal-dialog
 ```
 
 ---
 
 ## Usage
 
+You can use this component in **two ways**:
+
+1. Import individually (recommended, enables tree-shaking)
+2. Register globally as a Vue plugin
+
+---
+
+### 1. Individual Import (recommended)
+
 ```vue
 <script setup>
 import { ref } from 'vue';
-import { J1nn0VueModalDialog } from 'j1nn0-vue-modal-dialog';
-import 'j1nn0-vue-modal-dialog/dist/j1nn0-vue-modal-dialog.css';
+import { VueModalDialog } from '@j1nn0/vue-modal-dialog';
+import '@j1nn0/vue-modal-dialog/dist/vue-modal-dialog.css';
 
 const isOpen = ref(false);
 
@@ -49,7 +58,7 @@ const submitForm = () => {
 <template>
   <button @click="isOpen = true">Open Dialog</button>
 
-  <J1nn0VueModalDialog v-model="isOpen">
+  <VueModalDialog v-model="isOpen">
     <!-- Header slot -->
     <template #header> Dialog Title </template>
 
@@ -63,6 +72,34 @@ const submitForm = () => {
       <button @click="isOpen = false">Cancel</button>
       <button @click="submitForm">Submit</button>
     </template>
+  </VueModalDialog>
+</template>
+```
+
+---
+
+### 2. Global Plugin Registration
+
+```js
+// main.js
+import { createApp } from 'vue';
+import App from './App.vue';
+
+import { J1nn0VueModalDialogPlugin } from '@j1nn0/vue-modal-dialog';
+import '@j1nn0/vue-modal-dialog/dist/vue-modal-dialog.css';
+
+const app = createApp(App);
+app.use(J1nn0VueModalDialogPlugin);
+app.mount('#app');
+```
+
+Now you can use `<J1nn0VueModalDialog>` anywhere in your app without importing it:
+
+```vue
+<template>
+  <J1nn0VueModalDialog v-model="isOpen">
+    <template #header> Global Dialog </template>
+    <p>Body content</p>
   </J1nn0VueModalDialog>
 </template>
 ```
@@ -71,11 +108,11 @@ const submitForm = () => {
 
 ## Props
 
-| Prop       | Type                | Default  | Description                                                                  |
-| ---------- | ------------------- | -------- | ---------------------------------------------------------------------------- |
-| `backdrop` | `Boolean \| String` | `true`   | `true` = click on backdrop closes dialog, `"static"` = backdrop does nothing |
-| `escape`   | `Boolean`           | `true`   | Pressing Escape key closes the dialog                                        |
-| `position` | `String`            | 'center' | Vertical position of the dialog: 'center' = middle, 'top' = top-aligned      |
+| Prop       | Type                | Default    | Description                                                                  |
+| ---------- | ------------------- | ---------- | ---------------------------------------------------------------------------- |
+| `backdrop` | `Boolean \| String` | `true`     | `true` = click on backdrop closes dialog, `"static"` = backdrop does nothing |
+| `escape`   | `Boolean`           | `true`     | Pressing Escape key closes the dialog                                        |
+| `position` | `String`            | `"center"` | Position of the dialog: `"center"` or `"top"`                                |
 
 ---
 
@@ -94,7 +131,7 @@ const submitForm = () => {
 - `role="dialog"` + `aria-modal="true"`
 - `aria-labelledby` points to header slot
 - `aria-describedby` points to body slot
-- Close button has `aria-label="Close"`
+- Close button has `aria-label="閉じる"`
 - Focus trap inside the dialog ensures keyboard navigation
 - Escape key closes the dialog if enabled
 
@@ -106,8 +143,6 @@ const submitForm = () => {
 - Dialog height (default): auto, max `80vh`, scrollable if content overflows
 - Word wrapping enabled in header and body
 - Backdrop has fade-in/out animation with blur effect
-- position prop controls vertical alignment (center or top)
-- Header and footer are fixed; only body scrolls if content overflows
 
 ---
 

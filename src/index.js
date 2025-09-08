@@ -1,11 +1,9 @@
-import J1nn0VueModalDialog from '@/components/J1nn0VueModalDialog.vue';
+import VueModalDialog from '@/components/VueModalDialog.vue';
 
-// 個別インポート用
-export { J1nn0VueModalDialog };
-
-// Vue.use 用の install 関数
-export default {
+export const J1nn0VueModalDialogPlugin = {
   install(app) {
-    app.component('J1nn0VueModalDialog', J1nn0VueModalDialog);
+    app.component('J1nn0VueModalDialog', VueModalDialog);
   },
 };
+
+export { VueModalDialog };

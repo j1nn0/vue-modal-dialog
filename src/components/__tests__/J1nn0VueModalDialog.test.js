@@ -1,8 +1,10 @@
-import { describe, it, expect, vi } from 'vitest';
+import * as vueUseCore from '@vueuse/core';
+
+import { describe, expect, it, vi } from 'vitest';
+
+import VueModalDialog from '../VueModalDialog.vue';
 import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
-import J1nn0VueModalDialog from '../J1nn0VueModalDialog.vue';
-import * as vueUseCore from '@vueuse/core';
 
 vi.mock('@vueuse/core', () => ({
   onClickOutside: vi.fn(),
@@ -16,45 +18,45 @@ vi.mock('@vueuse/integrations/useFocusTrap', () => ({
   })),
 }));
 
-describe('J1nn0VueModalDialog', () => {
+describe('VueModalDialog', () => {
   it('renders dialog when open', () => {
-    const wrapper = mount(J1nn0VueModalDialog, {
-      props: { modelValue: true }
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: true },
     });
     expect(wrapper.find('.dialog').exists()).toBe(true);
     expect(wrapper.find('.backdrop').exists()).toBe(true);
   });
 
   it('hides dialog when closed', () => {
-    const wrapper = mount(J1nn0VueModalDialog, {
-      props: { modelValue: false }
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: false },
     });
     expect(wrapper.find('.dialog').exists()).toBe(false);
   });
 
   it('validates backdrop prop', () => {
-    const { validator } = J1nn0VueModalDialog.props.backdrop;
+    const { validator } = VueModalDialog.props.backdrop;
     expect(validator(true)).toBe(true);
     expect(validator('static')).toBe(true);
     expect(validator(false)).toBe(false);
   });
 
   it('closes on button click', async () => {
-    const wrapper = mount(J1nn0VueModalDialog, {
-      props: { modelValue: true }
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: true },
     });
     await wrapper.find('.dialog-close').trigger('click');
     expect(wrapper.emitted('update:modelValue')[0]).toEqual([false]);
   });
 
   it('renders slots', () => {
-    const wrapper = mount(J1nn0VueModalDialog, {
+    const wrapper = mount(VueModalDialog, {
       props: { modelValue: true },
       slots: {
         header: 'Title',
         default: 'Body',
-        footer: 'Footer'
-      }
+        footer: 'Footer',
+      },
     });
     expect(wrapper.text()).toContain('Title');
     expect(wrapper.text()).toContain('Body');
@@ -62,8 +64,8 @@ describe('J1nn0VueModalDialog', () => {
   });
 
   it('has ARIA attributes', () => {
-    const wrapper = mount(J1nn0VueModalDialog, {
-      props: { modelValue: true }
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: true },
     });
     const dialog = wrapper.find('.dialog');
     expect(dialog.attributes('role')).toBe('dialog');
@@ -72,8 +74,8 @@ describe('J1nn0VueModalDialog', () => {
   });
 
   it('emits events', async () => {
-    const wrapper = mount(J1nn0VueModalDialog, {
-      props: { modelValue: false }
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: false },
     });
     await wrapper.setProps({ modelValue: true });
     await nextTick();
@@ -85,11 +87,11 @@ describe('J1nn0VueModalDialog', () => {
     vueUseCore.onClickOutside.mockImplementation((ref, callback) => {
       mockCallback.mockImplementation(callback);
     });
-    
-    const wrapper = mount(J1nn0VueModalDialog, {
-      props: { modelValue: true, backdrop: 'static' }
+
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: true, backdrop: 'static' },
     });
-    
+
     mockCallback();
     expect(wrapper.emitted('update:modelValue')).toBeFalsy();
   });
@@ -99,11 +101,11 @@ describe('J1nn0VueModalDialog', () => {
     vueUseCore.onClickOutside.mockImplementation((ref, callback) => {
       mockCallback.mockImplementation(callback);
     });
-    
-    const wrapper = mount(J1nn0VueModalDialog, {
-      props: { modelValue: true, backdrop: true }
+
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: true, backdrop: true },
     });
-    
+
     mockCallback();
     expect(wrapper.emitted('update:modelValue')[0]).toEqual([false]);
   });
@@ -113,11 +115,11 @@ describe('J1nn0VueModalDialog', () => {
     vueUseCore.onKeyStroke.mockImplementation((key, callback) => {
       mockCallback.mockImplementation(callback);
     });
-    
-    const wrapper = mount(J1nn0VueModalDialog, {
-      props: { modelValue: true, escape: false }
+
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: true, escape: false },
     });
-    
+
     const mockEvent = { preventDefault: vi.fn() };
     mockCallback(mockEvent);
     expect(wrapper.emitted('update:modelValue')).toBeFalsy();
@@ -128,11 +130,11 @@ describe('J1nn0VueModalDialog', () => {
     vueUseCore.onKeyStroke.mockImplementation((key, callback) => {
       mockCallback.mockImplementation(callback);
     });
-    
-    const wrapper = mount(J1nn0VueModalDialog, {
-      props: { modelValue: true, escape: true }
+
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: true, escape: true },
     });
-    
+
     const mockEvent = { preventDefault: vi.fn() };
     mockCallback(mockEvent);
     expect(mockEvent.preventDefault).toHaveBeenCalled();
@@ -140,8 +142,8 @@ describe('J1nn0VueModalDialog', () => {
   });
 
   it('emits closed event', async () => {
-    const wrapper = mount(J1nn0VueModalDialog, {
-      props: { modelValue: true }
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: true },
     });
     await wrapper.setProps({ modelValue: false });
     await nextTick();
@@ -153,11 +155,11 @@ describe('J1nn0VueModalDialog', () => {
     vueUseCore.onClickOutside.mockImplementation((ref, callback) => {
       mockCallback.mockImplementation(callback);
     });
-    
-    const wrapper = mount(J1nn0VueModalDialog, {
-      props: { modelValue: false }
+
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: false },
     });
-    
+
     mockCallback();
     expect(wrapper.emitted('update:modelValue')).toBeFalsy();
   });
@@ -167,11 +169,11 @@ describe('J1nn0VueModalDialog', () => {
     vueUseCore.onKeyStroke.mockImplementation((key, callback) => {
       mockCallback.mockImplementation(callback);
     });
-    
-    const wrapper = mount(J1nn0VueModalDialog, {
-      props: { modelValue: false }
+
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: false },
     });
-    
+
     const mockEvent = { preventDefault: vi.fn() };
     mockCallback(mockEvent);
     expect(wrapper.emitted('update:modelValue')).toBeFalsy();

@@ -1,8 +1,8 @@
-import { URL, fileURLToPath } from 'node:url'
+import { URL, fileURLToPath } from 'node:url';
 
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import vueDevTools from 'vite-plugin-vue-devtools';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -18,7 +18,7 @@ export default defineConfig({
       entry: fileURLToPath(new URL('./src/index.js', import.meta.url)),
       name: 'J1nn0VueModalDialog',
       formats: ['es', 'umd'],
-      fileName: (format) => `j1nn0-vue-modal-dialog.${format}.js`,
+      fileName: (format) => `vue-modal-dialog.${format}.js`,
     },
     rollupOptions: {
       external: ['vue', '@vueuse/core', '@vueuse/integrations'], // 外部依存
@@ -31,4 +31,4 @@ export default defineConfig({
       },
     },
   },
-})
+});

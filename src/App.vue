@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import J1nn0VueModalDialog from '@/components/J1nn0VueModalDialog.vue';
+import VueModalDialog from '@/components/VueModalDialog.vue';
 
 const isOpened = ref(false);
 
@@ -27,7 +27,7 @@ const closed = () => {
     documentation
   </p>
   <button type="button" @click="openDialog">Dialog</button>
-  <J1nn0VueModalDialog
+  <VueModalDialog
     backdrop="static"
     :escape="false"
     position="center"
@@ -35,7 +35,7 @@ const closed = () => {
     @opened="opened"
     @closed="closed"
   >
-    <template #header><strong>j1nn0-vue-modal-dialog</strong></template>
+    <template #header><strong>&copy;j1nn0/vue-modal-dialog</strong></template>
 
     <p>
       This is the body content of the dialog. It supports long text and will wrap automatically.
@@ -54,7 +54,7 @@ const closed = () => {
       <span>Footer</span>
       <button type="button" @click="closeDialog">Close</button>
     </template>
-  </J1nn0VueModalDialog>
+  </VueModalDialog>
 </template>
 
 <style scoped></style>
