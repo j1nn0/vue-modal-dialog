@@ -2,7 +2,7 @@ name: Publish to npm & GitHub Packages
 
 on:
   push:
-    # タグが push されたときにのみ実行
+    # タグが push されたときのみ実行
     tags:
       - 'v*.*.*'
 
@@ -10,7 +10,7 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     steps:
-      # リポジトリをチェックアウト（フル履歴を取得）
+      # リポジトリをチェックアウト（フル履歴取得）
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -21,10 +21,23 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 22
+          registry-url: https://registry.npmjs.org
 
       # pnpm をグローバルインストール
       - name: Install pnpm
         run: npm install -g pnpm@10.15.1
+
+      # npmjs.org 認証トークンを設定
+      - name: Configure npmjs auth
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # GitHub Packages 認証トークンを追加
+      - name: Configure GitHub Packages auth
+        run: echo "//npm.pkg.github.com/:_authToken=${GH_TOKEN}" >> ~/.npmrc
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       # 依存関係をインストール
       - name: Install dependencies
