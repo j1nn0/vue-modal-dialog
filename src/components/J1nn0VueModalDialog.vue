@@ -94,7 +94,7 @@ onKeyStroke('Escape', (e) => {
           <div class="dialog-title">
             <slot name="header"></slot>
           </div>
-          <button class="dialog-close" @click="close" aria-label="閉じる">×</button>
+          <button class="dialog-close" @click="close" aria-label="Close">×</button>
         </header>
 
         <div class="dialog-body" :id="bodyId">
@@ -111,19 +111,36 @@ onKeyStroke('Escape', (e) => {
 
 <style>
 :root {
-  --dialog-backdrop-blur: 2px;
-  --dialog-border-radius: 8px;
+  --j1nn0-vue-modal-dialog-backdrop-z-index: 1000px;
+  --j1nn0-vue-modal-dialog-backdrop-background: rgba(0, 0, 0, 0.6);
+  --j1nn0-vue-modal-dialog-backdrop-blur: 2px;
+  --j1nn0-vue-modal-dialog-border: none;
+  --j1nn0-vue-modal-dialog-border-radius: 8px;
+
+  --j1nn0-vue-modal-dialog-width: 90%;
+  --j1nn0-vue-modal-dialog-max-width: 600px;
+  --j1nn0-vue-modal-dialog-max-height: 80vh;
+
+  --j1nn0-vue-modal-dialog-header-background: #f5f5f5;
+  --j1nn0-vue-modal-dialog-header-padding: 1rem;
+
+  --j1nn0-vue-modal-dialog-body-padding: 1rem;
+
+  --j1nn0-vue-modal-dialog-footer-background: #f5f5f5;
+  --j1nn0-vue-modal-dialog-footer-padding: 1rem;
 }
 </style>
 
 <style lang="scss" scoped>
+// Backdrop
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(var(--dialog-backdrop-blur)); /* 裏のページをぼかす */
-  -webkit-backdrop-filter: blur(var(--dialog-backdrop-blur)); /* Safari 対応 */
-  z-index: 1000;
+  background: var(--j1nn0-vue-modal-dialog-backdrop-background);
+  backdrop-filter: blur(var(--j1nn0-vue-modal-dialog-backdrop-blur));
+  // Support Safari
+  -webkit-backdrop-filter: blur(var(--j1nn0-vue-modal-dialog-backdrop-blur));
+  z-index: var(--j1nn0-vue-modal-dialog-backdrop-z-index);
   transition:
     backdrop-filter 0.3s ease,
     opacity 0.3s ease;
@@ -144,17 +161,19 @@ onKeyStroke('Escape', (e) => {
 .fade-backdrop-enter-to,
 .fade-backdrop-leave-from {
   opacity: 1;
-  backdrop-filter: blur(var(--dialog-backdrop-blur));
-  -webkit-backdrop-filter: blur(var(--dialog-backdrop-blur));
+  backdrop-filter: blur(var(--j1nn0-vue-modal-dialog-backdrop-blur));
+  // Support Safari
+  -webkit-backdrop-filter: blur(var(--j1nn0-vue-modal-dialog-backdrop-blur));
 }
 
+// Dialog
 .dialog {
   position: fixed;
-  z-index: 1001;
-  width: 90%;
-  max-width: 600px;
-  border: none;
-  border-radius: 8px;
+  z-index: calc(var(--j1nn0-vue-modal-dialog-backdrop-z-index) + 1px);
+  width: var(--j1nn0-vue-modal-dialog-width);
+  max-width: var(--j1nn0-vue-modal-dialog-max-width);
+  border: var(--j1nn0-vue-modal-dialog-border);
+  border-radius: var(--j1nn0-vue-modal-dialog-border-radius);
   padding: 0;
   box-sizing: border-box;
   white-space: normal !important;
@@ -162,7 +181,6 @@ onKeyStroke('Escape', (e) => {
   word-break: break-word;
 }
 
-/* フェードアニメーション */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -177,7 +195,7 @@ onKeyStroke('Escape', (e) => {
 }
 
 .dialog-content {
-  max-height: 80vh;
+  max-height: var(--j1nn0-vue-modal-dialog-max-height);
   overflow-y: auto;
   overflow-x: hidden;
   padding: 0;
@@ -191,8 +209,6 @@ onKeyStroke('Escape', (e) => {
 
 .dialog-header,
 .dialog-footer {
-  padding: 1rem;
-  background: #f5f5f5;
   flex-shrink: 0;
   position: relative;
   display: flex;
@@ -201,13 +217,17 @@ onKeyStroke('Escape', (e) => {
 }
 
 .dialog-header {
-  border-top-left-radius: var(--dialog-border-radius);
-  border-top-right-radius: var(--dialog-border-radius);
+  background: var(--j1nn0-vue-modal-dialog-header-background);
+  padding: var(--j1nn0-vue-modal-dialog-header-padding);
+  border-top-left-radius: var(--j1nn0-vue-modal-dialog-border-radius);
+  border-top-right-radius: var(--j1nn0-vue-modal-dialog-border-radius);
 }
 
 .dialog-footer {
-  border-bottom-left-radius: var(--dialog-border-radius);
-  border-bottom-right-radius: var(--dialog-border-radius);
+  background: var(--j1nn0-vue-modal-dialog-footer-background);
+  padding: var(--j1nn0-vue-modal-dialog-footer-padding);
+  border-bottom-left-radius: var(--j1nn0-vue-modal-dialog-border-radius);
+  border-bottom-right-radius: var(--j1nn0-vue-modal-dialog-border-radius);
 }
 
 .dialog-title {
@@ -229,6 +249,6 @@ onKeyStroke('Escape', (e) => {
 .dialog-body {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: var(--j1nn0-vue-modal-dialog-body-padding);
 }
 </style>

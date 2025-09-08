@@ -101,8 +101,8 @@ const submitForm = () => {
 
 ## Styles
 
-- Dialog width: `90%` up to `600px` max
-- Dialog height: auto, max `80vh`, scrollable if content overflows
+- Dialog width (default): `90%` up to `600px` max
+- Dialog height (default): auto, max `80vh`, scrollable if content overflows
 - Word wrapping enabled in header and body
 - Backdrop has fade-in/out animation with blur effect
 
