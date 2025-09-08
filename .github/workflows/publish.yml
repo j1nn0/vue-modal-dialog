@@ -1,4 +1,4 @@
-name: Publish to npm
+name: Publish to npm & GitHub Packages
 
 on:
   push:
@@ -21,23 +21,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 22
-          registry-url: https://registry.npmjs.org
 
       # pnpm をグローバルインストール
       - name: Install pnpm
         run: npm install -g pnpm@10.15.1
-
-      # npm 認証トークンを設定
-      - name: Configure npm auth
-        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      # GitHub Packages 認証トークンを設定
-      - name: Configure GitHub Packages auth
-        run: echo "//npm.pkg.github.com/:_authToken=${GH_TOKEN}" >> ~/.npmrc
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       # 依存関係をインストール
       - name: Install dependencies
@@ -47,8 +34,8 @@ jobs:
       - name: Build
         run: pnpm build
 
-      # npm に公開（Git チェックをスキップ）
-      - name: Publish to npm
+      # npmjs.org に公開
+      - name: Publish to npmjs.org
         run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
