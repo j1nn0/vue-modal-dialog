@@ -1,8 +1,7 @@
-name: Publish to npm & GitHub Packages
+name: Publish to npm
 
 on:
   push:
-    # タグが push されたときのみ実行
     tags:
       - 'v*.*.*'
 
@@ -10,7 +9,7 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     steps:
-      # リポジトリをチェックアウト（フル履歴取得）
+      # リポジトリをチェックアウト（フル履歴）
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -27,17 +26,11 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@10.15.1
 
-      # npmjs.org 認証トークンを設定
+      # npmjs.org 用の認証
       - name: Configure npmjs auth
         run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      # GitHub Packages 認証トークンを追加
-      - name: Configure GitHub Packages auth
-        run: echo "//npm.pkg.github.com/:_authToken=${GH_TOKEN}" >> ~/.npmrc
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       # 依存関係をインストール
       - name: Install dependencies
@@ -47,11 +40,19 @@ jobs:
       - name: Build
         run: pnpm build
 
-      # npmjs.org に公開
+      # npmjs.org に公開（Git チェック無効化）
       - name: Publish to npmjs.org
         run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # GitHub Packages 用の認証（@j1nn0 スコープ）
+      - name: Configure GitHub Packages auth
+        run: |
+          echo "@j1nn0:registry=https://npm.pkg.github.com" > ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${GH_TOKEN}" >> ~/.npmrc
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       # GitHub Packages に公開
       - name: Publish to GitHub Packages
