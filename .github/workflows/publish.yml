@@ -20,6 +20,8 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
+      - name: Install pnpm
+        run: npm install -g pnpm@10.15.1
 
       # npm 認証トークンを設定
       - name: Configure npm auth
