@@ -71,10 +71,11 @@ const submitForm = () => {
 
 ## Props
 
-| Prop       | Type                | Default | Description                                                                  |
-| ---------- | ------------------- | ------- | ---------------------------------------------------------------------------- |
-| `backdrop` | `Boolean \| String` | `true`  | `true` = click on backdrop closes dialog, `"static"` = backdrop does nothing |
-| `escape`   | `Boolean`           | `true`  | Pressing Escape key closes the dialog                                        |
+| Prop       | Type                | Default  | Description                                                                  |
+| ---------- | ------------------- | -------- | ---------------------------------------------------------------------------- |
+| `backdrop` | `Boolean \| String` | `true`   | `true` = click on backdrop closes dialog, `"static"` = backdrop does nothing |
+| `escape`   | `Boolean`           | `true`   | Pressing Escape key closes the dialog                                        |
+| `position` | `String`            | 'center' | Vertical position of the dialog: 'center' = middle, 'top' = top-aligned      |
 
 ---
 
@@ -93,7 +94,7 @@ const submitForm = () => {
 - `role="dialog"` + `aria-modal="true"`
 - `aria-labelledby` points to header slot
 - `aria-describedby` points to body slot
-- Close button has `aria-label="閉じる"`
+- Close button has `aria-label="Close"`
 - Focus trap inside the dialog ensures keyboard navigation
 - Escape key closes the dialog if enabled
 
@@ -105,6 +106,8 @@ const submitForm = () => {
 - Dialog height (default): auto, max `80vh`, scrollable if content overflows
 - Word wrapping enabled in header and body
 - Backdrop has fade-in/out animation with blur effect
+- position prop controls vertical alignment (center or top)
+- Header and footer are fixed; only body scrolls if content overflows
 
 ---
 

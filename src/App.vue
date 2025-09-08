@@ -28,8 +28,9 @@ const closed = () => {
   </p>
   <button type="button" @click="openDialog">Dialog</button>
   <J1nn0VueModalDialog
-    :backdrop="'static'"
+    backdrop="static"
     :escape="false"
+    position="center"
     v-model="isOpened"
     @opened="opened"
     @closed="closed"

@@ -3,26 +3,33 @@ import { useTemplateRef, watch, nextTick, useSlots } from 'vue';
 import { onClickOutside, onKeyStroke } from '@vueuse/core';
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 
+// Random ID（for ARIA）
 const headerId = `dialog-header-${Math.random().toString(36).slice(2)}`;
 const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
 
+// v-model
 const isOpen = defineModel({
   type: Boolean,
   required: true,
 });
 
+// Props
 const props = defineProps({
   backdrop: {
     type: [Boolean, String],
     default: true,
-    validator: (value) => {
-      return value === true || value === 'static';
-    },
+    validator: (value) => value === true || value === 'static',
   },
 
   escape: {
     type: Boolean,
     default: true,
+  },
+
+  position: {
+    type: String,
+    default: 'center',
+    validator: (value) => ['center', 'top'].includes(value),
   },
 });
 
@@ -30,6 +37,7 @@ const emit = defineEmits(['opened', 'closed']);
 const dialogRef = useTemplateRef('dialogRef');
 const slots = useSlots();
 
+// Focus trap
 const { activate: activateFocusTrap, deactivate: deactivateFocusTrap } = useFocusTrap(dialogRef, {
   initialFocus: false,
   escapeDeactivates: false,
@@ -51,21 +59,20 @@ watch(isOpen, async (newVal) => {
   }
 });
 
+// Close
 const close = () => {
   isOpen.value = false;
 };
 
+// backdrop click
 onClickOutside(dialogRef, () => {
   if (!isOpen.value) return;
-
-  if (props.backdrop === true) {
-    close();
-  }
+  if (props.backdrop === true) close();
 });
 
+// Escape key
 onKeyStroke('Escape', (e) => {
   if (!isOpen.value) return;
-
   if (props.escape) {
     e.preventDefault();
     close();
@@ -84,6 +91,10 @@ onKeyStroke('Escape', (e) => {
       v-if="isOpen"
       :open="isOpen"
       class="dialog"
+      :class="{
+        'is-center': props.position === 'center',
+        'is-top': props.position === 'top',
+      }"
       role="dialog"
       aria-modal="true"
       :aria-labelledby="headerId"
@@ -111,7 +122,7 @@ onKeyStroke('Escape', (e) => {
 
 <style>
 :root {
-  --j1nn0-vue-modal-dialog-backdrop-z-index: 1000px;
+  --j1nn0-vue-modal-dialog-backdrop-z-index: 1000;
   --j1nn0-vue-modal-dialog-backdrop-background: rgba(0, 0, 0, 0.6);
   --j1nn0-vue-modal-dialog-backdrop-blur: 2px;
   --j1nn0-vue-modal-dialog-border: none;
@@ -138,7 +149,6 @@ onKeyStroke('Escape', (e) => {
   inset: 0;
   background: var(--j1nn0-vue-modal-dialog-backdrop-background);
   backdrop-filter: blur(var(--j1nn0-vue-modal-dialog-backdrop-blur));
-  // Support Safari
   -webkit-backdrop-filter: blur(var(--j1nn0-vue-modal-dialog-backdrop-blur));
   z-index: var(--j1nn0-vue-modal-dialog-backdrop-z-index);
   transition:
@@ -162,25 +172,39 @@ onKeyStroke('Escape', (e) => {
 .fade-backdrop-leave-from {
   opacity: 1;
   backdrop-filter: blur(var(--j1nn0-vue-modal-dialog-backdrop-blur));
-  // Support Safari
   -webkit-backdrop-filter: blur(var(--j1nn0-vue-modal-dialog-backdrop-blur));
 }
 
 // Dialog
 .dialog {
   position: fixed;
-  z-index: calc(var(--j1nn0-vue-modal-dialog-backdrop-z-index) + 1px);
+  z-index: calc(var(--j1nn0-vue-modal-dialog-backdrop-z-index) + 1);
   width: var(--j1nn0-vue-modal-dialog-width);
   max-width: var(--j1nn0-vue-modal-dialog-max-width);
   border: var(--j1nn0-vue-modal-dialog-border);
   border-radius: var(--j1nn0-vue-modal-dialog-border-radius);
   padding: 0;
   box-sizing: border-box;
-  white-space: normal !important;
-  overflow-wrap: break-word;
-  word-break: break-word;
+
+  display: flex;
+  flex-direction: column;
+
+  &.is-center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: var(--j1nn0-vue-modal-dialog-max-height);
+  }
+
+  &.is-top {
+    top: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    max-height: calc(100vh - 4rem);
+  }
 }
 
+// Fade animation
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -194,17 +218,12 @@ onKeyStroke('Escape', (e) => {
   opacity: 1;
 }
 
+// Content
 .dialog-content {
-  max-height: var(--j1nn0-vue-modal-dialog-max-height);
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 0;
   display: flex;
   flex-direction: column;
-  white-space: normal;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  box-sizing: border-box;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 .dialog-header,
@@ -247,7 +266,8 @@ onKeyStroke('Escape', (e) => {
 }
 
 .dialog-body {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   padding: var(--j1nn0-vue-modal-dialog-body-padding);
 }
