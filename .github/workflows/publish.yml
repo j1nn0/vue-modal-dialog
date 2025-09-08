@@ -33,6 +33,12 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      # GitHub Packages 認証トークンを設定
+      - name: Configure GitHub Packages auth
+        run: echo "//npm.pkg.github.com/:_authToken=${GH_TOKEN}" >> ~/.npmrc
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
       # 依存関係をインストール
       - name: Install dependencies
         run: pnpm install
@@ -46,3 +52,9 @@ jobs:
         run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # GitHub Packages に公開
+      - name: Publish to GitHub Packages
+        run: npm publish --registry https://npm.pkg.github.com --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
