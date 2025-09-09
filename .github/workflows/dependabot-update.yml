@@ -2,8 +2,6 @@ name: Dependabot Lock Update
 
 on:
   workflow_dispatch: # 手動トリガーも可能
-  schedule:
-    - cron: '0 3 * * 1' # 毎週月曜 3:00 UTC に実行
   repository_dispatch:
     types: [dependabot-auto-update] # Dependabot からのイベントで起動可能
 
