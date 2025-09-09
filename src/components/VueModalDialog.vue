@@ -136,23 +136,28 @@ const dialogWidthClass = computed(() => ({
 
 <style>
 :root {
+  /* Backdrop */
   --j1nn0-vue-modal-dialog-backdrop-z-index: 1000;
   --j1nn0-vue-modal-dialog-backdrop-background: rgba(0, 0, 0, 0.6);
   --j1nn0-vue-modal-dialog-backdrop-blur: 2px;
+
+  /* Dialog */
   --j1nn0-vue-modal-dialog-border: none;
   --j1nn0-vue-modal-dialog-border-radius: 8px;
-
   --j1nn0-vue-modal-dialog-width: 90%;
   --j1nn0-vue-modal-dialog-max-width-sm: 300px;
   --j1nn0-vue-modal-dialog-max-width-md: 600px;
   --j1nn0-vue-modal-dialog-max-width-lg: 900px;
   --j1nn0-vue-modal-dialog-max-height: 80vh;
 
+  /* Header */
   --j1nn0-vue-modal-dialog-header-background: #f5f5f5;
   --j1nn0-vue-modal-dialog-header-padding: 1rem;
 
+  /* Body */
   --j1nn0-vue-modal-dialog-body-padding: 1rem;
 
+  /* Footer */
   --j1nn0-vue-modal-dialog-footer-background: #f5f5f5;
   --j1nn0-vue-modal-dialog-footer-padding: 1rem;
 }

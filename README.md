@@ -250,7 +250,9 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
   --j1nn0-vue-modal-dialog-border: none;
   --j1nn0-vue-modal-dialog-border-radius: 8px;
   --j1nn0-vue-modal-dialog-width: 90%;
-  --j1nn0-vue-modal-dialog-max-width: 600px;
+  --j1nn0-vue-modal-dialog-max-width-sm: 300px;
+  --j1nn0-vue-modal-dialog-max-width-md: 600px;
+  --j1nn0-vue-modal-dialog-max-width-lg: 900px;
   --j1nn0-vue-modal-dialog-max-height: 80vh;
 
   /* Header */
