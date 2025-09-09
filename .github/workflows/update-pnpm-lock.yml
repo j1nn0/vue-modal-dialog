@@ -1,0 +1,41 @@
+name: Update pnpm-lock.yaml
+
+# Dependabot が package.json を更新した PR を main にマージしたときや手動実行可能
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  update-lock:
+    runs-on: ubuntu-latest
+    steps:
+      # リポジトリをチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Node.js 22 をセットアップ
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      # pnpm をグローバルインストール
+      - name: Install pnpm
+        run: npm install -g pnpm@10.15.1
+
+      # 依存関係をインストール（pnpm-lock.yaml を更新）
+      - name: Install dependencies
+        run: pnpm install
+
+      # pnpm-lock.yaml に差分があればコミットして main ブランチにプッシュ
+      - name: Commit updated pnpm-lock.yaml
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git diff --cached --quiet || git commit -m "Update pnpm-lock.yaml via CI"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
