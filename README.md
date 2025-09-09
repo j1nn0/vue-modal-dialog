@@ -13,6 +13,7 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 - Header, body, and footer slots
 - Optional footer slot
 - Close button in the header
+- Configurable dialog size: `sm`, `md`, `lg`, `fullscreen`
 
 ---
 
@@ -111,7 +112,7 @@ app.use(J1nn0VueModalDialogPlugin);
 app.mount('#app');
 ```
 
-Now you can use `<J1nn0VueModalDialog>` anywhere in your app without importing it:
+Use `<J1nn0VueModalDialog>` anywhere in your app without importing it:
 
 ```vue
 <template>
@@ -169,6 +170,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
         </template>
       </j1nn0-vue-modal-dialog>
     </div>
+
     <script>
       const { createApp, ref } = Vue;
       const { J1nn0VueModalDialogPlugin, VueModalDialog } = J1nn0VueModalDialog;
@@ -203,6 +205,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 | `backdrop` | `Boolean \| String` | `true`     | `true` = click on backdrop closes dialog, `"static"` = backdrop does nothing |
 | `escape`   | `Boolean`           | `true`     | Pressing Escape key closes the dialog                                        |
 | `position` | `String`            | `"center"` | Position of the dialog: `"center"` or `"top"`                                |
+| `size`     | `String`            | `"md"`     | Dialog size: `sm`, `md`, `lg`, `fullscreen`                                  |
 
 ---
 
@@ -229,10 +232,39 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ## Styles
 
-- Dialog width (default): `90%` up to `600px` max
-- Dialog height (default): auto, max `80vh`, scrollable if content overflows
+- Dialog width: `sm`, `md`, `lg`, `fullscreen`
+- Dialog height: auto, max `80vh` (default), scrollable if content overflows
 - Word wrapping enabled in header and body
 - Backdrop has fade-in/out animation with blur effect
+
+### CSS Custom Properties
+
+```css
+:root {
+  /* Backdrop */
+  --j1nn0-vue-modal-dialog-backdrop-z-index: 1000;
+  --j1nn0-vue-modal-dialog-backdrop-background: rgba(0, 0, 0, 0.6);
+  --j1nn0-vue-modal-dialog-backdrop-blur: 2px;
+
+  /* Dialog */
+  --j1nn0-vue-modal-dialog-border: none;
+  --j1nn0-vue-modal-dialog-border-radius: 8px;
+  --j1nn0-vue-modal-dialog-width: 90%;
+  --j1nn0-vue-modal-dialog-max-width: 600px;
+  --j1nn0-vue-modal-dialog-max-height: 80vh;
+
+  /* Header */
+  --j1nn0-vue-modal-dialog-header-background: #f5f5f5;
+  --j1nn0-vue-modal-dialog-header-padding: 1rem;
+
+  /* Body */
+  --j1nn0-vue-modal-dialog-body-padding: 1rem;
+
+  /* Footer */
+  --j1nn0-vue-modal-dialog-footer-background: #f5f5f5;
+  --j1nn0-vue-modal-dialog-footer-padding: 1rem;
+}
+```
 
 ---
 
