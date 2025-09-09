@@ -2,6 +2,11 @@
 
 A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility support.
 
+[![License](https://img.shields.io/npm/l/@j1nn0/vue-modal-dialog)](https://github.com/j1nn0/vue-modal-dialog/blob/main/LICENSE)
+[![npm](https://img.shields.io/npm/v/@j1nn0/vue-modal-dialog)](https://www.npmjs.com/package/@j1nn0/vue-modal-dialog)
+[![Downloads](https://img.shields.io/npm/dm/@j1nn0/vue-modal-dialog)](https://www.npmjs.com/package/@j1nn0/vue-modal-dialog)
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/@j1nn0/vue-modal-dialog)
+
 ---
 
 ## Features
