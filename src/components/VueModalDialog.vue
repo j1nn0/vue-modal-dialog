@@ -165,7 +165,6 @@ const dialogWidthClass = computed(() => ({
   inset: 0;
   background: var(--j1nn0-vue-modal-dialog-backdrop-background);
   backdrop-filter: blur(var(--j1nn0-vue-modal-dialog-backdrop-blur));
-  -webkit-backdrop-filter: blur(var(--j1nn0-vue-modal-dialog-backdrop-blur));
   z-index: var(--j1nn0-vue-modal-dialog-backdrop-z-index);
   transition:
     backdrop-filter 0.3s ease,
@@ -182,13 +181,11 @@ const dialogWidthClass = computed(() => ({
 .fade-backdrop-leave-to {
   opacity: 0;
   backdrop-filter: blur(0px);
-  -webkit-backdrop-filter: blur(0px);
 }
 .fade-backdrop-enter-to,
 .fade-backdrop-leave-from {
   opacity: 1;
   backdrop-filter: blur(var(--j1nn0-vue-modal-dialog-backdrop-blur));
-  -webkit-backdrop-filter: blur(var(--j1nn0-vue-modal-dialog-backdrop-blur));
 }
 
 // Dialog
