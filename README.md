@@ -124,6 +124,78 @@ Now you can use `<J1nn0VueModalDialog>` anywhere in your app without importing i
 
 ---
 
+## CDN Usage
+
+You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **individual import** and **global plugin** usage are supported.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vue Modal Dialog CDN Example</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/tabbable/dist/index.umd.js"></script>
+    <script src="https://unpkg.com/focus-trap/dist/focus-trap.umd.js"></script>
+    <script src="https://unpkg.com/@vueuse/shared"></script>
+    <script src="https://unpkg.com/@vueuse/core"></script>
+    <script src="https://unpkg.com/@vueuse/integrations"></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@j1nn0/vue-modal-dialog/dist/vue-modal-dialog.css"
+    />
+    <script src="https://unpkg.com/@j1nn0/vue-modal-dialog/dist/vue-modal-dialog.umd.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Individual Import -->
+      <button type="button" @click="isOpenImport = true">Open Import Dialog</button>
+      <vue-modal-dialog v-model="isOpenImport">
+        <template #header>Import Dialog Title</template>
+        <p>Body content goes here</p>
+        <template #footer>
+          <button @click="isOpenImport = false">Close</button>
+        </template>
+      </vue-modal-dialog>
+
+      <!-- Global Plugin -->
+      <button type="button" @click="isOpenGlobal = true">Open Global Dialog</button>
+      <j1nn0-vue-modal-dialog v-model="isOpenGlobal">
+        <template #header>Global Dialog Title</template>
+        <p>Body content goes here</p>
+        <template #footer>
+          <button @click="isOpenGlobal = false">Close</button>
+        </template>
+      </j1nn0-vue-modal-dialog>
+    </div>
+    <script>
+      const { createApp, ref } = Vue;
+      const { J1nn0VueModalDialogPlugin, VueModalDialog } = J1nn0VueModalDialog;
+
+      const app = createApp({
+        setup() {
+          const isOpenImport = ref(false);
+          const isOpenGlobal = ref(false);
+
+          return { isOpenImport, isOpenGlobal };
+        },
+      });
+
+      // Individual import registration
+      app.component('VueModalDialog', VueModalDialog);
+
+      // Global plugin registration
+      app.use(J1nn0VueModalDialogPlugin);
+
+      app.mount('#app');
+    </script>
+  </body>
+</html>
+```
+
+---
+
 ## Props
 
 | Prop       | Type                | Default    | Description                                                                  |
