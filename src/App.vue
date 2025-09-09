@@ -24,9 +24,10 @@ const closed = () => {
   <button type="button" @click="openDialog">Dialog</button>
 
   <VueModalDialog
-    backdrop="static"
-    :escape="false"
+    :backdrop="true"
+    :escape="true"
     position="center"
+    width="lg"
     v-model="isOpened"
     @opened="opened"
     @closed="closed"

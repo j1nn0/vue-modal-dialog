@@ -1,5 +1,5 @@
 <script setup>
-import { useTemplateRef, watch, nextTick, useSlots } from 'vue';
+import { computed, useTemplateRef, watch, nextTick, useSlots } from 'vue';
 import { onClickOutside, onKeyStroke } from '@vueuse/core';
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 
@@ -30,6 +30,12 @@ const props = defineProps({
     type: String,
     default: 'center',
     validator: (value) => ['center', 'top'].includes(value),
+  },
+
+  width: {
+    type: String,
+    default: 'md',
+    validator: (v) => ['sm', 'md', 'lg', 'fullscreen'].includes(v),
   },
 });
 
@@ -78,11 +84,19 @@ onKeyStroke('Escape', (e) => {
     close();
   }
 });
+
+// Dialog size
+const dialogWidthClass = computed(() => ({
+  'dialog-sm': props.width === 'sm',
+  'dialog-md': props.width === 'md',
+  'dialog-lg': props.width === 'lg',
+  'dialog-fullscreen': props.width === 'fullscreen',
+}));
 </script>
 
 <template>
   <transition name="fade-backdrop" appear>
-    <div v-if="isOpen" class="backdrop"></div>
+    <div v-if="isOpen && width !== 'fullscreen'" class="backdrop"></div>
   </transition>
 
   <transition name="fade" appear>
@@ -91,10 +105,10 @@ onKeyStroke('Escape', (e) => {
       v-if="isOpen"
       :open="isOpen"
       class="dialog"
-      :class="{
-        'is-center': props.position === 'center',
-        'is-top': props.position === 'top',
-      }"
+      :class="[
+        { 'is-center': props.position === 'center', 'is-top': props.position === 'top' },
+        dialogWidthClass,
+      ]"
       role="dialog"
       aria-modal="true"
       :aria-labelledby="headerId"
@@ -129,7 +143,9 @@ onKeyStroke('Escape', (e) => {
   --j1nn0-vue-modal-dialog-border-radius: 8px;
 
   --j1nn0-vue-modal-dialog-width: 90%;
-  --j1nn0-vue-modal-dialog-max-width: 600px;
+  --j1nn0-vue-modal-dialog-max-width-sm: 300px;
+  --j1nn0-vue-modal-dialog-max-width-md: 600px;
+  --j1nn0-vue-modal-dialog-max-width-lg: 900px;
   --j1nn0-vue-modal-dialog-max-height: 80vh;
 
   --j1nn0-vue-modal-dialog-header-background: #f5f5f5;
@@ -180,7 +196,6 @@ onKeyStroke('Escape', (e) => {
   position: fixed;
   z-index: calc(var(--j1nn0-vue-modal-dialog-backdrop-z-index) + 1);
   width: var(--j1nn0-vue-modal-dialog-width);
-  max-width: var(--j1nn0-vue-modal-dialog-max-width);
   border: var(--j1nn0-vue-modal-dialog-border);
   border-radius: var(--j1nn0-vue-modal-dialog-border-radius);
   padding: 0;
@@ -194,6 +209,7 @@ onKeyStroke('Escape', (e) => {
     left: 50%;
     transform: translate(-50%, -50%);
     max-height: var(--j1nn0-vue-modal-dialog-max-height);
+    margin: 0;
   }
 
   &.is-top {
@@ -270,5 +286,30 @@ onKeyStroke('Escape', (e) => {
   min-height: 0;
   overflow-y: auto;
   padding: var(--j1nn0-vue-modal-dialog-body-padding);
+}
+
+// Dialog width
+.dialog-sm {
+  max-width: var(--j1nn0-vue-modal-dialog-max-width-sm);
+}
+.dialog-md {
+  max-width: var(--j1nn0-vue-modal-dialog-max-width-md);
+}
+.dialog-lg {
+  max-width: var(--j1nn0-vue-modal-dialog-max-width-lg);
+}
+.dialog-fullscreen {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh !important;
+  border-radius: 0;
+  top: 0 !important;
+  left: 0 !important;
+  transform: none !important;
+
+  .dialog-content {
+    height: 100%;
+  }
 }
 </style>
