@@ -26,9 +26,10 @@
     "prepare": "husky"
   },
   "keywords": [
-    "vue3",
+    "vue",
     "dialog",
     "modal",
+    "modal-dialog",
     "focus-trap",
     "accessible"
   ],
