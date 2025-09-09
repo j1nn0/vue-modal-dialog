@@ -29,12 +29,13 @@ export default defineConfig({
       fileName: (format) => `vue-modal-dialog.${format}.js`,
     },
     rollupOptions: {
-      external: ['vue', '@vueuse/core', '@vueuse/integrations'], // 外部依存
+      external: ['vue', '@vueuse/core', '@vueuse/integrations', 'focus-trap'], // 外部依存
       output: {
         globals: {
           vue: 'Vue',
           '@vueuse/core': 'VueUse',
           '@vueuse/integrations': 'VueUseIntegrations',
+          'focus-trap': 'focusTrap',
         },
       },
     },
