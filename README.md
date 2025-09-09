@@ -109,11 +109,11 @@ const submitForm = () => {
 import { createApp } from 'vue';
 import App from './App.vue';
 
-import { J1nn0VueModalDialogPlugin } from '@j1nn0/vue-modal-dialog';
+import { VueModalDialogPlugin } from '@j1nn0/vue-modal-dialog';
 import '@j1nn0/vue-modal-dialog/dist/vue-modal-dialog.css';
 
 const app = createApp(App);
-app.use(J1nn0VueModalDialogPlugin);
+app.use(VueModalDialogPlugin);
 app.mount('#app');
 ```
 
@@ -178,7 +178,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
     <script>
       const { createApp, ref } = Vue;
-      const { J1nn0VueModalDialogPlugin, VueModalDialog } = J1nn0VueModalDialog;
+      const { VueModalDialogPlugin, VueModalDialog } = J1nn0VueModalDialog;
 
       const app = createApp({
         setup() {
@@ -193,7 +193,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
       app.component('VueModalDialog', VueModalDialog);
 
       // Global plugin registration
-      app.use(J1nn0VueModalDialogPlugin);
+      app.use(VueModalDialogPlugin);
 
       app.mount('#app');
     </script>
