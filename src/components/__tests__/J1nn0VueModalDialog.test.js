@@ -178,4 +178,48 @@ describe('VueModalDialog', () => {
     mockCallback(mockEvent);
     expect(wrapper.emitted('update:modelValue')).toBeFalsy();
   });
+
+  it('applies correct width class based on prop', () => {
+    const sizes = ['sm', 'md', 'lg', 'fullscreen'];
+
+    sizes.forEach((size) => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: true, width: size },
+      });
+      const dialog = wrapper.find('.dialog');
+
+      expect(dialog.classes()).toContain(`dialog-${size}`);
+    });
+  });
+
+  it('defaults to md width when no prop is given', () => {
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: true },
+    });
+    const dialog = wrapper.find('.dialog');
+    expect(dialog.classes()).toContain('dialog-md');
+  });
+
+  it('does not render backdrop when fullscreen', () => {
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: true, width: 'fullscreen' },
+    });
+    expect(wrapper.find('.backdrop').exists()).toBe(false);
+  });
+
+  it('applies center position by default', () => {
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: true },
+    });
+    const dialog = wrapper.find('.dialog');
+    expect(dialog.classes()).toContain('is-center');
+  });
+
+  it('applies top position when set', () => {
+    const wrapper = mount(VueModalDialog, {
+      props: { modelValue: true, position: 'top' },
+    });
+    const dialog = wrapper.find('.dialog');
+    expect(dialog.classes()).toContain('is-top');
+  });
 });
