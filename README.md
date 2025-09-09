@@ -131,7 +131,7 @@ Now you can use `<J1nn0VueModalDialog>` anywhere in your app without importing i
 - `role="dialog"` + `aria-modal="true"`
 - `aria-labelledby` points to header slot
 - `aria-describedby` points to body slot
-- Close button has `aria-label="閉じる"`
+- Close button has `aria-label="Close"`
 - Focus trap inside the dialog ensures keyboard navigation
 - Escape key closes the dialog if enabled
 
