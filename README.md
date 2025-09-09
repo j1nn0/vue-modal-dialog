@@ -30,6 +30,24 @@ yarn add @j1nn0/vue-modal-dialog
 
 ---
 
+## Peer Dependencies
+
+Before using this component, make sure you have installed the following peer dependencies:
+
+```bash
+npm install vue @vueuse/core @vueuse/integrations focus-trap
+```
+
+or
+
+```bash
+yarn add vue @vueuse/core @vueuse/integrations focus-trap
+```
+
+These dependencies are **required** for the library to function properly.
+
+---
+
 ## Usage
 
 You can use this component in **two ways**:
