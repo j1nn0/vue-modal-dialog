@@ -8,6 +8,9 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22]
     steps:
       # リポジトリをチェックアウト（フル履歴）
       - name: Checkout repository
@@ -15,16 +18,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Node.js 22 をセットアップ
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
-
-      # pnpm をグローバルインストール
+      # pnpm、node をセットアップ
       - name: Install pnpm
-        run: npm install -g pnpm@10.15.1
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
 
       # npm 認証トークンを設定
       - name: Configure npm auth
