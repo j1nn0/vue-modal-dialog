@@ -21,6 +21,7 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 - Optional footer slot
 - Close button in the header
 - Configurable dialog size: `sm`, `md`, `lg`, `fullscreen`
+- Configurable dialog width (supports custom widths via width prop for flexible layouts)
 
 ---
 
@@ -207,12 +208,12 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ## Props
 
-| Prop       | Type                | Default    | Description                                                                  |
-| ---------- | ------------------- | ---------- | ---------------------------------------------------------------------------- |
-| `backdrop` | `Boolean \| String` | `true`     | `true` = click on backdrop closes dialog, `"static"` = backdrop does nothing |
-| `escape`   | `Boolean`           | `true`     | Pressing Escape key closes the dialog                                        |
-| `position` | `String`            | `"center"` | Position of the dialog: `"center"` or `"top"`                                |
-| `size`     | `String`            | `"md"`     | Dialog size: `sm`, `md`, `lg`, `fullscreen`                                  |
+| Prop       | Type                | Default    | Description                                                                                                               |
+| ---------- | ------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `backdrop` | `Boolean \| String` | `true`     | `true` = click on backdrop closes dialog, `"static"` = backdrop does nothing                                              |
+| `escape`   | `Boolean`           | `true`     | Pressing Escape key closes the dialog                                                                                     |
+| `position` | `String`            | `"center"` | Position of the dialog: `"center"` or `"top"`                                                                             |
+| `width`    | `String`            | `"md"`     | Dialog width. Presets: `sm`, `md`, `lg`, `fullscreen`. Also supports custom CSS width, e.g. `"400px"`, `"50%"`, `"80vw"`. |
 
 ---
 

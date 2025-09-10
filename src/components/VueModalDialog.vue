@@ -33,9 +33,13 @@ const props = defineProps({
   },
 
   width: {
-    type: String,
+    type: [String],
     default: 'md',
-    validator: (v) => ['sm', 'md', 'lg', 'fullscreen'].includes(v),
+    validator: (v) =>
+      ['sm', 'md', 'lg', 'fullscreen'].includes(v) ||
+      v.endsWith('px') ||
+      v.endsWith('%') ||
+      v.endsWith('vw'),
   },
 });
 
@@ -92,6 +96,17 @@ const dialogWidthClass = computed(() => ({
   'dialog-lg': props.width === 'lg',
   'dialog-fullscreen': props.width === 'fullscreen',
 }));
+
+const dialogWidthStyle = computed(() => {
+  const presets = {
+    sm: 'var(--j1nn0-vue-modal-dialog-max-width-sm)',
+    md: 'var(--j1nn0-vue-modal-dialog-max-width-md)',
+    lg: 'var(--j1nn0-vue-modal-dialog-max-width-lg)',
+    fullscreen: '100vw',
+  };
+
+  return presets[props.width] || props.width; // プリセットなければそのままCSS幅
+});
 </script>
 
 <template>
@@ -104,6 +119,7 @@ const dialogWidthClass = computed(() => ({
       ref="dialogRef"
       v-if="isOpen"
       :open="isOpen"
+      :style="{ maxWidth: dialogWidthStyle }"
       class="dialog"
       :class="[
         { 'is-center': props.position === 'center', 'is-top': props.position === 'top' },
