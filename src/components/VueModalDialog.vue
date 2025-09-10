@@ -1,19 +1,11 @@
 <script setup>
-import { computed, useTemplateRef, watch, nextTick, useSlots } from 'vue';
+import { useTemplateRef, useSlots } from 'vue';
 import { onClickOutside, onKeyStroke } from '@vueuse/core';
-import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
+import { useDialogState } from '@/composables/useDialogState';
+import { useDialogSize } from '@/composables/useDialogSize';
+import { useDialogMode } from '@/composables/useDialogMode';
 
-// Random ID（for ARIA）
-const headerId = `dialog-header-${Math.random().toString(36).slice(2)}`;
-const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
-
-// v-model
-const isOpen = defineModel({
-  type: Boolean,
-  required: true,
-});
-
-// Props
+// props / emit
 const props = defineProps({
   backdrop: {
     type: [Boolean, String],
@@ -41,38 +33,22 @@ const props = defineProps({
       v.endsWith('%') ||
       v.endsWith('vw'),
   },
-});
 
+  mode: {
+    type: String,
+    default: null,
+    validator: (v) => ['light', 'dark', null].includes(v),
+  },
+});
 const emit = defineEmits(['opened', 'closed']);
 const dialogRef = useTemplateRef('dialogRef');
 const slots = useSlots();
+const isOpen = defineModel({ type: Boolean, required: true });
 
-// Focus trap
-const { activate: activateFocusTrap, deactivate: deactivateFocusTrap } = useFocusTrap(dialogRef, {
-  initialFocus: false,
-  escapeDeactivates: false,
-});
-
-let overflow = null;
-
-watch(isOpen, async (newVal) => {
-  if (newVal) {
-    overflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    await nextTick();
-    activateFocusTrap();
-    emit('opened');
-  } else {
-    document.body.style.overflow = overflow;
-    deactivateFocusTrap();
-    emit('closed');
-  }
-});
-
-// Close
-const close = () => {
-  isOpen.value = false;
-};
+// composables
+const { close } = useDialogState(isOpen, dialogRef, emit, props);
+const { dialogWidthClass, dialogWidthStyle } = useDialogSize(props);
+const { modeClass } = useDialogMode(props);
 
 // backdrop click
 onClickOutside(dialogRef, () => {
@@ -89,29 +65,14 @@ onKeyStroke('Escape', (e) => {
   }
 });
 
-// Dialog size
-const dialogWidthClass = computed(() => ({
-  'dialog-sm': props.width === 'sm',
-  'dialog-md': props.width === 'md',
-  'dialog-lg': props.width === 'lg',
-  'dialog-fullscreen': props.width === 'fullscreen',
-}));
-
-const dialogWidthStyle = computed(() => {
-  const presets = {
-    sm: 'var(--j1nn0-vue-modal-dialog-max-width-sm)',
-    md: 'var(--j1nn0-vue-modal-dialog-max-width-md)',
-    lg: 'var(--j1nn0-vue-modal-dialog-max-width-lg)',
-    fullscreen: '100vw',
-  };
-
-  return presets[props.width] || props.width; // プリセットなければそのままCSS幅
-});
+// Random ID（for ARIA）
+const headerId = `dialog-header-${Math.random().toString(36).slice(2)}`;
+const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
 </script>
 
 <template>
   <transition name="fade-backdrop" appear>
-    <div v-if="isOpen && width !== 'fullscreen'" class="backdrop"></div>
+    <div v-if="isOpen && width !== 'fullscreen'" class="backdrop" :class="modeClass"></div>
   </transition>
 
   <transition name="fade" appear>
@@ -124,6 +85,7 @@ const dialogWidthStyle = computed(() => {
       :class="[
         { 'is-center': props.position === 'center', 'is-top': props.position === 'top' },
         dialogWidthClass,
+        modeClass,
       ]"
       role="dialog"
       aria-modal="true"
@@ -165,6 +127,7 @@ const dialogWidthStyle = computed(() => {
   --j1nn0-vue-modal-dialog-max-width-md: 600px;
   --j1nn0-vue-modal-dialog-max-width-lg: 900px;
   --j1nn0-vue-modal-dialog-max-height: 80vh;
+  --j1nn0-vue-modal-dialog-text-color: #000000;
 
   /* Header */
   --j1nn0-vue-modal-dialog-header-background: #f5f5f5;
@@ -176,6 +139,13 @@ const dialogWidthStyle = computed(() => {
   /* Footer */
   --j1nn0-vue-modal-dialog-footer-background: #f5f5f5;
   --j1nn0-vue-modal-dialog-footer-padding: 1rem;
+
+  /* Dark mode */
+  --j1nn0-vue-modal-dialog-backdrop-background-dark: rgba(255, 255, 255, 0.2);
+  --j1nn0-vue-modal-dialog-header-background-dark: #1f2937;
+  --j1nn0-vue-modal-dialog-footer-background-dark: #1f2937;
+  --j1nn0-vue-modal-dialog-body-background-dark: #111827;
+  --j1nn0-vue-modal-dialog-text-color-dark: #f9fafb;
 }
 </style>
 
@@ -184,12 +154,19 @@ const dialogWidthStyle = computed(() => {
 .backdrop {
   position: fixed;
   inset: 0;
-  background: var(--j1nn0-vue-modal-dialog-backdrop-background);
   backdrop-filter: blur(var(--j1nn0-vue-modal-dialog-backdrop-blur));
   z-index: var(--j1nn0-vue-modal-dialog-backdrop-z-index);
   transition:
     backdrop-filter 0.3s ease,
     opacity 0.3s ease;
+
+  &.mode-light {
+    background: var(--j1nn0-vue-modal-dialog-backdrop-background);
+  }
+
+  &.mode-dark {
+    background: var(--j1nn0-vue-modal-dialog-backdrop-background-dark);
+  }
 }
 
 .fade-backdrop-enter-active,
@@ -213,12 +190,10 @@ const dialogWidthStyle = computed(() => {
 .dialog {
   position: fixed;
   z-index: calc(var(--j1nn0-vue-modal-dialog-backdrop-z-index) + 1);
-  width: var(--j1nn0-vue-modal-dialog-width);
   border: var(--j1nn0-vue-modal-dialog-border);
   border-radius: var(--j1nn0-vue-modal-dialog-border-radius);
   padding: 0;
   box-sizing: border-box;
-
   display: flex;
   flex-direction: column;
 
@@ -228,6 +203,8 @@ const dialogWidthStyle = computed(() => {
     transform: translate(-50%, -50%);
     max-height: var(--j1nn0-vue-modal-dialog-max-height);
     margin: 0;
+    width: 100%;
+    max-width: var(--j1nn0-vue-modal-dialog-width);
   }
 
   &.is-top {
@@ -235,6 +212,44 @@ const dialogWidthStyle = computed(() => {
     left: 50%;
     transform: translateX(-50%);
     max-height: calc(100vh - 4rem);
+    width: 100%;
+    max-width: var(--j1nn0-vue-modal-dialog-width);
+    box-sizing: border-box;
+    margin: 0;
+  }
+
+  &.mode-light {
+    color: var(--j1nn0-vue-modal-dialog-text-color);
+
+    .dialog-header {
+      background: var(--j1nn0-vue-modal-dialog-header-background);
+    }
+    .dialog-footer {
+      background: var(--j1nn0-vue-modal-dialog-footer-background);
+    }
+    .dialog-body {
+      background: var(--j1nn0-vue-modal-dialog-body-background);
+    }
+    .dialog-close {
+      color: var(--j1nn0-vue-modal-dialog-text-color);
+    }
+  }
+
+  &.mode-dark {
+    color: var(--j1nn0-vue-modal-dialog-text-color-dark);
+
+    .dialog-header {
+      background: var(--j1nn0-vue-modal-dialog-header-background-dark);
+    }
+    .dialog-footer {
+      background: var(--j1nn0-vue-modal-dialog-footer-background-dark);
+    }
+    .dialog-body {
+      background: var(--j1nn0-vue-modal-dialog-body-background-dark);
+    }
+    .dialog-close {
+      color: var(--j1nn0-vue-modal-dialog-text-color-dark);
+    }
   }
 }
 
@@ -272,14 +287,12 @@ const dialogWidthStyle = computed(() => {
 }
 
 .dialog-header {
-  background: var(--j1nn0-vue-modal-dialog-header-background);
   padding: var(--j1nn0-vue-modal-dialog-header-padding);
   border-top-left-radius: var(--j1nn0-vue-modal-dialog-border-radius);
   border-top-right-radius: var(--j1nn0-vue-modal-dialog-border-radius);
 }
 
 .dialog-footer {
-  background: var(--j1nn0-vue-modal-dialog-footer-background);
   padding: var(--j1nn0-vue-modal-dialog-footer-padding);
   border-bottom-left-radius: var(--j1nn0-vue-modal-dialog-border-radius);
   border-bottom-right-radius: var(--j1nn0-vue-modal-dialog-border-radius);
@@ -310,7 +323,7 @@ const dialogWidthStyle = computed(() => {
   word-break: break-word;
 }
 
-// Dialog width
+// Dialog width classes
 .dialog-sm {
   max-width: var(--j1nn0-vue-modal-dialog-max-width-sm);
 }
@@ -332,6 +345,11 @@ const dialogWidthStyle = computed(() => {
 
   .dialog-content {
     height: 100%;
+  }
+
+  .dialog-header,
+  .dialog-footer {
+    border-radius: 0;
   }
 }
 </style>
