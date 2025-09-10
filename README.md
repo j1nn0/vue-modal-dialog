@@ -22,6 +22,7 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 - Close button in the header
 - Configurable dialog size: `sm`, `md`, `lg`, `fullscreen`
 - Configurable dialog width (supports custom widths via width prop for flexible layouts)
+- Supports dark mode and light mode via the `mode` prop (`"light"`, `"dark"`, or `null` to follow OS/browser preference)
 
 ---
 
@@ -208,12 +209,13 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ## Props
 
-| Prop       | Type                | Default    | Description                                                                                                               |
-| ---------- | ------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `backdrop` | `Boolean \| String` | `true`     | `true` = click on backdrop closes dialog, `"static"` = backdrop does nothing                                              |
-| `escape`   | `Boolean`           | `true`     | Pressing Escape key closes the dialog                                                                                     |
-| `position` | `String`            | `"center"` | Position of the dialog: `"center"` or `"top"`                                                                             |
-| `width`    | `String`            | `"md"`     | Dialog width. Presets: `sm`, `md`, `lg`, `fullscreen`. Also supports custom CSS width, e.g. `"400px"`, `"50%"`, `"80vw"`. |
+| Prop       | Type                  | Default    | Description                                                                                                              |
+| ---------- | --------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `backdrop` | `Boolean` \| `String` | `true`     | `true` = click on backdrop closes dialog, `"static"` = backdrop does nothing                                             |
+| `escape`   | `Boolean`             | `true`     | Pressing Escape key closes the dialog                                                                                    |
+| `position` | `String`              | `"center"` | Position of the dialog: `"center"` or `"top"`                                                                            |
+| `width`    | `String`              | `"md"`     | Dialog width. Presets: `sm`, `md`, `lg`, `fullscreen`. Also supports custom CSS width, e.g. `"400px"`, `"50%"`, `"80vw"` |
+| `mode`     | `String` \| null      | null       | Dialog color mode: "light" for light mode, "dark" for dark mode, null to follow the OS/browser preference                |
 
 ---
 
@@ -244,6 +246,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 - Dialog height: auto, max `80vh` (default), scrollable if content overflows
 - Word wrapping enabled in header and body
 - Backdrop has fade-in/out animation with blur effect
+- Supports Light and Dark mode via `mode` prop
 
 ### CSS Custom Properties
 
@@ -262,6 +265,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
   --j1nn0-vue-modal-dialog-max-width-md: 600px;
   --j1nn0-vue-modal-dialog-max-width-lg: 900px;
   --j1nn0-vue-modal-dialog-max-height: 80vh;
+  --j1nn0-vue-modal-dialog-text-color: #000000;
 
   /* Header */
   --j1nn0-vue-modal-dialog-header-background: #f5f5f5;
@@ -273,6 +277,13 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
   /* Footer */
   --j1nn0-vue-modal-dialog-footer-background: #f5f5f5;
   --j1nn0-vue-modal-dialog-footer-padding: 1rem;
+
+  /* Dark mode */
+  --j1nn0-vue-modal-dialog-backdrop-background-dark: rgba(255, 255, 255, 0.2);
+  --j1nn0-vue-modal-dialog-header-background-dark: #1f2937;
+  --j1nn0-vue-modal-dialog-footer-background-dark: #1f2937;
+  --j1nn0-vue-modal-dialog-body-background-dark: #111827;
+  --j1nn0-vue-modal-dialog-text-color-dark: #f9fafb;
 }
 ```
 
