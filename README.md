@@ -275,6 +275,25 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ---
 
+## Notes on Multiple Modals
+
+This library is designed with the assumption that **only one modal is open at a time**.  
+Opening multiple modals simultaneously may cause the following issues:
+
+- Backdrops stacking, making the screen too dark
+- Focus trap not functioning correctly
+- Escape key behavior becoming ambiguous
+- Accessibility attributes (e.g. `aria-hidden`) breaking
+
+Therefore, **it is recommended to control modals on the application side** so that only one is visible at any given time.
+
+At present, supporting multiple simultaneous modals is **not planned**.  
+If there is strong demand, it may be considered in the future.
+
+---
+
 ## License
 
-MIT
+MIT License
+
+Copyright © 2025–PRESENT j1nn0
