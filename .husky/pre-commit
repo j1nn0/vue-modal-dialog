@@ -5,8 +5,8 @@ FILES=$(git diff --cached --name-only --diff-filter=ACM)
 if [ -n "$FILES" ]; then
   echo "Formatting staged files..."
   # フォーマット対象外のファイルでエラーになったとしても無視
-  pnpm prettier --write $FILES || true
-  git add $FILES
+  pnpm prettier --write "$FILES" || true
+  git add "$FILES"
 fi
 
 pnpm lint
