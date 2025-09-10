@@ -267,6 +267,8 @@ const dialogWidthStyle = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .dialog-header {
@@ -304,6 +306,8 @@ const dialogWidthStyle = computed(() => {
   min-height: 0;
   overflow-y: auto;
   padding: var(--j1nn0-vue-modal-dialog-body-padding);
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 // Dialog width

@@ -17,6 +17,17 @@ const width = ref('md'); // sm | md | lg | fullscreen
 const eventLog = ref([]);
 const opened = () => eventLog.value.push('opened');
 const closed = () => eventLog.value.push('closed');
+
+// ダミーテキスト（長い文章と長い単語を混ぜています）
+const dummyText = `
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Pellentesque ultralongwordthatshouldbreakautomaticallywithoutoverflowingthecontainer
+in vel mauris eget purus fermentum efficitur. Vivamus sagittis tortor non eros pulvinar
+ultricies. Sed non purus sit amet velit efficitur gravida. Cras a urna et turpis
+maximummodaldialogheightcontent that will require scrolling. Lorem ipsum dolor sit amet,
+consectetur adipiscing elit. Vestibulum consequat, libero vel convallis pellentesque,
+massa arcu lacinia leo, at finibus libero nulla nec lectus.
+`.repeat(5);
 </script>
 
 <template>
@@ -69,11 +80,9 @@ const closed = () => eventLog.value.push('closed');
       <strong>VueModalDialog Playground</strong>
     </template>
 
-    <div style="max-height: 60vh; padding: 1rem">
+    <div>
       <p>This is a scrollable body to test the scroll behavior.</p>
-      <p v-for="i in 50" :key="i">
-        Line {{ i }}: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-      </p>
+      <p>{{ dummyText }}</p>
     </div>
 
     <template #footer>
