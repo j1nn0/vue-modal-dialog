@@ -27,10 +27,10 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 
 - [✨ Features](#-features)
 - [💾 Installation](#-installation)
-- [⚙️ Peer Dependencies](#-peer-dependencies)
+- [⚙️ Peer Dependencies](#%EF%B8%8F-peer-dependencies)
 - [🛠 Usage](#-usage)
-  - [1️⃣ Individual Import (recommended)](#1-individual-import-recommended)
-  - [2️⃣ Global Plugin Registration](#2-global-plugin-registration)
+  - [1️⃣ Individual Import (recommended)](#1%EF%B8%8F⃣-individual-import-recommended)
+  - [2️⃣ Global Plugin Registration](#2%EF%B8%8F⃣-global-plugin-registration)
 - [🌐 CDN Usage](#-cdn-usage)
 - [📌 Props](#-props)
 - [🎛 Slots](#-slots)
