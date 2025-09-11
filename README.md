@@ -2,12 +2,18 @@
 
 A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility support.
 
+#### 📦 Project Info
+
 [![License](https://img.shields.io/badge/License-MIT-ff0000?style=flat-square&logo=open-source-initiative&logoColor=white)](https://github.com/j1nn0/vue-modal-dialog/blob/main/LICENSE)
 [![npm version](https://img.shields.io/npm/v/@j1nn0/vue-modal-dialog?style=flat-square&logo=npm&logoColor=white&cacheSeconds=60)](https://www.npmjs.com/package/@j1nn0/vue-modal-dialog)
 [![Downloads](https://img.shields.io/npm/dm/@j1nn0/vue-modal-dialog?style=flat-square&logo=npm&logoColor=white&cacheSeconds=60)](https://www.npmjs.com/package/@j1nn0/vue-modal-dialog)
 
+#### ⚙️ Build & Quality
+
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/@j1nn0/vue-modal-dialog?style=flat-square&logo=webpack&logoColor=white&cacheSeconds=60)](https://bundlephobia.com/package/@j1nn0/vue-modal-dialog)
 [![Vite](https://img.shields.io/badge/build%20with-Vite-646CFF?style=flat-square&logo=vite&logoColor=white)](https://ja.vite.dev/)
+
+#### 🛠 Tech Stack
 
 [![Vue](https://img.shields.io/badge/Vue-v3.5-41b883?style=flat-square&logo=vue.js&logoColor=white)](https://vuejs.org/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6-f7df1e?style=flat-square&logo=javascript&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
@@ -17,7 +23,25 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 
 ---
 
-## Features
+## 📑 Table of Contents
+
+- [✨ Features](#-features)
+- [💾 Installation](#-installation)
+- [⚙️ Peer Dependencies](#-peer-dependencies)
+- [🛠 Usage](#-usage)
+  - [1️⃣ Individual Import (recommended)](#1-individual-import-recommended)
+  - [2️⃣ Global Plugin Registration](#2-global-plugin-registration)
+- [🌐 CDN Usage](#-cdn-usage)
+- [📌 Props](#-props)
+- [🎛 Slots](#-slots)
+- [♿ Accessibility](#-accessibility)
+- [🎨 Styles](#-styles)
+- [📝 Notes on Multiple Modals](#-notes-on-multiple-modals)
+- [🏷 License](#-license)
+
+---
+
+## ✨ Features
 
 - Vue 3 support
 - Focus trap inside the modal
@@ -32,7 +56,7 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 
 ---
 
-## Installation
+## 💾 Installation
 
 ```bash
 npm install @j1nn0/vue-modal-dialog
@@ -46,7 +70,7 @@ yarn add @j1nn0/vue-modal-dialog
 
 ---
 
-## Peer Dependencies
+## ⚙️ Peer Dependencies
 
 Before using this component, make sure you have installed the following peer dependencies:
 
@@ -64,7 +88,7 @@ These dependencies are **required** for the library to function properly.
 
 ---
 
-## Usage
+## 🛠 Usage
 
 You can use this component in **two ways**:
 
@@ -73,7 +97,7 @@ You can use this component in **two ways**:
 
 ---
 
-### 1. Individual Import (recommended)
+### 1️⃣ Individual Import (recommended)
 
 ```vue
 <script setup>
@@ -112,7 +136,7 @@ const submitForm = () => {
 
 ---
 
-### 2. Global Plugin Registration
+### 2️⃣ Global Plugin Registration
 
 ```js
 // main.js
@@ -140,7 +164,7 @@ Use `<J1nn0VueModalDialog>` anywhere in your app without importing it:
 
 ---
 
-## CDN Usage
+## 🌐 CDN Usage
 
 You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **individual import** and **global plugin** usage are supported.
 
@@ -213,7 +237,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ---
 
-## Props
+## 📌 Props
 
 | Prop       | Type                  | Default    | Description                                                                                                              |
 | ---------- | --------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
@@ -225,7 +249,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ---
 
-## Slots
+## 🎛 Slots
 
 | Slot     | Description                                               |
 | -------- | --------------------------------------------------------- |
@@ -235,7 +259,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ---
 
-## Accessibility
+## ♿ Accessibility
 
 - `role="dialog"` + `aria-modal="true"`
 - `aria-labelledby` points to header slot
@@ -246,7 +270,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ---
 
-## Styles
+## 🎨 Styles
 
 - Dialog width: `sm`, `md`, `lg`, `fullscreen`
 - Dialog height: auto, max `80vh` (default), scrollable if content overflows
@@ -295,7 +319,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ---
 
-## Notes on Multiple Modals
+## 📝 Notes on Multiple Modals
 
 This library is designed with the assumption that **only one modal is open at a time**.  
 Opening multiple modals simultaneously may cause the following issues:
@@ -312,7 +336,7 @@ If there is strong demand, it may be considered in the future.
 
 ---
 
-## License
+## 🏷 License
 
 MIT License
 
