@@ -245,7 +245,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 | `escape`   | `Boolean`             | `true`     | Pressing Escape key closes the dialog                                                                                    |
 | `position` | `String`              | `"center"` | Position of the dialog: `"center"` or `"top"`                                                                            |
 | `width`    | `String`              | `"md"`     | Dialog width. Presets: `sm`, `md`, `lg`, `fullscreen`. Also supports custom CSS width, e.g. `"400px"`, `"50%"`, `"80vw"` |
-| `mode`     | `String` \| null      | null       | Dialog color mode: "light" for light mode, "dark" for dark mode, null to follow the OS/browser preference                |
+| `mode`     | `String` \| `null`    | `null`     | Dialog color mode: `"light"` for light mode, `"dark"` for dark mode, null to follow the OS/browser preference            |
 
 ---
 
