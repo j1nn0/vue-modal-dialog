@@ -1,6 +1,6 @@
 {
   "name": "@j1nn0/vue-modal-dialog",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "A reusable Vue 3 modal dialog component with focus trap and ARIA support",
   "main": "dist/vue-modal-dialog.umd.js",
   "module": "dist/vue-modal-dialog.es.js",
