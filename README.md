@@ -5,7 +5,10 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 [![License](https://img.shields.io/badge/License-MIT-ff0000?style=for-the-badge&logo=open-source-initiative&logoColor=white)](https://github.com/j1nn0/vue-modal-dialog/blob/main/LICENSE)
 [![npm version](https://img.shields.io/npm/v/@j1nn0/vue-modal-dialog?style=for-the-badge&logo=npm&logoColor=white&cacheSeconds=60)](https://www.npmjs.com/package/@j1nn0/vue-modal-dialog)
 [![Downloads](https://img.shields.io/npm/dm/@j1nn0/vue-modal-dialog?style=for-the-badge&logo=npm&logoColor=white&cacheSeconds=60)](https://www.npmjs.com/package/@j1nn0/vue-modal-dialog)
+
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/@j1nn0/vue-modal-dialog?style=for-the-badge&logo=webpack&logoColor=white&cacheSeconds=60)](https://bundlephobia.com/package/@j1nn0/vue-modal-dialog)
+[![Vite](https://img.shields.io/badge/build%20with-Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://ja.vite.dev/)
+
 [![Vue](https://img.shields.io/badge/Vue-v3.5-41b883?style=for-the-badge&logo=vue.js&logoColor=white)](https://vuejs.org/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6-f7df1e?style=for-the-badge&logo=javascript&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
