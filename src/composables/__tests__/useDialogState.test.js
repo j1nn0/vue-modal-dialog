@@ -31,7 +31,7 @@ describe('useDialogState', () => {
   });
 
   afterEach(() => {
-    document.body.style.overflow = '';
+    document.body.classList.remove('vue-modal-open');
   });
 
   it('activates focus trap and sets overflow when opened', async () => {
@@ -40,7 +40,7 @@ describe('useDialogState', () => {
     await nextTick();
     await nextTick(); // watch 内の非同期処理完了を待つ
 
-    expect(document.body.style.overflow).toBe('hidden');
+    expect(document.body.classList.contains('vue-modal-open')).toBeTruthy();
     expect(activateSpy).toHaveBeenCalled();
     expect(emit).toHaveBeenCalledWith('opened');
 
@@ -49,7 +49,7 @@ describe('useDialogState', () => {
     await nextTick();
     await nextTick();
 
-    expect(document.body.style.overflow).toBe('');
+    expect(document.body.classList.contains('vue-modal-open')).toBeFalsy();
     expect(deactivateSpy).toHaveBeenCalled();
     expect(emit).toHaveBeenCalledWith('closed');
   });
@@ -67,7 +67,7 @@ describe('useDialogState', () => {
     await nextTick();
     await nextTick();
 
-    expect(document.body.style.overflow).toBe('');
+    expect(document.body.classList.contains('vue-modal-open')).toBeFalsy();
     expect(deactivateSpy).toHaveBeenCalled();
     expect(emit).toHaveBeenCalledWith('closed');
   });

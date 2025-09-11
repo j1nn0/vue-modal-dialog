@@ -3,7 +3,6 @@ import { nextTick, watch } from 'vue';
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 
 export function useDialogState(isOpen, dialogRef, emit) {
-  let overflow = null;
   const { activate: activateFocusTrap, deactivate: deactivateFocusTrap } = useFocusTrap(dialogRef, {
     initialFocus: false,
     escapeDeactivates: false,
@@ -15,13 +14,12 @@ export function useDialogState(isOpen, dialogRef, emit) {
 
   watch(isOpen, async (val) => {
     if (val) {
-      overflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
+      document.body.classList.add('vue-modal-open');
       await nextTick();
       activateFocusTrap();
       emit('opened');
     } else {
-      document.body.style.overflow = overflow;
+      document.body.classList.remove('vue-modal-open');
       deactivateFocusTrap();
       emit('closed');
     }

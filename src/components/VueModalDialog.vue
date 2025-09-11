@@ -148,6 +148,9 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
   --j1nn0-vue-modal-dialog-body-background-dark: #111827;
   --j1nn0-vue-modal-dialog-text-color-dark: #f9fafb;
 }
+.vue-modal-open {
+  overflow: hidden;
+}
 </style>
 
 <style lang="scss" scoped>
