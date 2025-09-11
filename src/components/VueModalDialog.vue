@@ -76,7 +76,7 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
   </transition>
 
   <transition name="fade" appear>
-    <dialog
+    <div
       ref="dialogRef"
       v-if="isOpen"
       :open="isOpen"
@@ -108,7 +108,7 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
           <slot name="footer"></slot>
         </footer>
       </div>
-    </dialog>
+    </div>
   </transition>
 </template>
 
@@ -134,6 +134,7 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
   --j1nn0-vue-modal-dialog-header-padding: 1rem;
 
   /* Body */
+  --j1nn0-vue-modal-dialog-body-background: #fff;
   --j1nn0-vue-modal-dialog-body-padding: 1rem;
 
   /* Footer */

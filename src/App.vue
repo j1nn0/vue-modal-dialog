@@ -20,6 +20,10 @@ const eventLog = ref([]);
 const opened = () => eventLog.value.push('opened');
 const closed = () => eventLog.value.push('closed');
 
+const backdropVal = computed(() => {
+  return backdrop.value ? true : 'static';
+});
+
 // ダミーテキスト（長い文章と長い単語を混ぜています）
 const dummyText = computed(() =>
   `
@@ -88,7 +92,7 @@ massa arcu lacinia leo, at finibus libero nulla nec lectus.
     <!-- モーダル -->
     <VueModalDialog
       v-model="isOpened"
-      :backdrop="backdrop"
+      :backdrop="backdropVal"
       :escape="escape"
       :position="position"
       :width="width"
