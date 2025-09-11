@@ -302,6 +302,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
   --j1nn0-vue-modal-dialog-header-padding: 1rem;
 
   /* Body */
+  --j1nn0-vue-modal-dialog-body-background: #fff;
   --j1nn0-vue-modal-dialog-body-padding: 1rem;
 
   /* Footer */
