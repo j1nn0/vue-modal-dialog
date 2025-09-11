@@ -143,6 +143,7 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
 
   /* Dark mode */
   --j1nn0-vue-modal-dialog-backdrop-background-dark: rgba(255, 255, 255, 0.2);
+  --j1nn0-vue-modal-dialog-border-dark: none;
   --j1nn0-vue-modal-dialog-header-background-dark: #1f2937;
   --j1nn0-vue-modal-dialog-footer-background-dark: #1f2937;
   --j1nn0-vue-modal-dialog-body-background-dark: #111827;
@@ -194,7 +195,6 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
 .dialog {
   position: fixed;
   z-index: calc(var(--j1nn0-vue-modal-dialog-backdrop-z-index) + 1);
-  border: var(--j1nn0-vue-modal-dialog-border);
   border-radius: var(--j1nn0-vue-modal-dialog-border-radius);
   padding: 0;
   box-sizing: border-box;
@@ -223,6 +223,7 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
   }
 
   &.mode-light {
+    border: var(--j1nn0-vue-modal-dialog-border);
     color: var(--j1nn0-vue-modal-dialog-text-color);
 
     .dialog-header {
@@ -240,6 +241,7 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
   }
 
   &.mode-dark {
+    border: var(--j1nn0-vue-modal-dialog-border-dark);
     color: var(--j1nn0-vue-modal-dialog-text-color-dark);
 
     .dialog-header {

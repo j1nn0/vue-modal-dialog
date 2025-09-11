@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, reactive, computed, watch } from 'vue';
 import VueModalDialog from '@/components/VueModalDialog.vue';
+import { useDialogMode } from './composables/useDialogMode';
 
 // モーダル開閉
 const isOpened = ref(false);
@@ -23,6 +24,20 @@ const closed = () => eventLog.value.push('closed');
 const backdropVal = computed(() => {
   return backdrop.value ? true : 'static';
 });
+
+const modeProps = reactive({ mode: null });
+watch(mode, (newVal) => {
+  modeProps.mode = newVal;
+});
+const { modeClass } = useDialogMode(modeProps);
+watch(
+  modeClass,
+  (newVal, oldVal) => {
+    document.body.classList.remove(oldVal);
+    document.body.classList.add(newVal);
+  },
+  { immediate: true },
+);
 
 // ダミーテキスト（長い文章と長い単語を混ぜています）
 const dummyText = computed(() =>
@@ -123,6 +138,15 @@ massa arcu lacinia leo, at finibus libero nulla nec lectus.
     </ul>
   </div>
 </template>
+
+<style lang="scss">
+body {
+  &.mode-dark {
+    background: #333;
+    color: #aaa;
+  }
+}
+</style>
 
 <style scoped>
 .controls {

@@ -311,6 +311,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
   /* Dark mode */
   --j1nn0-vue-modal-dialog-backdrop-background-dark: rgba(255, 255, 255, 0.2);
+  --j1nn0-vue-modal-dialog-border-dark: none;
   --j1nn0-vue-modal-dialog-header-background-dark: #1f2937;
   --j1nn0-vue-modal-dialog-footer-background-dark: #1f2937;
   --j1nn0-vue-modal-dialog-body-background-dark: #111827;
