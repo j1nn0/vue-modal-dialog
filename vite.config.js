@@ -1,14 +1,23 @@
 import { URL, fileURLToPath } from 'node:url';
 
+import banner from 'vite-plugin-banner';
 import { defineConfig } from 'vite';
 import eslint from 'vite-plugin-eslint';
+import pkg from './package.json';
 import vue from '@vitejs/plugin-vue';
 import vueDevTools from 'vite-plugin-vue-devtools';
+
+const bunnerText = `/*!
+* ${pkg.name} v${pkg.version}
+* (c) 2025-present ${pkg.author}
+* @license ${pkg.license}
+*/`;
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    banner(bunnerText),
     vueDevTools(),
     eslint({
       failOnWarning: true,
