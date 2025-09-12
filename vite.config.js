@@ -7,7 +7,7 @@ import pkg from './package.json';
 import vue from '@vitejs/plugin-vue';
 import vueDevTools from 'vite-plugin-vue-devtools';
 
-const bunnerText = `/*!
+const bannerText = `/*!
 * ${pkg.name} v${pkg.version}
 * (c) 2025-present ${pkg.author}
 * @license ${pkg.license}
@@ -17,7 +17,7 @@ const bunnerText = `/*!
 export default defineConfig({
   plugins: [
     vue(),
-    banner(bunnerText),
+    banner(bannerText),
     vueDevTools(),
     eslint({
       failOnWarning: true,
