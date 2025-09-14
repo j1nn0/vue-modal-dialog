@@ -2,16 +2,36 @@
   "name": "@j1nn0/vue-modal-dialog",
   "version": "0.5.8",
   "description": "A reusable Vue 3 modal dialog component with focus trap and ARIA support",
+  "keywords": [
+    "vue",
+    "dialog",
+    "modal",
+    "modal-dialog",
+    "focus-trap",
+    "accessible"
+  ],
+  "author": "j1nn0",
+  "license": "MIT",
+
   "main": "dist/vue-modal-dialog.umd.js",
   "module": "dist/vue-modal-dialog.es.js",
+  "types": "types/index.d.ts",
   "style": "dist/vue-modal-dialog.css",
   "type": "module",
   "files": [
-    "dist"
+    "dist",
+    "types"
   ],
+
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -25,16 +45,19 @@
     "upgrade-interactive": "pnpm update --interactive",
     "prepare": "husky"
   },
-  "keywords": [
-    "vue",
-    "dialog",
-    "modal",
-    "modal-dialog",
-    "focus-trap",
-    "accessible"
-  ],
-  "author": "j1nn0",
-  "license": "MIT",
+
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/j1nn0/vue-modal-dialog.git"
+  },
+  "bugs": {
+    "url": "https://github.com/j1nn0/vue-modal-dialog/issues"
+  },
+  "homepage": "https://github.com/j1nn0/vue-modal-dialog#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "@vitejs/plugin-vue": "^6.0.1",
@@ -68,27 +91,12 @@
     "focus-trap": "^7.6.5",
     "vue": "^3.5.18"
   },
+
   "packageManager": "pnpm@10.15.1",
   "pnpm": {
     "onlyBuiltDependencies": [
       "@parcel/watcher",
       "esbuild"
     ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/j1nn0/vue-modal-dialog.git"
-  },
-  "bugs": {
-    "url": "https://github.com/j1nn0/vue-modal-dialog/issues"
-  },
-  "homepage": "https://github.com/j1nn0/vue-modal-dialog#readme",
-  "publishConfig": {
-    "access": "public"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+  }
 }

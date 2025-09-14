@@ -10,7 +10,7 @@ const props = defineProps({
   backdrop: {
     type: [Boolean, String],
     default: true,
-    validator: (value) => value === true || value === 'static',
+    validator: (value) => [true, false, 'static'].includes(value),
   },
 
   escape: {
