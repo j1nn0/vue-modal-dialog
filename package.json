@@ -1,6 +1,6 @@
 {
   "name": "@j1nn0/vue-modal-dialog",
-  "version": "0.5.8",
+  "version": "0.5.9",
   "description": "A reusable Vue 3 modal dialog component with focus trap and ARIA support",
   "keywords": [
     "vue",
@@ -12,7 +12,6 @@
   ],
   "author": "j1nn0",
   "license": "MIT",
-
   "main": "dist/vue-modal-dialog.umd.js",
   "module": "dist/vue-modal-dialog.es.js",
   "types": "types/index.d.ts",
@@ -22,7 +21,6 @@
     "dist",
     "types"
   ],
-
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   },
@@ -31,7 +29,6 @@
     "last 2 versions",
     "not dead"
   ],
-
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -45,7 +42,6 @@
     "upgrade-interactive": "pnpm update --interactive",
     "prepare": "husky"
   },
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/j1nn0/vue-modal-dialog.git"
@@ -57,7 +53,6 @@
   "publishConfig": {
     "access": "public"
   },
-
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "@vitejs/plugin-vue": "^6.0.1",
@@ -91,7 +86,6 @@
     "focus-trap": "^7.6.5",
     "vue": "^3.5.18"
   },
-
   "packageManager": "pnpm@10.15.1",
   "pnpm": {
     "onlyBuiltDependencies": [
