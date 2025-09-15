@@ -1,4 +1,4 @@
-import { DefineComponent, Plugin, VNode, CSSProperties } from 'vue';
+import { DefineComponent, Plugin, VNode } from 'vue';
 
 export interface VueModalDialogProps {
   /** backdrop モード */
