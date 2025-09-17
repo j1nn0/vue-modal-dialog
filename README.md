@@ -147,18 +147,23 @@ import { VueModalDialogPlugin } from '@j1nn0/vue-modal-dialog';
 import '@j1nn0/vue-modal-dialog/dist/vue-modal-dialog.css';
 
 const app = createApp(App);
+
+// Registers globally as <VueModalDialog> by default
 app.use(VueModalDialogPlugin);
+// Or specify a custom name
+// app.use(VueModalDialogPlugin, { name: 'CustomName' });
+
 app.mount('#app');
 ```
 
-Use `<J1nn0VueModalDialog>` anywhere in your app without importing it:
+Use `<VueModalDialog>` (or your custom name) anywhere in your app without importing it:
 
 ```vue
 <template>
-  <J1nn0VueModalDialog v-model="isOpen">
+  <VueModalDialog v-model="isOpen">
     <template #header> Global Dialog </template>
     <p>Body content</p>
-  </J1nn0VueModalDialog>
+  </VueModalDialog>
 </template>
 ```
 
@@ -201,13 +206,13 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
       <!-- Global Plugin -->
       <button type="button" @click="isOpenGlobal = true">Open Global Dialog</button>
-      <j1nn0-vue-modal-dialog v-model="isOpenGlobal">
+      <global-plugin-modal-dialog v-model="isOpenGlobal">
         <template #header>Global Dialog Title</template>
         <p>Body content goes here</p>
         <template #footer>
           <button @click="isOpenGlobal = false">Close</button>
         </template>
-      </j1nn0-vue-modal-dialog>
+      </global-plugin-modal-dialog>
     </div>
 
     <script>
@@ -226,8 +231,8 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
       // Individual import registration
       app.component('VueModalDialog', VueModalDialog);
 
-      // Global plugin registration
-      app.use(VueModalDialogPlugin);
+      // Global plugin registration (default name: 'VueModalDialog')
+      app.use(VueModalDialogPlugin, { name: 'GlobalPluginModalDialog' });
 
       app.mount('#app');
     </script>
