@@ -86,7 +86,7 @@
     "focus-trap": "^7.6.5",
     "vue": "^3.5.18"
   },
-  "packageManager": "pnpm@10.15.1",
+  "packageManager": "pnpm@10.16.1",
   "pnpm": {
     "onlyBuiltDependencies": [
       "@parcel/watcher",
