@@ -1,0 +1,35 @@
+{
+  "name": "vue-modal-dialog",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "NODE_VERSION": "22.19.0",
+      "PNPM_VERSION": "10.17.0"
+    }
+  },
+  "workspaceFolder": "/workspaces/vue-modal-dialog",
+  "shutdownAction": "stopContainer",
+  "remoteUser": "node",
+  "forwardPorts": [5173],
+  "updateRemoteUserUID": true,
+  "postCreateCommand": "pnpm install",
+  "postAttachCommand": "git config --global user.name \"j1nn0\" && git config --global user.email \"j1nn0.github@gmail.com\"",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Vue.volar",
+        "dbaeumer.vscode-eslint",
+        "EditorConfig.EditorConfig",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/sh",
+        "explorer.fileNesting.enabled": true,
+        "explorer.fileNesting.patterns": {
+          "vite.config.*": "jsconfig*, vitest.config.*",
+          "package.json": "pnpm*, eslint*, .prettier*"
+        }
+      }
+    }
+  }
+}
