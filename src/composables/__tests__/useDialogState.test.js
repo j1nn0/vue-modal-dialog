@@ -42,7 +42,7 @@ describe('useDialogState', () => {
 
     expect(document.body.classList.contains('vue-modal-open')).toBeTruthy();
     expect(activateSpy).toHaveBeenCalled();
-    expect(emit).toHaveBeenCalledWith('opened');
+    expect(emit).toBeCalledWith('opened');
 
     // 閉じる
     isOpen.value = false;
@@ -51,7 +51,7 @@ describe('useDialogState', () => {
 
     expect(document.body.classList.contains('vue-modal-open')).toBeFalsy();
     expect(deactivateSpy).toHaveBeenCalled();
-    expect(emit).toHaveBeenCalledWith('closed');
+    expect(emit).toBeCalledWith('closed');
   });
 
   it('close() sets isOpen to false and triggers closing logic', async () => {
@@ -69,6 +69,6 @@ describe('useDialogState', () => {
 
     expect(document.body.classList.contains('vue-modal-open')).toBeFalsy();
     expect(deactivateSpy).toHaveBeenCalled();
-    expect(emit).toHaveBeenCalledWith('closed');
+    expect(emit).toBeCalledWith('closed');
   });
 });
