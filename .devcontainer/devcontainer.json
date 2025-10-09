@@ -20,7 +20,13 @@
         "Vue.volar",
         "dbaeumer.vscode-eslint",
         "EditorConfig.EditorConfig",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "mhutchie.git-graph",
+        "eamodio.gitlens",
+        "sdras.vue-vscode-snippets",
+        "xabikos.JavaScriptSnippets",
+        "tombonnike.vscode-status-bar-format-toggle",
+        "christian-kohler.npm-intellisense"
       ],
       "settings": {
         "terminal.integrated.shell.linux": "/bin/sh",
