@@ -39,7 +39,7 @@ jobs:
       - name: Build
         run: pnpm build
 
-      # npm に公開（Git チェックをスキップ）
+      # npm に公開（Git チェックをスキップ） - npm 11.5.1以降が必要
       - name: Publish to npm
         run: npm install -g npm@latest
-      - run: npm publish --access public --no-git-checks
+      - run: pnpm publish --access public --no-git-checks
