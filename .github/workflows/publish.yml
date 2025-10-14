@@ -19,17 +19,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      # pnpm、node をセットアップ
+      # pnpmをセットアップ
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
+
+      # nodeをセットアップ
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
-          cache: 'pnpm'
+
+      # OIDCにnpm@11.5.1以降が必要
+      - name: Install npm@latest
+        run: npm install -g npm@latest
 
       # 依存関係をインストール
       - name: Install dependencies
@@ -39,7 +44,6 @@ jobs:
       - name: Build
         run: pnpm build
 
-      # npm に公開（Git チェックをスキップ） - npm 11.5.1以降が必要
+      # npm に公開（Git チェックをスキップ）
       - name: Publish to npm
-        run: npm install -g npm@latest
-      - run: pnpm publish --access public --no-git-checks
+        run: pnpm publish --access public --no-git-checks
