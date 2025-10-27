@@ -6,7 +6,7 @@ ARG PNPM_VERSION=10
 FROM node:${NODE_VERSION}-bookworm
 
 # PNPM インストール
-RUN npm install -g pnpm@${PNPM_VERSION} @antfu/ni
+RUN npm install -g npm @antfu/ni pnpm@${PNPM_VERSION}
 
 # ワークディレクトリ
 WORKDIR /workspaces/vue-modal-dialog
