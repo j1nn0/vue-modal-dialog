@@ -1,14 +1,17 @@
 list:
 	@grep "^[a-zA-Z\-]*:" Makefile | grep -v "grep" | sed -e 's/^/make /' | sed -e 's/://'
 
+push:
+	git push origin main --tags
+
 release-patch:
 	npm version patch
-	git push origin --force --tags
+	@make push
 
 release-minor:
 	npm version minor
-	git push origin --force --tags
+	@make push
 
 release-major:
 	npm version major
-	git push origin --force --tags
+	@make push
