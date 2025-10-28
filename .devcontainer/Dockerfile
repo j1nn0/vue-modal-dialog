@@ -1,5 +1,5 @@
 # バージョンを引数で受け取る
-ARG NODE_VERSION=22
+ARG NODE_VERSION=24
 ARG PNPM_VERSION=10
 
 # Node.js ベースイメージ
