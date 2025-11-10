@@ -3,10 +3,14 @@ ARG NODE_VERSION=24
 ARG PNPM_VERSION=10
 
 # Node.js ベースイメージ
-FROM node:${NODE_VERSION}-bookworm
+FROM node:${NODE_VERSION}-bookworm-slim
 
 # PNPM インストール
-RUN npm install -g npm @antfu/ni pnpm@${PNPM_VERSION}
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    ca-certificates \
+ && rm -rf /var/lib/apt/lists/* \
+ && npm install -g npm @antfu/ni pnpm@${PNPM_VERSION}
 
 # ワークディレクトリ
 WORKDIR /workspaces/vue-modal-dialog
