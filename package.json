@@ -57,9 +57,9 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@vitejs/plugin-vue": "^6.0.1",
-    "@vitest/coverage-v8": "^4.0.14",
+    "@vitest/coverage-v8": "^4.0.15",
     "@vitest/eslint-plugin": "^1.5.1",
-    "@vitest/ui": "^4.0.14",
+    "@vitest/ui": "^4.0.15",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/test-utils": "^2.4.6",
     "@vueuse/core": "^14.1.0",
@@ -72,13 +72,13 @@
     "husky": "^9.1.7",
     "jsdom": "^27.2.0",
     "postcss": "^8.5.6",
-    "prettier": "^3.7.3",
+    "prettier": "^3.7.4",
     "sass-embedded": "^1.93.3",
     "vite": "^7.2.6",
     "vite-plugin-banner": "^0.8.1",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-vue-devtools": "^8.0.5",
-    "vitest": "^4.0.14",
+    "vitest": "^4.0.15",
     "vue": "^3.5.25"
   },
   "peerDependencies": {
