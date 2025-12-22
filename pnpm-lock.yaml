@@ -34,7 +34,7 @@ importers:
         version: 14.1.0(vue@3.5.26(typescript@5.9.3))
       '@vueuse/integrations':
         specifier: ^14.1.0
-        version: 14.1.0(focus-trap@7.6.6)(vue@3.5.26(typescript@5.9.3))
+        version: 14.1.0(focus-trap@7.7.0)(vue@3.5.26(typescript@5.9.3))
       autoprefixer:
         specifier: ^10.4.23
         version: 10.4.23(postcss@8.5.6)
@@ -46,7 +46,7 @@ importers:
         version: 10.6.2(eslint@9.39.2)(vue-eslint-parser@10.2.0(eslint@9.39.2))
       focus-trap:
         specifier: ^7.6.6
-        version: 7.6.6
+        version: 7.7.0
       globals:
         specifier: ^16.5.0
         version: 16.5.0
@@ -1332,8 +1332,8 @@ packages:
   flatted@3.3.3:
     resolution: {integrity: sha512-GX+ysw4PBCz0PzosHDepZGANEuFCMLrnRTiEy9McGjmkCQYwRq4A/X786G/fjM/+OjsWSU1ZrY5qyARZmO/uwg==}
 
-  focus-trap@7.6.6:
-    resolution: {integrity: sha512-v/Z8bvMCajtx4mEXmOo7QEsIzlIOqRXTIwgUfsFOF9gEsespdbD0AkPIka1bSXZ8Y8oZ+2IVDQZePkTfEHZl7Q==}
+  focus-trap@7.7.0:
+    resolution: {integrity: sha512-DJJDHpEgoSbP8ZE1MNeU2IzCpfFyFdNZZRilqmfH2XiQsPK6PtD8AfJqWzEBudUQB2yHwZc5iq54rjTaGQ+ljw==}
 
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
@@ -3067,13 +3067,13 @@ snapshots:
       '@vueuse/shared': 14.1.0(vue@3.5.26(typescript@5.9.3))
       vue: 3.5.26(typescript@5.9.3)
 
-  '@vueuse/integrations@14.1.0(focus-trap@7.6.6)(vue@3.5.26(typescript@5.9.3))':
+  '@vueuse/integrations@14.1.0(focus-trap@7.7.0)(vue@3.5.26(typescript@5.9.3))':
     dependencies:
       '@vueuse/core': 14.1.0(vue@3.5.26(typescript@5.9.3))
       '@vueuse/shared': 14.1.0(vue@3.5.26(typescript@5.9.3))
       vue: 3.5.26(typescript@5.9.3)
     optionalDependencies:
-      focus-trap: 7.6.6
+      focus-trap: 7.7.0
 
   '@vueuse/metadata@14.1.0': {}
 
@@ -3444,7 +3444,7 @@ snapshots:
 
   flatted@3.3.3: {}
 
-  focus-trap@7.6.6:
+  focus-trap@7.7.0:
     dependencies:
       tabbable: 6.3.0
 
