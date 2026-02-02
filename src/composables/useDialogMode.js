@@ -20,7 +20,7 @@ export function useDialogMode(props) {
   watch(() => props.mode, updateMode, { immediate: true });
 
   // prefers-color-scheme の変更
-  let mediaQuery;
+  let mediaQuery = null;
   const mediaListener = (e) => {
     if (props.mode == null) {
       effectiveMode.value = e.matches ? 'dark' : 'light';
@@ -32,7 +32,6 @@ export function useDialogMode(props) {
       mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       mediaQuery.addEventListener('change', mediaListener);
     }
-    updateMode();
   });
 
   onUnmounted(() => {
