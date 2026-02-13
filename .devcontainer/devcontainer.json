@@ -13,11 +13,8 @@
   "shutdownAction": "stopContainer",
   "remoteUser": "node",
   "updateRemoteUserUID": true,
-  "containerEnv": {
-    "PNPM_HOME": "/home/node/.pnpm-store"
-  },
   "forwardPorts": [5173],
-  "postCreateCommand": "git config --local user.name \"j1nn0\" && git config --local user.email \"j1nn0.github@gmail.com\" && pnpm config set store-dir ~/.pnpm-store && pnpm install",
+  "postCreateCommand": "git config --local user.name \"j1nn0\" && git config --local user.email \"j1nn0.github@gmail.com\" && npm install -g npm && npm install -g @antfu/ni && pnpm config set store-dir ~/.pnpm-store && pnpm install --force",
   "customizations": {
     "vscode": {
       "extensions": [

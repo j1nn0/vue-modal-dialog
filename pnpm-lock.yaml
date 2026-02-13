@@ -33,8 +33,8 @@ importers:
         specifier: ^14.2.1
         version: 14.2.1(vue@3.5.28(typescript@5.9.3))
       '@vueuse/integrations':
-        specifier: ^14.2.0
-        version: 14.2.0(focus-trap@8.0.0)(vue@3.5.28(typescript@5.9.3))
+        specifier: ^14.2.1
+        version: 14.2.1(focus-trap@8.0.0)(vue@3.5.28(typescript@5.9.3))
       autoprefixer:
         specifier: ^10.4.24
         version: 10.4.24(postcss@8.5.6)
@@ -948,18 +948,13 @@ packages:
   '@vue/test-utils@2.4.6':
     resolution: {integrity: sha512-FMxEjOpYNYiFe0GkaHsnJPXFHxQ6m4t8vI/ElPGpMWxZKpmRvQ33OIrvRXemy6yha03RxhOlQuy+gZMC3CQSow==}
 
-  '@vueuse/core@14.2.0':
-    resolution: {integrity: sha512-tpjzVl7KCQNVd/qcaCE9XbejL38V6KJAEq/tVXj7mDPtl6JtzmUdnXelSS+ULRkkrDgzYVK7EerQJvd2jR794Q==}
-    peerDependencies:
-      vue: ^3.5.0
-
   '@vueuse/core@14.2.1':
     resolution: {integrity: sha512-3vwDzV+GDUNpdegRY6kzpLm4Igptq+GA0QkJ3W61Iv27YWwW/ufSlOfgQIpN6FZRMG0mkaz4gglJRtq5SeJyIQ==}
     peerDependencies:
       vue: ^3.5.0
 
-  '@vueuse/integrations@14.2.0':
-    resolution: {integrity: sha512-Yuo5XbIi6XkfSXOYKd5SBZwyBEyO3Hd41eeG2555hDbE0Maz/P0BfPJDYhgDXjS9xI0jkWUUp1Zh5lXHOgkwLw==}
+  '@vueuse/integrations@14.2.1':
+    resolution: {integrity: sha512-2LIUpBi/67PoXJGqSDQUF0pgQWpNHh7beiA+KG2AbybcNm+pTGWT6oPGlBgUoDWmYwfeQqM/uzOHqcILpKL7nA==}
     peerDependencies:
       async-validator: ^4
       axios: ^1
@@ -1000,16 +995,8 @@ packages:
       universal-cookie:
         optional: true
 
-  '@vueuse/metadata@14.2.0':
-    resolution: {integrity: sha512-i3axTGjU8b13FtyR4Keeama+43iD+BwX9C2TmzBVKqjSHArF03hjkp2SBZ1m72Jk2UtrX0aYCugBq2R1fhkuAQ==}
-
   '@vueuse/metadata@14.2.1':
     resolution: {integrity: sha512-1ButlVtj5Sb/HDtIy1HFr1VqCP4G6Ypqt5MAo0lCgjokrk2mvQKsK2uuy0vqu/Ks+sHfuHo0B9Y9jn9xKdjZsw==}
-
-  '@vueuse/shared@14.2.0':
-    resolution: {integrity: sha512-Z0bmluZTlAXgUcJ4uAFaML16JcD8V0QG00Db3quR642I99JXIDRa2MI2LGxiLVhcBjVnL1jOzIvT5TT2lqJlkA==}
-    peerDependencies:
-      vue: ^3.5.0
 
   '@vueuse/shared@14.2.1':
     resolution: {integrity: sha512-shTJncjV9JTI4oVNyF1FQonetYAiTBd+Qj7cY89SWbXSkx7gyhrgtEdF2ZAVWS1S3SHlaROO6F2IesJxQEkZBw==}
@@ -3085,13 +3072,6 @@ snapshots:
       js-beautify: 1.15.4
       vue-component-type-helpers: 2.2.12
 
-  '@vueuse/core@14.2.0(vue@3.5.28(typescript@5.9.3))':
-    dependencies:
-      '@types/web-bluetooth': 0.0.21
-      '@vueuse/metadata': 14.2.0
-      '@vueuse/shared': 14.2.0(vue@3.5.28(typescript@5.9.3))
-      vue: 3.5.28(typescript@5.9.3)
-
   '@vueuse/core@14.2.1(vue@3.5.28(typescript@5.9.3))':
     dependencies:
       '@types/web-bluetooth': 0.0.21
@@ -3099,21 +3079,15 @@ snapshots:
       '@vueuse/shared': 14.2.1(vue@3.5.28(typescript@5.9.3))
       vue: 3.5.28(typescript@5.9.3)
 
-  '@vueuse/integrations@14.2.0(focus-trap@8.0.0)(vue@3.5.28(typescript@5.9.3))':
+  '@vueuse/integrations@14.2.1(focus-trap@8.0.0)(vue@3.5.28(typescript@5.9.3))':
     dependencies:
-      '@vueuse/core': 14.2.0(vue@3.5.28(typescript@5.9.3))
-      '@vueuse/shared': 14.2.0(vue@3.5.28(typescript@5.9.3))
+      '@vueuse/core': 14.2.1(vue@3.5.28(typescript@5.9.3))
+      '@vueuse/shared': 14.2.1(vue@3.5.28(typescript@5.9.3))
       vue: 3.5.28(typescript@5.9.3)
     optionalDependencies:
       focus-trap: 8.0.0
 
-  '@vueuse/metadata@14.2.0': {}
-
   '@vueuse/metadata@14.2.1': {}
-
-  '@vueuse/shared@14.2.0(vue@3.5.28(typescript@5.9.3))':
-    dependencies:
-      vue: 3.5.28(typescript@5.9.3)
 
   '@vueuse/shared@14.2.1(vue@3.5.28(typescript@5.9.3))':
     dependencies:
