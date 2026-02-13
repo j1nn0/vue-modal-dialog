@@ -4,9 +4,7 @@
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
       "configureZshAsDefaultShell": false,
-      "username": "node",
-      "gitUserName": "j1nn0",
-      "gitUserEmail": "j1nn0.github@gmail.com"
+      "username": "node"
     }
   },
   "workspaceFolder": "/workspaces/vue-modal-dialog",
