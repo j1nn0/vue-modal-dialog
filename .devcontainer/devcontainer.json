@@ -1,19 +1,23 @@
 {
   "name": "vue-modal-dialog",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "args": {
-      "NODE_VERSION": "24",
-      "PNPM_VERSION": "10"
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "configureZshAsDefaultShell": false,
+      "username": "node",
+      "gitUserName": "j1nn0",
+      "gitUserEmail": "j1nn0.github@gmail.com"
     }
   },
   "workspaceFolder": "/workspaces/vue-modal-dialog",
   "shutdownAction": "stopContainer",
   "remoteUser": "node",
-  "forwardPorts": [5173],
   "updateRemoteUserUID": true,
-  "postCreateCommand": "pnpm install",
-  "postAttachCommand": "git config --global user.name \"j1nn0\" && git config --global user.email \"j1nn0.github@gmail.com\"",
+  "containerEnv": {
+    "PNPM_HOME": "/home/node/.pnpm-store"
+  },
+  "forwardPorts": [5173],
+  "postCreateCommand": "git config --local user.name \"j1nn0\" && git config --local user.email \"j1nn0.github@gmail.com\" && pnpm config set store-dir ~/.pnpm-store && pnpm install",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -29,7 +33,6 @@
         "christian-kohler.npm-intellisense"
       ],
       "settings": {
-        "terminal.integrated.shell.linux": "/bin/sh",
         "explorer.fileNesting.enabled": true,
         "explorer.fileNesting.patterns": {
           "vite.config.*": "jsconfig*, vitest.config.*",

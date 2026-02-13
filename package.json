@@ -25,6 +25,7 @@
     "node": ">=24",
     "pnpm": ">=10"
   },
+  "packageManager": "pnpm@10.29.3",
   "browserslist": [
     "> 1%",
     "last 2 versions",
