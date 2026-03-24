@@ -16,13 +16,13 @@ const bannerText = `/*!
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    vue(),
-    banner(bannerText),
-    vueDevTools(),
     eslint({
       failOnWarning: true,
       include: ['src/**/*.js', 'src/**/*.vue'],
     }),
+    vue(),
+    banner(bannerText),
+    vueDevTools(),
   ],
   publicDir: false,
   resolve: {
