@@ -2,6 +2,17 @@
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.patterns": {
         "vite.config.*": "jsconfig*, vitest.config.*",
-        "package.json": "pnpm*, eslint*, .prettier*",
+        "package.json": "pnpm*, eslint*, .oxlint*, oxlint*, .oxfmt*, .prettier*",
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "always",
+    },
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
     },
 }

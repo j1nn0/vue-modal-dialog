@@ -11,7 +11,9 @@
   "shutdownAction": "stopContainer",
   "remoteUser": "node",
   "updateRemoteUserUID": true,
-  "forwardPorts": [5173],
+  "forwardPorts": [
+    5173
+  ],
   "postCreateCommand": "git config --local user.name \"j1nn0\" && git config --local user.email \"j1nn0.github@gmail.com\" && npm install -g @antfu/ni && pnpm config set store-dir ~/.pnpm-store && pnpm install --frozen-lockfile",
   "customizations": {
     "vscode": {
@@ -19,13 +21,14 @@
         "Vue.volar",
         "dbaeumer.vscode-eslint",
         "EditorConfig.EditorConfig",
-        "esbenp.prettier-vscode",
+        "oxc.oxc-vscode",
         "mhutchie.git-graph",
         "eamodio.gitlens",
         "sdras.vue-vscode-snippets",
         "xabikos.JavaScriptSnippets",
         "tombonnike.vscode-status-bar-format-toggle",
-        "christian-kohler.npm-intellisense"
+        "christian-kohler.npm-intellisense",
+        "amatiasq.sort-imports"
       ],
       "settings": {
         "explorer.fileNesting.enabled": true,
