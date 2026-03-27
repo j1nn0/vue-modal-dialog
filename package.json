@@ -34,6 +34,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "storybook": "storybook dev -p 6006 --no-open",
+    "build-storybook": "storybook build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:ui": "vitest --ui --coverage",
@@ -59,6 +61,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@storybook/addon-a11y": "^10.3.3",
+    "@storybook/vue3-vite": "^10.3.3",
     "@vitejs/plugin-vue": "^6.0.5",
     "@vitest/coverage-v8": "^4.1.2",
     "@vitest/eslint-plugin": "^1.6.13",
@@ -80,6 +84,7 @@
     "oxlint": "^1.57.0",
     "postcss": "^8.5.8",
     "sass-embedded": "^1.98.0",
+    "storybook": "^10.3.3",
     "vite": "^8.0.3",
     "vite-plugin-banner": "^0.8.1",
     "vite-plugin-eslint": "^1.8.1",

@@ -26,6 +26,7 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 ## 📑 Table of Contents
 
 - [✨ Features](#-features)
+- [🧪 Storybook](#-storybook)
 - [💾 Installation](#-installation)
 - [⚙️ Peer Dependencies](#%EF%B8%8F-peer-dependencies)
 - [🛠 Usage](#-usage)
@@ -53,6 +54,22 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 - Configurable dialog size: `sm`, `md`, `lg`, `fullscreen`
 - Configurable dialog width (supports custom widths via width prop for flexible layouts)
 - Supports dark mode and light mode via the `mode` prop (`"light"`, `"dark"`, or `null` to follow OS/browser preference)
+
+---
+
+## 🧪 Storybook
+
+Use Storybook to interactively verify modal behavior and props.
+
+```bash
+pnpm storybook
+```
+
+Build static Storybook output:
+
+```bash
+pnpm build-storybook
+```
 
 ---
 

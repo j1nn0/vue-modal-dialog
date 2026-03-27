@@ -31,3 +31,5 @@ coverage
 *.tsbuildinfo
 .aider*
 !.aider.conf.yml
+
+storybook-static
