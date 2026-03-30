@@ -1,0 +1,11 @@
+{
+    "hooks": {
+        "Stop": [
+            {
+                "type": "command",
+                "command": "node .github/hooks/run-quality-gate-on-stop.mjs",
+                "timeout": 1800
+            }
+        ]
+    }
+}
