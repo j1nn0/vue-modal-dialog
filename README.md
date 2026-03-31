@@ -346,18 +346,14 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ## 📝 Notes on Multiple Modals
 
-This library is designed with the assumption that **only one modal is open at a time**.  
-Opening multiple modals simultaneously may cause the following issues:
+This library supports **multiple modals open at the same time** with proper stacking behavior:
 
-- Backdrops stacking, making the screen too dark
-- Focus trap not functioning correctly
-- Escape key behavior becoming ambiguous
-- Accessibility attributes (e.g. `aria-hidden`) breaking
+- Each modal receives a unique, automatically incremented z-index so that later modals always appear above earlier ones.
+- The `vue-modal-open` class is added to `<body>` when the first modal opens and removed only when the last modal closes, preventing premature scroll restoration.
+- The **Escape key** and **backdrop click** only affect the topmost modal; background modals are not disturbed.
+- Focus is trapped inside the topmost modal. When that modal closes, focus automatically returns to the previous modal (powered by `focus-trap`'s built-in pausing/resuming mechanism).
 
-Therefore, **it is recommended to control modals on the application side** so that only one is visible at any given time.
-
-At present, supporting multiple simultaneous modals is **not planned**.  
-If there is strong demand, it may be considered in the future.
+No additional configuration is required — just use multiple `<VueModalDialog>` components independently and they will stack correctly.
 
 ---
 

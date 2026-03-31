@@ -46,19 +46,21 @@ const slots = useSlots();
 const isOpen = defineModel({ type: Boolean, required: true });
 
 // composables
-const { close } = useDialogState(isOpen, dialogRef, emit);
+const { close, isTop, backdropZIndex, dialogZIndex } = useDialogState(isOpen, dialogRef, emit);
 const { dialogWidthClass, dialogWidthStyle } = useDialogSize(props);
 const { modeClass } = useDialogMode(props);
 
 // backdrop click
 onClickOutside(dialogRef, () => {
   if (!isOpen.value) return;
+  if (!isTop.value) return;
   if (props.backdrop === true) close();
 });
 
 // Escape key
 onKeyStroke('Escape', (e) => {
   if (!isOpen.value) return;
+  if (!isTop.value) return;
   if (props.escape) {
     e.preventDefault();
     close();
@@ -72,7 +74,13 @@ const bodyId = useId();
 
 <template>
   <transition name="fade-backdrop" appear>
-    <div v-if="isOpen && width !== 'fullscreen'" class="backdrop" :class="modeClass" aria-hidden="true"></div>
+    <div
+      v-if="isOpen && width !== 'fullscreen'"
+      class="backdrop"
+      :class="modeClass"
+      :style="{ zIndex: backdropZIndex }"
+      aria-hidden="true"
+    ></div>
   </transition>
 
   <transition name="fade" appear>
@@ -80,7 +88,7 @@ const bodyId = useId();
       ref="dialogRef"
       v-if="isOpen"
       :open="isOpen"
-      :style="{ maxWidth: dialogWidthStyle }"
+      :style="{ maxWidth: dialogWidthStyle, zIndex: dialogZIndex }"
       class="dialog"
       :class="[
         { 'is-center': props.position === 'center', 'is-top': props.position === 'top' },
