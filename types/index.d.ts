@@ -1,6 +1,8 @@
 import { DefineComponent, Plugin, VNode } from 'vue';
 
 export interface VueModalDialogProps {
+  /** v-model で制御する開閉状態 */
+  modelValue: boolean;
   /** backdrop モード */
   backdrop?: boolean | 'static';
   /** Escape キーで閉じるか */
@@ -14,6 +16,7 @@ export interface VueModalDialogProps {
 }
 
 export interface VueModalDialogEmits {
+  (event: 'update:modelValue', value: boolean): void;
   (event: 'opened'): void;
   (event: 'closed'): void;
 }

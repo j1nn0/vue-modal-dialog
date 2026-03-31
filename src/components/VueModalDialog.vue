@@ -1,5 +1,5 @@
 <script setup>
-import { useTemplateRef, useSlots } from 'vue';
+import { useId, useTemplateRef, useSlots } from 'vue';
 import { onClickOutside, onKeyStroke } from '@vueuse/core';
 import { useDialogState } from '@/composables/useDialogState';
 import { useDialogSize } from '@/composables/useDialogSize';
@@ -46,7 +46,7 @@ const slots = useSlots();
 const isOpen = defineModel({ type: Boolean, required: true });
 
 // composables
-const { close } = useDialogState(isOpen, dialogRef, emit, props);
+const { close } = useDialogState(isOpen, dialogRef, emit);
 const { dialogWidthClass, dialogWidthStyle } = useDialogSize(props);
 const { modeClass } = useDialogMode(props);
 
@@ -65,14 +65,14 @@ onKeyStroke('Escape', (e) => {
   }
 });
 
-// Random ID（for ARIA）
-const headerId = `dialog-header-${Math.random().toString(36).slice(2)}`;
-const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
+// Stable IDs for ARIA (SSR-safe)
+const headerId = useId();
+const bodyId = useId();
 </script>
 
 <template>
   <transition name="fade-backdrop" appear>
-    <div v-if="isOpen && width !== 'fullscreen'" class="backdrop" :class="modeClass"></div>
+    <div v-if="isOpen && width !== 'fullscreen'" class="backdrop" :class="modeClass" aria-hidden="true"></div>
   </transition>
 
   <transition name="fade" appear>
