@@ -71,4 +71,48 @@ describe('useDialogState', () => {
     expect(deactivateSpy).toHaveBeenCalled();
     expect(emit).toBeCalledWith('closed');
   });
+
+  it('restores focus to the previously focused element on close', async () => {
+    // Set up a focusable trigger element
+    const trigger = document.createElement('button');
+    document.body.appendChild(trigger);
+    trigger.focus();
+    expect(document.activeElement).toBe(trigger);
+
+    // Open the dialog (captures previousActiveElement)
+    isOpen.value = true;
+    await nextTick();
+    await nextTick();
+
+    // Simulate focus moving inside the dialog by blurring the trigger
+    trigger.blur();
+
+    // Close the dialog
+    isOpen.value = false;
+    await nextTick();
+    await nextTick();
+
+    // Focus should be restored to the trigger
+    expect(document.activeElement).toBe(trigger);
+
+    document.body.removeChild(trigger);
+  });
+
+  it('does not throw when there is no previously focused element on close', async () => {
+    // Ensure no element is focused
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    isOpen.value = true;
+    await nextTick();
+    await nextTick();
+
+    // Should not throw
+    await expect(async () => {
+      isOpen.value = false;
+      await nextTick();
+      await nextTick();
+    }).not.toThrow();
+  });
 });

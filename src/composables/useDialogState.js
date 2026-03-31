@@ -12,8 +12,12 @@ export function useDialogState(isOpen, dialogRef, emit) {
     isOpen.value = false;
   };
 
+  let previousActiveElement = null;
+
   watch(isOpen, async (val) => {
     if (val) {
+      previousActiveElement =
+        typeof document !== 'undefined' ? document.activeElement : null;
       document.body.classList.add('vue-modal-open');
       await nextTick();
       activateFocusTrap();
@@ -22,6 +26,11 @@ export function useDialogState(isOpen, dialogRef, emit) {
       document.body.classList.remove('vue-modal-open');
       deactivateFocusTrap();
       emit('closed');
+      await nextTick();
+      if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
+        previousActiveElement.focus();
+      }
+      previousActiveElement = null;
     }
   });
 

@@ -1,5 +1,5 @@
 <script setup>
-import { useTemplateRef, useSlots } from 'vue';
+import { useId, useTemplateRef, useSlots } from 'vue';
 import { onClickOutside, onKeyStroke } from '@vueuse/core';
 import { useDialogState } from '@/composables/useDialogState';
 import { useDialogSize } from '@/composables/useDialogSize';
@@ -65,9 +65,9 @@ onKeyStroke('Escape', (e) => {
   }
 });
 
-// Random ID（for ARIA）
-const headerId = `dialog-header-${Math.random().toString(36).slice(2)}`;
-const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
+// Stable IDs for ARIA (SSR-safe via useId)
+const headerId = useId();
+const bodyId = useId();
 </script>
 
 <template>
@@ -97,7 +97,7 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
           <div class="dialog-title">
             <slot name="header"></slot>
           </div>
-          <button class="dialog-close" @click="close" aria-label="Close">×</button>
+          <button class="dialog-close" @click="close" aria-label="Close"><span aria-hidden="true">×</span></button>
         </header>
 
         <div class="dialog-body" :id="bodyId">
