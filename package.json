@@ -80,7 +80,7 @@
     "husky": "^9.1.7",
     "jsdom": "^29.0.1",
     "npm-run-all2": "^8.0.4",
-    "oxfmt": "^0.42.0",
+    "oxfmt": "^0.43.0",
     "oxlint": "^1.57.0",
     "postcss": "^8.5.8",
     "sass-embedded": "^1.98.0",
