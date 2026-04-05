@@ -2,7 +2,7 @@
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.patterns": {
         "vite.config.*": "jsconfig*, vitest.config.*",
-        "package.json": "pnpm*, eslint*, .oxlint*, oxlint*, .oxfmt*, .prettier*",
+        "package.json": "pnpm*, eslint*, .oxlint*, oxlint*, .oxfmt*, .prettier*, .npm*",
     },
     "editor.codeActionsOnSave": {
         "source.fixAll": "always",
