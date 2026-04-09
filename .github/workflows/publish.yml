@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          registry-url: "https://registry.npmjs.org"
+          registry-url: "https://npm.flatt.tech/"
           cache: pnpm
 
       # OIDCにnpm@11.5.1以降が必要
