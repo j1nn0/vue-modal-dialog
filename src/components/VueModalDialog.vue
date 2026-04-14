@@ -1,9 +1,10 @@
 <script setup>
-import { useTemplateRef, useSlots } from 'vue';
+import { useTemplateRef, useSlots, ref, computed, watch, onBeforeUnmount } from 'vue';
 import { onClickOutside, onKeyStroke } from '@vueuse/core';
 import { useDialogState } from '@/composables/useDialogState';
 import { useDialogSize } from '@/composables/useDialogSize';
 import { useDialogMode } from '@/composables/useDialogMode';
+import { useDialogStack } from '@/composables/useDialogStack';
 
 // props / emit
 const props = defineProps({
@@ -45,21 +46,70 @@ const dialogRef = useTemplateRef('dialogRef');
 const slots = useSlots();
 const isOpen = defineModel({ type: Boolean, required: true });
 
-// composables
-const { close } = useDialogState(isOpen, dialogRef, emit, props);
+// Stack integration: shared single backdrop, dialogs stacked above it
+const dialogId = `dialog-${Math.random().toString(36).slice(2)}`;
+const stackIndex = ref(-1);
+
+// composables (pass dialogId to useDialogState so focus-trap can react to stack)
+const { close } = useDialogState(isOpen, dialogRef, emit, props, dialogId);
 const { dialogWidthClass, dialogWidthStyle } = useDialogSize(props);
 const { modeClass } = useDialogMode(props);
 
-// backdrop click
-onClickOutside(dialogRef, () => {
-  if (!isOpen.value) return;
-  if (props.backdrop === true) close();
+// read base z-index safely
+const BASE_Z = (typeof window !== 'undefined')
+  ? (() => {
+      try {
+        const v = getComputedStyle(document.documentElement).getPropertyValue('--j1nn0-vue-modal-dialog-backdrop-z-index');
+        const n = parseInt(v, 10);
+        return Number.isFinite(n) ? n : 1000;
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.debug('getComputedStyle error', err);
+        return 1000;
+      }
+    })()
+  : 1000;
+
+const zIndexValue = computed(() => {
+  const idx = stackIndex.value >= 0 ? stackIndex.value : 0;
+  return BASE_Z + idx * 2 + 1; // dialog above its backdrop
 });
 
-// Escape key
+const isTop = computed(() => useDialogStack.topId() === dialogId);
+
+function updateStackIndex() {
+  stackIndex.value = useDialogStack.indexOf(dialogId);
+}
+
+// subscribe once to stack updates so we update stackIndex reactively
+useDialogStack.subscribe(updateStackIndex);
+
+// Watch open state to register/unregister in stack
+watch(isOpen, (val) => {
+  if (val) {
+    const idx = useDialogStack.push({ id: dialogId, el: dialogRef, onClose: close, propsSnapshot: props });
+    stackIndex.value = idx;
+    updateStackIndex();
+  } else {
+    useDialogStack.pop(dialogId);
+  }
+});
+
+onBeforeUnmount(() => {
+  useDialogStack.pop(dialogId);
+  useDialogStack.unsubscribe(updateStackIndex);
+});
+
+// backdrop click responds only if this modal is top
+onClickOutside(dialogRef, () => {
+  if (!isOpen.value) return;
+  if (props.backdrop === true && isTop.value) close();
+});
+
+// Escape key only handled by top modal
 onKeyStroke('Escape', (e) => {
   if (!isOpen.value) return;
-  if (props.escape) {
+  if (props.escape && isTop.value) {
     e.preventDefault();
     close();
   }
@@ -72,7 +122,7 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
 
 <template>
   <transition name="fade-backdrop" appear>
-    <div v-if="isOpen && width !== 'fullscreen'" class="backdrop" :class="modeClass"></div>
+    <div v-if="isOpen && isTop && width !== 'fullscreen'" class="backdrop" :class="modeClass" :style="{ zIndex: BASE_Z + (stackIndex >= 0 ? stackIndex * 2 : 0) }"></div>
   </transition>
 
   <transition name="fade" appear>
@@ -80,7 +130,7 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
       ref="dialogRef"
       v-if="isOpen"
       :open="isOpen"
-      :style="{ maxWidth: dialogWidthStyle }"
+      :style="{ maxWidth: dialogWidthStyle, zIndex: zIndexValue }"
       class="dialog"
       :class="[
         { 'is-center': props.position === 'center', 'is-top': props.position === 'top' },
@@ -88,7 +138,8 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
         modeClass,
       ]"
       role="dialog"
-      aria-modal="true"
+      :aria-modal="isTop"
+      :aria-hidden="!isTop"
       :aria-labelledby="headerId"
       :aria-describedby="bodyId"
     >
