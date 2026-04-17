@@ -10,7 +10,7 @@ function notify() {
       fn(snapshot);
     } catch (err) {
       // swallow errors from subscribers
-       
+
       console.debug('useDialogStack subscriber error', err);
     }
   });

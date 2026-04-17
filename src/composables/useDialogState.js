@@ -44,7 +44,7 @@ export function useDialogState(isOpen, dialogRef, emit, props, dialogId) {
       }
     } catch (err) {
       // ignore
-       
+
       console.debug('useDialogState updateFocus error', err);
     }
   }

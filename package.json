@@ -10,7 +10,7 @@
     "focus-trap",
     "accessible"
   ],
-  "author": "j1nn0",
+  "author": "j1nn0 <j1nn0.github@gmail.com>",
   "license": "MIT",
   "main": "dist/vue-modal-dialog.umd.js",
   "module": "dist/vue-modal-dialog.es.js",

@@ -56,19 +56,21 @@ const { dialogWidthClass, dialogWidthStyle } = useDialogSize(props);
 const { modeClass } = useDialogMode(props);
 
 // read base z-index safely
-const BASE_Z = (typeof window !== 'undefined')
-  ? (() => {
-      try {
-        const v = getComputedStyle(document.documentElement).getPropertyValue('--j1nn0-vue-modal-dialog-backdrop-z-index');
-        const n = parseInt(v, 10);
-        return Number.isFinite(n) ? n : 1000;
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.debug('getComputedStyle error', err);
-        return 1000;
-      }
-    })()
-  : 1000;
+const BASE_Z =
+  typeof window !== 'undefined'
+    ? (() => {
+        try {
+          const v = getComputedStyle(document.documentElement).getPropertyValue(
+            '--j1nn0-vue-modal-dialog-backdrop-z-index',
+          );
+          const n = parseInt(v, 10);
+          return Number.isFinite(n) ? n : 1000;
+        } catch (err) {
+          console.debug('getComputedStyle error', err);
+          return 1000;
+        }
+      })()
+    : 1000;
 
 const zIndexValue = computed(() => {
   const idx = stackIndex.value >= 0 ? stackIndex.value : 0;
@@ -87,7 +89,12 @@ useDialogStack.subscribe(updateStackIndex);
 // Watch open state to register/unregister in stack
 watch(isOpen, (val) => {
   if (val) {
-    const idx = useDialogStack.push({ id: dialogId, el: dialogRef, onClose: close, propsSnapshot: props });
+    const idx = useDialogStack.push({
+      id: dialogId,
+      el: dialogRef,
+      onClose: close,
+      propsSnapshot: props,
+    });
     stackIndex.value = idx;
     updateStackIndex();
   } else {
@@ -122,7 +129,12 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
 
 <template>
   <transition name="fade-backdrop" appear>
-    <div v-if="isOpen && isTop && width !== 'fullscreen'" class="backdrop" :class="modeClass" :style="{ zIndex: BASE_Z + (stackIndex >= 0 ? stackIndex * 2 : 0) }"></div>
+    <div
+      v-if="isOpen && isTop && width !== 'fullscreen'"
+      class="backdrop"
+      :class="modeClass"
+      :style="{ zIndex: BASE_Z + (stackIndex >= 0 ? stackIndex * 2 : 0) }"
+    ></div>
   </transition>
 
   <transition name="fade" appear>
