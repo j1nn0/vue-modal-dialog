@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { nextTick, ref } from 'vue';
+import type { Ref } from 'vue';
 
 import { useDialogState } from '../useDialogState';
+import type { DialogEmit } from '../useDialogState';
 
 // useFocusTrap をモック
 const activateSpy = vi.fn();
@@ -15,15 +17,15 @@ vi.mock('@vueuse/integrations/useFocusTrap', () => ({
 }));
 
 describe('useDialogState', () => {
-  let dialogRef;
-  let isOpen;
-  let emit;
-  let dialogState;
+  let dialogRef: Ref<HTMLElement | null>;
+  let isOpen: Ref<boolean>;
+  let emit: DialogEmit;
+  let dialogState: { close: () => void };
 
   beforeEach(() => {
     dialogRef = ref(null);
     isOpen = ref(false);
-    emit = vi.fn();
+    emit = vi.fn() as unknown as DialogEmit;
     activateSpy.mockClear();
     deactivateSpy.mockClear();
     document.body.style.overflow = '';

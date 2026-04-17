@@ -1,6 +1,7 @@
 import { URL, fileURLToPath } from 'node:url';
 
 import banner from 'vite-plugin-banner';
+import dts from 'vite-plugin-dts';
 import { defineConfig } from 'vite';
 import eslint from 'vite-plugin-eslint';
 import pkg from './package.json';
@@ -18,9 +19,13 @@ export default defineConfig({
   plugins: [
     eslint({
       failOnWarning: true,
-      include: ['src/**/*.js', 'src/**/*.vue'],
+      include: ['src/**/*.{ts,vue}'],
     }),
     vue(),
+    dts({
+      tsconfigPath: './tsconfig.build.json',
+      rollupTypes: true,
+    }),
     banner(bannerText),
     vueDevTools(),
   ],
@@ -32,7 +37,7 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: fileURLToPath(new URL('./src/index.js', import.meta.url)),
+      entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
       name: 'J1nn0VueModalDialog',
       formats: ['es', 'umd'],
       fileName: (format) => `vue-modal-dialog.${format}.js`,

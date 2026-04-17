@@ -5,7 +5,7 @@ import { useDialogMode } from '../useDialogMode';
 
 test('useDialogMode respects props.mode and updates', async () => {
   // props を ref でラップ
-  const props = ref({ mode: 'dark' });
+  const props = ref<{ mode: 'light' | 'dark' | null }>({ mode: 'dark' });
   const { effectiveMode, modeClass } = useDialogMode(props.value);
 
   // 初期値

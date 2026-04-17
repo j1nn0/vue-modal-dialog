@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useTemplateRef, useSlots, ref, computed, watch, onBeforeUnmount } from 'vue';
 import { onClickOutside, onKeyStroke } from '@vueuse/core';
 import { useDialogState } from '@/composables/useDialogState';
@@ -6,45 +6,29 @@ import { useDialogSize } from '@/composables/useDialogSize';
 import { useDialogMode } from '@/composables/useDialogMode';
 import { useDialogStack } from '@/composables/useDialogStack';
 
+interface Props {
+  backdrop?: boolean | 'static';
+  escape?: boolean;
+  position?: 'center' | 'top';
+  width?: string;
+  mode?: 'light' | 'dark' | null;
+}
+
 // props / emit
-const props = defineProps({
-  backdrop: {
-    type: [Boolean, String],
-    default: true,
-    validator: (value) => [true, false, 'static'].includes(value),
-  },
-
-  escape: {
-    type: Boolean,
-    default: true,
-  },
-
-  position: {
-    type: String,
-    default: 'center',
-    validator: (value) => ['center', 'top'].includes(value),
-  },
-
-  width: {
-    type: [String],
-    default: 'md',
-    validator: (v) =>
-      ['sm', 'md', 'lg', 'fullscreen'].includes(v) ||
-      v.endsWith('px') ||
-      v.endsWith('%') ||
-      v.endsWith('vw'),
-  },
-
-  mode: {
-    type: String,
-    default: null,
-    validator: (v) => ['light', 'dark', null].includes(v),
-  },
+const props = withDefaults(defineProps<Props>(), {
+  backdrop: true,
+  escape: true,
+  position: 'center',
+  width: 'md',
+  mode: null,
 });
-const emit = defineEmits(['opened', 'closed']);
+const emit = defineEmits<{
+  opened: [];
+  closed: [];
+}>();
 const dialogRef = useTemplateRef('dialogRef');
 const slots = useSlots();
-const isOpen = defineModel({ type: Boolean, required: true });
+const isOpen = defineModel<boolean>({ required: true });
 
 // Stack integration: shared single backdrop, dialogs stacked above it
 const dialogId = `dialog-${Math.random().toString(36).slice(2)}`;

@@ -1,16 +1,24 @@
+import type { ComputedRef, Ref } from 'vue';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
-export function useDialogMode(props) {
-  const effectiveMode = ref(undefined);
+export interface DialogModeProps {
+  mode?: 'light' | 'dark' | null;
+}
 
-  const getSystemMode = () => {
+export function useDialogMode(props: DialogModeProps): {
+  effectiveMode: Ref<'light' | 'dark' | undefined>;
+  modeClass: ComputedRef<string>;
+} {
+  const effectiveMode = ref<'light' | 'dark' | undefined>(undefined);
+
+  const getSystemMode = (): 'light' | 'dark' => {
     if (typeof window !== 'undefined' && window.matchMedia) {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     return 'light';
   };
 
-  const updateMode = () => {
+  const updateMode = (): void => {
     effectiveMode.value = props.mode != null ? props.mode : getSystemMode();
   };
 
@@ -20,8 +28,8 @@ export function useDialogMode(props) {
   watch(() => props.mode, updateMode, { immediate: true });
 
   // prefers-color-scheme の変更
-  let mediaQuery = null;
-  const mediaListener = (e) => {
+  let mediaQuery: MediaQueryList | null = null;
+  const mediaListener = (e: MediaQueryListEvent): void => {
     if (props.mode == null) {
       effectiveMode.value = e.matches ? 'dark' : 'light';
     }

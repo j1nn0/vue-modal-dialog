@@ -1,65 +1,73 @@
+import type { Ref } from 'vue';
+
+export interface StackEntry {
+  id: string;
+  el?: Ref<HTMLElement | null>;
+  onClose?: () => void;
+  propsSnapshot?: Record<string, unknown>;
+}
+
 // Singleton stack manager for modal dialogs
 // API: push(entry) -> index, pop(id) -> removed entry, top(), topId(), count(), indexOf(id), subscribe(fn), unsubscribe(fn)
-const stack = [];
-const subscribers = new Set();
+const stack: StackEntry[] = [];
+const subscribers = new Set<(stack: StackEntry[]) => void>();
 
-function notify() {
+function notify(): void {
   const snapshot = stack.slice();
   subscribers.forEach((fn) => {
     try {
       fn(snapshot);
     } catch (err) {
       // swallow errors from subscribers
-
       console.debug('useDialogStack subscriber error', err);
     }
   });
 }
 
-function applyBodyClass() {
+function applyBodyClass(): void {
   if (typeof document === 'undefined') return;
   if (stack.length > 0) document.body.classList.add('vue-modal-open');
   else document.body.classList.remove('vue-modal-open');
 }
 
 export const useDialogStack = {
-  push(entry) {
+  push(entry: StackEntry): number {
     stack.push(entry);
     applyBodyClass();
     notify();
     return stack.length - 1;
   },
-  pop(id) {
+  pop(id: string): StackEntry | null {
     const idx = stack.findIndex((e) => e.id === id);
     if (idx !== -1) {
       const [removed] = stack.splice(idx, 1);
       applyBodyClass();
       notify();
-      return removed;
+      return removed ?? null;
     }
     return null;
   },
-  top() {
-    return stack.length ? stack[stack.length - 1] : null;
+  top(): StackEntry | null {
+    return stack.length ? (stack[stack.length - 1] ?? null) : null;
   },
-  topId() {
-    const t = stack.length ? stack[stack.length - 1] : null;
+  topId(): string | null {
+    const t = stack.length ? (stack[stack.length - 1] ?? null) : null;
     return t ? t.id : null;
   },
-  count() {
+  count(): number {
     return stack.length;
   },
-  indexOf(id) {
+  indexOf(id: string): number {
     return stack.findIndex((e) => e.id === id);
   },
-  subscribe(fn) {
+  subscribe(fn: (stack: StackEntry[]) => void): void {
     subscribers.add(fn);
   },
-  unsubscribe(fn) {
+  unsubscribe(fn: (stack: StackEntry[]) => void): void {
     subscribers.delete(fn);
   },
   // for debugging / tests
-  _getStack() {
+  _getStack(): StackEntry[] {
     return stack.slice();
   },
 };

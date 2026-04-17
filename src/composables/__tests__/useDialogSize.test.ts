@@ -1,16 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { nextTick, ref } from 'vue';
+import type { Ref } from 'vue';
 
 import { useDialogSize } from '../useDialogSize';
 
 describe('useDialogSize composable', () => {
-  const mountComposable = (width) => {
+  const mountComposable = (width: string | Ref<string>) => {
     return useDialogSize({ width });
   };
 
   it('returns correct class for preset widths', () => {
-    const presets = ['sm', 'md', 'lg', 'fullscreen'];
-    const expectedClasses = {
+    const presets = ['sm', 'md', 'lg', 'fullscreen'] as const;
+    const expectedClasses: Record<string, Record<string, boolean>> = {
       sm: { 'dialog-sm': true, 'dialog-md': false, 'dialog-lg': false, 'dialog-fullscreen': false },
       md: { 'dialog-sm': false, 'dialog-md': true, 'dialog-lg': false, 'dialog-fullscreen': false },
       lg: { 'dialog-sm': false, 'dialog-md': false, 'dialog-lg': true, 'dialog-fullscreen': false },
@@ -29,7 +30,7 @@ describe('useDialogSize composable', () => {
   });
 
   it('returns correct style for preset widths', () => {
-    const presets = {
+    const presets: Record<string, string> = {
       sm: 'var(--j1nn0-vue-modal-dialog-max-width-sm)',
       md: 'var(--j1nn0-vue-modal-dialog-max-width-md)',
       lg: 'var(--j1nn0-vue-modal-dialog-max-width-lg)',

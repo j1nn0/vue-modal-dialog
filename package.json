@@ -14,12 +14,11 @@
   "license": "MIT",
   "main": "dist/vue-modal-dialog.umd.js",
   "module": "dist/vue-modal-dialog.es.js",
-  "types": "types/index.d.ts",
+  "types": "dist/index.d.ts",
   "style": "dist/vue-modal-dialog.css",
   "type": "module",
   "files": [
-    "dist",
-    "types"
+    "dist"
   ],
   "engines": {
     "node": ">=24",
@@ -33,7 +32,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vue-tsc --noEmit -p tsconfig.build.json && vite build",
     "storybook": "storybook dev -p 6006 --no-open",
     "build-storybook": "storybook build",
     "preview": "vite preview",
@@ -69,6 +68,7 @@
     "@vitest/ui": "^4.1.2",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.9.1",
     "@vueuse/core": "^14.2.1",
     "@vueuse/integrations": "^14.2.1",
     "autoprefixer": "^10.4.27",
@@ -85,12 +85,16 @@
     "postcss": "^8.5.8",
     "sass-embedded": "^1.98.0",
     "storybook": "^10.3.3",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.58.1",
     "vite": "^8.0.3",
     "vite-plugin-banner": "^0.8.1",
+    "vite-plugin-dts": "^4.5.4",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-vue-devtools": "^8.1.1",
     "vitest": "^4.1.2",
-    "vue": "^3.5.31"
+    "vue": "^3.5.31",
+    "vue-tsc": "^3.2.6"
   },
   "peerDependencies": {
     "@vueuse/core": "^14.2.0",

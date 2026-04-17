@@ -13,8 +13,8 @@ describe('useDialogStack', () => {
   it('push/pop updates count, topId and body class', () => {
     expect(useDialogStack.count()).toBe(0);
 
-    const events = [];
-    const subs = (stack) => events.push(stack.map((e) => e.id));
+    const events: string[][] = [];
+    const subs = (stack: { id: string }[]) => events.push(stack.map((e) => e.id));
     useDialogStack.subscribe(subs);
 
     useDialogStack.push({ id: 'a' });

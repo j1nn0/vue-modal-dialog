@@ -1,15 +1,26 @@
+import type { Ref } from 'vue';
 import { nextTick, watch } from 'vue';
 
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 import { useDialogStack } from '@/composables/useDialogStack';
 
-export function useDialogState(isOpen, dialogRef, emit, props, dialogId) {
+type DialogEmit = ((event: 'opened') => void) & ((event: 'closed') => void);
+
+export type { DialogEmit };
+
+export function useDialogState(
+  isOpen: Ref<boolean>,
+  dialogRef: Ref<HTMLElement | null>,
+  emit: DialogEmit,
+  _props: Record<string, unknown> = {},
+  dialogId?: string,
+): { close: () => void } {
   const { activate: activateFocusTrap, deactivate: deactivateFocusTrap } = useFocusTrap(dialogRef, {
     initialFocus: false,
     escapeDeactivates: false,
   });
 
-  const close = () => {
+  const close = (): void => {
     isOpen.value = false;
   };
 
@@ -34,7 +45,7 @@ export function useDialogState(isOpen, dialogRef, emit, props, dialogId) {
   // Stack-aware behavior when dialogId is provided
   let subscribed = false;
 
-  function updateFocus() {
+  function updateFocus(): void {
     try {
       const topId = useDialogStack.topId();
       if (isOpen.value && topId === dialogId) {
@@ -44,7 +55,6 @@ export function useDialogState(isOpen, dialogRef, emit, props, dialogId) {
       }
     } catch (err) {
       // ignore
-
       console.debug('useDialogState updateFocus error', err);
     }
   }

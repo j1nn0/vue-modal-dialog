@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { nextTick, ref } from 'vue';
+import type { Ref } from 'vue';
 
 import { useDialogState } from '../useDialogState';
+import type { DialogEmit } from '../useDialogState';
 import { useDialogStack } from '../useDialogStack';
 
 // mock focus trap
@@ -15,15 +17,14 @@ vi.mock('@vueuse/integrations/useFocusTrap', () => ({
 }));
 
 describe('useDialogState (stack-aware)', () => {
-  let dialogRef;
-  let isOpen;
-  let emit;
-  let _dialogState;
+  let dialogRef: Ref<HTMLElement | null>;
+  let isOpen: Ref<boolean>;
+  let emit: DialogEmit;
 
   beforeEach(() => {
     dialogRef = ref(null);
     isOpen = ref(false);
-    emit = vi.fn();
+    emit = vi.fn() as unknown as DialogEmit;
     activateSpy.mockClear();
     deactivateSpy.mockClear();
     // clear any existing stack
@@ -38,7 +39,7 @@ describe('useDialogState (stack-aware)', () => {
   });
 
   it('activates focus trap only when top of stack', async () => {
-    _dialogState = useDialogState(isOpen, dialogRef, emit, {}, 'd1');
+    useDialogState(isOpen, dialogRef, emit, {}, 'd1');
 
     // open and register
     isOpen.value = true;
