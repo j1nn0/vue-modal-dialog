@@ -1,6 +1,6 @@
 # vue-modal-dialog
 
-A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility support.
+Vue 3 向けの再利用可能なモーダルダイアログコンポーネントです。フォーカストラップと ARIA アクセシビリティに対応しています。
 
 #### 📦 Project Info
 
@@ -45,29 +45,29 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 
 ## ✨ Features
 
-- Vue 3 support
-- Focus trap inside the modal
-- Keyboard accessibility (Escape to close)
-- Backdrop with blur and fade animation
-- Supports multiple modals opened simultaneously with automatic stack management
-- Header, body, and footer slots
-- Optional footer slot
-- Close button in the header
-- Configurable dialog size: `sm`, `md`, `lg`, `fullscreen`
-- Configurable dialog width (supports custom widths via width prop for flexible layouts)
-- Supports dark mode and light mode via the `mode` prop (`"light"`, `"dark"`, or `null` to follow OS/browser preference)
+- Vue 3 対応
+- モーダル内のフォーカストラップ
+- キーボードアクセシビリティ（Escape で閉じる）
+- ぼかし + フェードアニメーション付きバックドロップ
+- 複数モーダルの同時表示と自動スタック管理に対応
+- ヘッダー / ボディ / フッターのスロット
+- 任意のフッタースロット
+- ヘッダー内の閉じるボタン
+- ダイアログサイズ設定: `sm`, `md`, `lg`, `fullscreen`
+- ダイアログ幅の設定（`width` prop でカスタム幅も指定可能）
+- `mode` prop によるライト/ダークモード対応（`"light"`, `"dark"`, `null` は OS/ブラウザ設定に追従）
 
 ---
 
 ## 🧪 Storybook
 
-Use Storybook to interactively verify modal behavior and props.
+Storybook を使って、モーダルの挙動や props をインタラクティブに確認できます。
 
 ```bash
 pnpm storybook
 ```
 
-Build static Storybook output:
+静的ビルドを生成する場合:
 
 ```bash
 pnpm build-storybook
@@ -81,7 +81,7 @@ pnpm build-storybook
 npm install @j1nn0/vue-modal-dialog
 ```
 
-or
+または
 
 ```bash
 yarn add @j1nn0/vue-modal-dialog
@@ -91,28 +91,28 @@ yarn add @j1nn0/vue-modal-dialog
 
 ## ⚙️ Peer Dependencies
 
-Before using this component, make sure you have installed the following peer dependencies:
+このコンポーネントを利用する前に、次の peer dependencies をインストールしてください。
 
 ```bash
 npm install vue @vueuse/core @vueuse/integrations focus-trap
 ```
 
-or
+または
 
 ```bash
 yarn add vue @vueuse/core @vueuse/integrations focus-trap
 ```
 
-These dependencies are **required** for the library to function properly.
+これらの依存関係は、ライブラリを正しく動作させるために必須です。
 
 ---
 
 ## 🛠 Usage
 
-You can use this component in **two ways**:
+このコンポーネントは **2つの方法** で利用できます。
 
-1. Import individually (recommended, enables tree-shaking)
-2. Register globally as a Vue plugin
+1. 個別インポート（推奨、tree-shaking が有効）
+2. Vue プラグインとしてグローバル登録
 
 ---
 
@@ -155,7 +155,7 @@ const submitForm = () => {
 
 ### Multiple Modals (Stack)
 
-You can open multiple dialogs at the same time. Stack behavior is handled automatically.
+複数のダイアログを同時に開くことができます。スタック挙動は自動で管理されます。
 
 ```vue
 <script setup>
@@ -184,7 +184,7 @@ const showDialog2 = ref(false);
 </template>
 ```
 
-When multiple dialogs are open, only the topmost dialog handles Escape and backdrop close.
+複数のダイアログが開いている場合、Escape キーと backdrop による close は最前面のダイアログのみが処理します。
 
 ---
 
@@ -208,7 +208,7 @@ app.use(VueModalDialogPlugin);
 app.mount('#app');
 ```
 
-Use `<VueModalDialog>` (or your custom name) anywhere in your app without importing it:
+`<VueModalDialog>`（またはカスタム名）を、各ファイルで個別 import せずに利用できます。
 
 ```vue
 <template>
@@ -223,7 +223,7 @@ Use `<VueModalDialog>` (or your custom name) anywhere in your app without import
 
 ## 🌐 CDN Usage
 
-You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **individual import** and **global plugin** usage are supported.
+`@j1nn0/vue-modal-dialog` は、バンドラなしで CDN 経由でも利用できます。**個別 import** と **グローバルプラグイン** の両方に対応しています。
 
 ```html
 <!DOCTYPE html>
@@ -296,45 +296,45 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ## 📌 Props
 
-| Prop       | Type                  | Default    | Description                                                                                                              |
-| ---------- | --------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `backdrop` | `Boolean` \| `String` | `true`     | `true` = click on backdrop closes dialog, `"static"` = backdrop does nothing                                             |
-| `escape`   | `Boolean`             | `true`     | Pressing Escape key closes the dialog                                                                                    |
-| `position` | `String`              | `"center"` | Position of the dialog: `"center"` or `"top"`                                                                            |
-| `width`    | `String`              | `"md"`     | Dialog width. Presets: `sm`, `md`, `lg`, `fullscreen`. Also supports custom CSS width, e.g. `"400px"`, `"50%"`, `"80vw"` |
-| `mode`     | `String` \| `null`    | `null`     | Dialog color mode: `"light"` for light mode, `"dark"` for dark mode, null to follow the OS/browser preference            |
+| Prop       | Type                  | Default    | Description                                                                                                       |
+| ---------- | --------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------- |
+| `backdrop` | `Boolean` \| `String` | `true`     | `true` = backdropクリックで閉じる、`"static"` = backdropクリックで閉じない                                        |
+| `escape`   | `Boolean`             | `true`     | Escapeキー押下でダイアログを閉じる                                                                                |
+| `position` | `String`              | `"center"` | ダイアログ位置: `"center"` または `"top"`                                                                         |
+| `width`    | `String`              | `"md"`     | ダイアログ幅。プリセット: `sm`, `md`, `lg`, `fullscreen`。`"400px"`, `"50%"`, `"80vw"` のようなカスタム幅にも対応 |
+| `mode`     | `String` \| `null`    | `null`     | カラーモード: `"light"` はライト、`"dark"` はダーク、`null` はOS/ブラウザ設定に追従                               |
 
 ---
 
 ## 🎛 Slots
 
-| Slot     | Description                                               |
-| -------- | --------------------------------------------------------- |
-| `header` | Optional. Content for the header. × button always present |
-| default  | Content for the body of the dialog                        |
-| `footer` | Optional. Content for footer, not rendered if empty       |
+| Slot     | Description                                   |
+| -------- | --------------------------------------------- |
+| `header` | 任意。ヘッダー用コンテンツ。×ボタンは常に表示 |
+| default  | ボディ用コンテンツ                            |
+| `footer` | 任意。空の場合は描画されない                  |
 
 ---
 
 ## ♿ Accessibility
 
-- `role="dialog"` + `aria-modal="true"` on the topmost dialog
-- `aria-modal="false"` + `aria-hidden="true"` on lower-layered dialogs
-- `aria-labelledby` points to header slot
-- `aria-describedby` points to body slot
-- Close button has `aria-label="Close"`
-- Focus trap is active on the topmost dialog to keep keyboard navigation predictable
-- Escape key closes the dialog if enabled (topmost dialog only when stacked)
+- `role="dialog"` + 最上位ダイアログに `aria-modal="true"`
+- 下層ダイアログには `aria-modal="false"` + `aria-hidden="true"`
+- `aria-labelledby` は header slot を参照
+- `aria-describedby` は body slot を参照
+- 閉じるボタンには `aria-label="Close"`
+- フォーカストラップは最上位ダイアログで有効化され、キーボード操作を一貫化
+- Escape でのクローズは有効時のみ（stack時は最上位ダイアログのみ）
 
 ---
 
 ## 🎨 Styles
 
-- Dialog width: `sm`, `md`, `lg`, `fullscreen`
-- Dialog height: auto, max `80vh` (default), scrollable if content overflows
-- Word wrapping enabled in header and body
-- Backdrop has fade-in/out animation with blur effect
-- Supports Light and Dark mode via `mode` prop
+- ダイアログ幅: `sm`, `md`, `lg`, `fullscreen`
+- ダイアログ高さ: auto、最大 `80vh`（デフォルト）。内容超過時はスクロール
+- ヘッダーとボディで自動改行を有効化
+- バックドロップはぼかし付きフェードイン/アウトアニメーション
+- `mode` prop によるライト/ダークモード対応
 
 ### CSS Custom Properties
 
@@ -381,19 +381,19 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ## 📝 Notes on Multiple Modals
 
-This library supports **multiple modals opened simultaneously**.
+このライブラリは **複数モーダルの同時表示** をサポートしています。
 
-When dialogs are stacked:
+ダイアログがスタックされた場合:
 
-- Only the topmost dialog responds to Escape and backdrop click
-- Only the topmost dialog renders a backdrop (`fullscreen` dialogs do not render a backdrop)
-- Focus trap is active only for the topmost dialog
-- ARIA attributes are updated by stack position:
-  - topmost dialog: `aria-modal="true"`, `aria-hidden="false"`
-  - lower-layered dialogs: `aria-modal="false"`, `aria-hidden="true"`
-- Dialog z-index is automatically calculated from stack order
+- Escapeキーと backdrop click に反応するのは最上位ダイアログのみ
+- backdrop を描画するのは最上位ダイアログのみ（`fullscreen` は backdrop を描画しません）
+- フォーカストラップは最上位ダイアログのみ有効
+- ARIA属性はスタック位置に応じて更新
+  - 最上位ダイアログ: `aria-modal="true"`, `aria-hidden="false"`
+  - 下層ダイアログ: `aria-modal="false"`, `aria-hidden="true"`
+- ダイアログの z-index はスタック順で自動計算
 
-No additional configuration is required to use stack behavior.
+スタック挙動の利用に追加設定は不要です。
 
 ---
 

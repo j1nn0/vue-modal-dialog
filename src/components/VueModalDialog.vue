@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useTemplateRef, useSlots, ref, computed, watch, onBeforeUnmount } from 'vue';
-import { onClickOutside, onKeyStroke } from '@vueuse/core';
+import { onKeyStroke, useEventListener } from '@vueuse/core';
 import { useDialogState } from '@/composables/useDialogState';
 import { useDialogSize } from '@/composables/useDialogSize';
 import { useDialogMode } from '@/composables/useDialogMode';
@@ -33,6 +33,7 @@ const isOpen = defineModel<boolean>({ required: true });
 // Stack integration: shared single backdrop, dialogs stacked above it
 const dialogId = `dialog-${Math.random().toString(36).slice(2)}`;
 const stackIndex = ref(-1);
+const currentTopId = ref<string | null>(null);
 
 // composables (pass dialogId to useDialogState so focus-trap can react to stack)
 const { close } = useDialogState(isOpen, dialogRef, emit, props, dialogId);
@@ -61,10 +62,12 @@ const zIndexValue = computed(() => {
   return BASE_Z + idx * 2 + 1; // dialog above its backdrop
 });
 
-const isTop = computed(() => useDialogStack.topId() === dialogId);
+const isTop = computed(() => currentTopId.value === dialogId);
+const canCloseByBackdrop = computed(() => props.backdrop !== false && props.backdrop !== 'static');
 
 function updateStackIndex() {
   stackIndex.value = useDialogStack.indexOf(dialogId);
+  currentTopId.value = useDialogStack.topId();
 }
 
 // subscribe once to stack updates so we update stackIndex reactively
@@ -91,11 +94,32 @@ onBeforeUnmount(() => {
   useDialogStack.unsubscribe(updateStackIndex);
 });
 
-// backdrop click responds only if this modal is top
-onClickOutside(dialogRef, () => {
+// Backdrop click responds only on the topmost modal.
+function handleBackdropClick() {
   if (!isOpen.value) return;
-  if (props.backdrop === true && isTop.value) close();
-});
+  if (canCloseByBackdrop.value && isTop.value) close();
+}
+
+// Fallback for environments where backdrop click can be swallowed by overlays/tooling.
+useEventListener(
+  () => (typeof document !== 'undefined' ? document : null),
+  'pointerdown',
+  (e: PointerEvent) => {
+    if (!isOpen.value) return;
+    if (!isTop.value) return;
+    if (!canCloseByBackdrop.value) return;
+    if (props.width === 'fullscreen') return;
+
+    const root = dialogRef.value;
+    const target = e.target as Node | null;
+    if (!root || !target) return;
+
+    if (!root.contains(target)) {
+      close();
+    }
+  },
+  { capture: true },
+);
 
 // Escape key only handled by top modal
 onKeyStroke('Escape', (e) => {
@@ -118,6 +142,7 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
       class="backdrop"
       :class="modeClass"
       :style="{ zIndex: BASE_Z + (stackIndex >= 0 ? stackIndex * 2 : 0) }"
+      @click="handleBackdropClick"
     ></div>
   </transition>
 
