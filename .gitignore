@@ -29,8 +29,6 @@ coverage
 *.sw?
 
 *.tsbuildinfo
-.aider*
-!.aider.conf.yml
 
 storybook-static
 .env
