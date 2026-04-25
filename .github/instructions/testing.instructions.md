@@ -1,7 +1,7 @@
 ---
 description: "Use when writing or updating Vitest tests, unit tests, mock setup, coverage checks, regression tests, or composable/component behavior tests."
 name: "Testing Guidelines"
-applyTo: "src/composables/__tests__/**/*.test.js"
+applyTo: "src/composables/__tests__/**/*.test.ts"
 ---
 # Testing Guidelines
 

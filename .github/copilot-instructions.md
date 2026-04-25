@@ -2,9 +2,9 @@
 
 ## Code Style
 - Use Vue 3 Composition API with `<script setup>` for components. Prefer `defineProps`, `defineEmits`, and `defineModel` patterns used in `src/components/VueModalDialog.vue`.
-- Keep imports using the `@/` alias for `src` paths (configured in `jsconfig.json`).
+- Keep imports using the `@/` alias for `src` paths (configured in `tsconfig.json`).
 - Keep composables in `src/composables/` with `use*` naming.
-- Keep tests colocated under `src/composables/__tests__/` and follow existing Vitest mocking patterns.
+- Keep tests colocated under `src/composables/__tests__/` (`.test.ts`) and follow existing Vitest mocking patterns.
 - Follow repository formatting/linting defaults (2 spaces, LF, max line length 100 via `.editorconfig`).
 
 ## Architecture
@@ -13,8 +13,9 @@
   - `useDialogState`: open/close state, focus trap, body class, lifecycle emits
   - `useDialogSize`: preset/custom width computation
   - `useDialogMode`: explicit/system light-dark mode handling
+  - `useDialogStack`: singleton stack manager for multiple modals (push/pop/top/subscribe)
 - Maintain this separation: component orchestrates UI and props; composables own focused behavior.
-- Public exports are defined in `src/index.js` (component + plugin). Keep API-compatible changes intentional.
+- Public exports are defined in `src/index.ts` (component + plugin). Keep API-compatible changes intentional.
 
 ## Build And Test
 - Use Node >= 24 and pnpm >= 10 (see `package.json` engines).

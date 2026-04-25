@@ -50,4 +50,4 @@ These targets currently do the following:
 
 ## Important Scope Note
 
-This repository defines version bumping and tag pushing in `Makefile`, but an automated publish workflow is not documented in the checked-in files reviewed here. If publishing to npm is required, confirm the current publish process before release.
+This repository defines version bumping and tag pushing in `Makefile`. Publishing to npm is automated via `.github/workflows/publish.yml`, which triggers on version tags (`v*.*.*`) and publishes to the npm registry using OIDC provenance. No manual publish step is required after the tag is pushed.

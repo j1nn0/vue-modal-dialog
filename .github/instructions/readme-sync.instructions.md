@@ -5,7 +5,7 @@ applyTo: "README.md"
 ---
 # README Sync Guidelines
 
-- Keep README aligned with the actual public API in `src/components/VueModalDialog.vue`, `src/index.js`, and `types/index.d.ts`.
+- Keep README aligned with the actual public API in `src/components/VueModalDialog.vue` and `src/index.ts`.
 - When props, emits, slots, defaults, or behavior change, update the affected README sections in the same task.
 - Recheck these sections before finishing: Installation, Peer Dependencies, Usage, Props, Slots, Accessibility, Styles, and Notes on Multiple Modals.
 - If `README.ja.md` exists, keep it aligned with `README.md` for the same sections and behavior changes.

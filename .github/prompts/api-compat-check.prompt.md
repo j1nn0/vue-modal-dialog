@@ -7,9 +7,9 @@ agent: "agent"
 Review the requested changes with a strict API-compatibility mindset.
 
 ## Scope
-- Public exports in `src/index.js`
+- Public exports in `src/index.ts`
 - Component props/emits/slots in `src/components/VueModalDialog.vue`
-- Type definitions in `types/index.d.ts`
+- Type definitions in `dist/index.d.ts` (generated at build time)
 - Usage docs/stories in `README.md` and `src/components/VueModalDialog.stories.js`
 
 ## Tasks
