@@ -5,6 +5,10 @@
   "singleQuote": true,
   "sortPackageJson": false,
   "ignorePatterns": [
-    ".github/**"
+    ".github/**",
+    "dist/**",
+    "node_modules/**",
+    "coverage/**",
+    "storybook-static/**",
   ]
 }
