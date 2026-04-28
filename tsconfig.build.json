@@ -10,5 +10,10 @@
     },
     "include": [
         "src/**/*"
+    ],
+    "exclude": [
+        "src/**/*.stories.*",
+        "src/**/*.test.*",
+        "src/**/__tests__"
     ]
 }
