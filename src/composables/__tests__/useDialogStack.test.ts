@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { useDialogStack } from '../useDialogStack';
 
@@ -109,6 +109,29 @@ describe('useDialogStack', () => {
       // if previouslyFocusedElement was never set (e.g., no focusable element),
       // popping to empty stack should not throw
       expect(() => useDialogStack.pop('nonexistent')).not.toThrow();
+    });
+  });
+
+  describe('error handling', () => {
+    it('warns to console and does not crash when a subscriber throws', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const throwingSub = () => {
+        throw new Error('subscriber crash');
+      };
+      useDialogStack.subscribe(throwingSub);
+      useDialogStack.push({ id: 'err' });
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        'useDialogStack subscriber error',
+        expect.any(Error),
+      );
+
+      // stack should still be updated despite the error
+      expect(useDialogStack.count()).toBe(1);
+
+      useDialogStack.unsubscribe(throwingSub);
+      warnSpy.mockRestore();
     });
   });
 });

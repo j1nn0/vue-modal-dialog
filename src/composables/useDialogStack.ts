@@ -23,7 +23,7 @@ function notify(): void {
       fn(snapshot);
     } catch (err) {
       // swallow errors from subscribers
-      console.debug('useDialogStack subscriber error', err);
+      console.warn('useDialogStack subscriber error', err);
     }
   });
 }
@@ -48,7 +48,7 @@ function restoreFocus(): void {
     try {
       previouslyFocusedElement.focus();
     } catch (err) {
-      console.debug('useDialogStack focus restore error', err);
+      console.warn('useDialogStack focus restore error', err);
     } finally {
       previouslyFocusedElement = null;
     }

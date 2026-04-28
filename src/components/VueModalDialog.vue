@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTemplateRef, useSlots, ref, computed, watch, onBeforeUnmount } from 'vue';
+import { useTemplateRef, useSlots, ref, computed, watch, onBeforeUnmount, nextTick } from 'vue';
 import { onKeyStroke, useEventListener } from '@vueuse/core';
 import type { VueModalDialogProps } from '@/types';
 import { useDialogState } from '@/composables/useDialogState';
@@ -44,7 +44,7 @@ const BASE_Z =
           const n = parseInt(v, 10);
           return Number.isFinite(n) ? n : 1000;
         } catch (err) {
-          console.debug('getComputedStyle error', err);
+          console.warn('getComputedStyle error', err);
           return 1000;
         }
       })()
@@ -79,6 +79,9 @@ watch(isOpen, (val) => {
     updateStackIndex();
   } else {
     useDialogStack.pop(dialogId);
+    // Defer closed emit to let Vue process the DOM change (and any
+    // transition) before notifying the parent.
+    nextTick().then(() => emit('closed'));
   }
 });
 

@@ -55,7 +55,7 @@ export function useDialogState(
       }
     } catch (err) {
       // ignore
-      console.debug('useDialogState updateFocus error', err);
+      console.warn('useDialogState updateFocus error', err);
     }
   }
 
@@ -70,9 +70,9 @@ export function useDialogState(
       }
       updateFocus();
     } else {
-      // closed
+      // closed — deactivate focus trap but defer 'closed' emit to the
+      // component so it fires after the leave transition completes.
       deactivateFocusTrap();
-      emit('closed');
       if (subscribed) {
         useDialogStack.unsubscribe(updateFocus);
         subscribed = false;
