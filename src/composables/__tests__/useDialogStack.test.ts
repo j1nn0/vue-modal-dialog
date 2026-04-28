@@ -122,10 +122,7 @@ describe('useDialogStack', () => {
       useDialogStack.subscribe(throwingSub);
       useDialogStack.push({ id: 'err' });
 
-      expect(warnSpy).toHaveBeenCalledWith(
-        'useDialogStack subscriber error',
-        expect.any(Error),
-      );
+      expect(warnSpy).toHaveBeenCalledWith('useDialogStack subscriber error', expect.any(Error));
 
       // stack should still be updated despite the error
       expect(useDialogStack.count()).toBe(1);

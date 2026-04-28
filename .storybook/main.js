@@ -10,6 +10,9 @@ const config = {
     name: '@storybook/vue3-vite',
     options: {},
   },
+  docs: {
+    autodocs: 'tag',
+  },
   async viteFinal(baseConfig) {
     return mergeConfig(baseConfig, {
       resolve: {
