@@ -16,7 +16,7 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 #### 🛠 Tech Stack
 
 [![Vue](https://img.shields.io/badge/Vue-v3.5-41b883?style=flat-square&logo=vue.js&logoColor=white)](https://vuejs.org/)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES6-f7df1e?style=flat-square&logo=javascript&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![TypeScript](https://img.shields.io/badge/TypeScript-v5.9-f7df1e?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESLint](https://img.shields.io/badge/Linting-ESLint-4B32C3?style=flat-square&logo=eslint&logoColor=white)](https://eslint.org/)
 [![Oxlint](https://img.shields.io/badge/Linting-Oxlint-4B32C3?style=flat-square&logo=oxc&logoColor=white)](https://oxc.rs/)
 [![Oxfmt](https://img.shields.io/badge/Formatting-Oxfmt-F7B93E?style=flat-square&logo=oxc&logoColor=white)](https://oxc.rs/)
@@ -299,7 +299,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 | Prop       | Type                  | Default    | Description                                                                                                              |
 | ---------- | --------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `backdrop` | `Boolean` \| `String` | `true`     | `true` = backdrop click closes dialog, `false` = no backdrop, `"static"` = backdrop shown but click does not close |
+| `backdrop` | `Boolean` \| `String` | `true`     | `true` = backdrop click closes dialog, `false` = no backdrop, `"static"` = backdrop shown but click does not close       |
 | `escape`   | `Boolean`             | `true`     | Pressing Escape key closes the dialog                                                                                    |
 | `position` | `String`              | `"center"` | Position of the dialog: `"center"` or `"top"`                                                                            |
 | `width`    | `String`              | `"md"`     | Dialog width. Presets: `sm`, `md`, `lg`, `fullscreen`. Also supports custom CSS width, e.g. `"400px"`, `"50%"`, `"80vw"` |
