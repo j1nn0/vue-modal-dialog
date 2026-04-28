@@ -47,6 +47,7 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 
 - Vue 3 support
 - Focus trap inside the modal
+- Focus restoration: the element that opened the dialog is re-focused when the last dialog closes
 - Keyboard accessibility (Escape to close)
 - Backdrop with blur and fade animation
 - Supports multiple modals opened simultaneously with automatic stack management
@@ -298,7 +299,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 | Prop       | Type                  | Default    | Description                                                                                                              |
 | ---------- | --------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `backdrop` | `Boolean` \| `String` | `true`     | `true` = click on backdrop closes dialog, `"static"` = backdrop does nothing                                             |
+| `backdrop` | `Boolean` \| `String` | `true`     | `true` = backdrop click closes dialog, `false` = no backdrop, `"static"` = backdrop shown but click does not close |
 | `escape`   | `Boolean`             | `true`     | Pressing Escape key closes the dialog                                                                                    |
 | `position` | `String`              | `"center"` | Position of the dialog: `"center"` or `"top"`                                                                            |
 | `width`    | `String`              | `"md"`     | Dialog width. Presets: `sm`, `md`, `lg`, `fullscreen`. Also supports custom CSS width, e.g. `"400px"`, `"50%"`, `"80vw"` |
@@ -324,6 +325,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 - `aria-describedby` points to body slot
 - Close button has `aria-label="Close"`
 - Focus trap is active on the topmost dialog to keep keyboard navigation predictable
+- Focus is restored to the element that was focused before the first dialog opened when the last dialog closes
 - Escape key closes the dialog if enabled (topmost dialog only when stacked)
 
 ---
@@ -392,6 +394,7 @@ When dialogs are stacked:
   - topmost dialog: `aria-modal="true"`, `aria-hidden="false"`
   - lower-layered dialogs: `aria-modal="false"`, `aria-hidden="true"`
 - Dialog z-index is automatically calculated from stack order
+- Focus is restored to the element that triggered the first dialog when all dialogs are closed
 
 No additional configuration is required to use stack behavior.
 
