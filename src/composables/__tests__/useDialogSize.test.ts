@@ -56,6 +56,11 @@ describe('useDialogSize composable', () => {
     expect(dialogWidthStyle.value).toBe(customWidth);
   });
 
+  it('returns undefined style for undefined width', () => {
+    const { dialogWidthStyle } = useDialogSize({ width: undefined });
+    expect(dialogWidthStyle.value).toBeUndefined();
+  });
+
   it('reacts to width changes', async () => {
     const width = ref('sm');
     const { dialogWidthClass, dialogWidthStyle } = mountComposable(width);
