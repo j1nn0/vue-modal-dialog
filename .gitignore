@@ -33,3 +33,4 @@ coverage
 !.aider.conf.yml
 
 storybook-static
+.env
