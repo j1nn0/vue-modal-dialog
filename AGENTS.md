@@ -21,7 +21,16 @@ This workspace is configured with two OpenCode MCP servers (`opencode.json`):
 
 - **context7** — Remote MCP. Query library docs with `Context7 Query Docs`. Always `Context7 Resolve` a library ID first. Useful for Vue, vitest, focus-trap, Sass, etc.
 - **serena** — Local MCP via `uvx`. Provides codebase-aware symbolic operations: `find_symbol`, `find_referencing_symbols`, `replace_symbol_body`, `serena_replace_content`. Preferred over raw grep/sed for structural edits.
-- **Skills** — Two agent skills in `.agents/skills/`: `git-commit` (conventional-commit workflow) and `find-skills` (skill discovery).
+- **Skills** — Agent skills in `.agents/skills/` (9 installed):
+  - `vue` — Vue 3 Composition API, `<script setup>` macros, reactivity, built-in components (Anthony Fu)
+  - `vue-best-practices` — MUST-use for Vue.js tasks; Composition API + TypeScript standard, SSR, vue-tsc
+  - `vue-testing-best-practices` — Vue component/composable testing with Vitest and Vue Test Utils
+  - `vueuse-functions` — Apply VueUse composables appropriately (this project uses `@vueuse/core` + `@vueuse/integrations`)
+  - `vite` — Vite build config, plugin API, SSR, library mode, Rolldown migration (Anthony Fu)
+  - `typescript-advanced-types` — Generics, conditional/mapped types, template literals, type utilities
+  - `accessibility` — WCAG 2.2 audit, keyboard nav, screen reader support, focus management (Addy Osmani)
+  - `git-commit` — Conventional commit workflow with auto-staging and message generation
+  - `find-skills` — Discover and install additional agent skills
 
 ## Validation pipeline
 
