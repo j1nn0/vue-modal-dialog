@@ -1,16 +1,20 @@
 import type { Ref } from 'vue';
+import type { VueModalDialogProps } from '@/types';
 
 export interface StackEntry {
   id: string;
   el?: Ref<HTMLElement | null>;
   onClose?: () => void;
-  propsSnapshot?: Record<string, unknown>;
+  propsSnapshot?: Partial<VueModalDialogProps>;
 }
 
 // Singleton stack manager for modal dialogs
 // API: push(entry) -> index, pop(id) -> removed entry, top(), topId(), count(), indexOf(id), subscribe(fn), unsubscribe(fn)
 const stack: StackEntry[] = [];
 const subscribers = new Set<(stack: StackEntry[]) => void>();
+
+// Focus restoration: save the element that was focused before the first dialog opened.
+let previouslyFocusedElement: Element | null = null;
 
 function notify(): void {
   const snapshot = stack.slice();
@@ -30,8 +34,30 @@ function applyBodyClass(): void {
   else document.body.classList.remove('vue-modal-open');
 }
 
+function saveFocus(): void {
+  if (typeof document === 'undefined') return;
+  const active = document.activeElement;
+  if (active instanceof HTMLElement) {
+    previouslyFocusedElement = active;
+  }
+}
+
+function restoreFocus(): void {
+  if (typeof document === 'undefined' || !previouslyFocusedElement) return;
+  if (previouslyFocusedElement instanceof HTMLElement) {
+    try {
+      previouslyFocusedElement.focus();
+    } catch (err) {
+      console.debug('useDialogStack focus restore error', err);
+    } finally {
+      previouslyFocusedElement = null;
+    }
+  }
+}
+
 export const useDialogStack = {
   push(entry: StackEntry): number {
+    if (stack.length === 0) saveFocus();
     stack.push(entry);
     applyBodyClass();
     notify();
@@ -43,6 +69,7 @@ export const useDialogStack = {
       const [removed] = stack.splice(idx, 1);
       applyBodyClass();
       notify();
+      if (stack.length === 0) restoreFocus();
       return removed ?? null;
     }
     return null;

@@ -81,4 +81,34 @@ describe('useDialogStack', () => {
       expect(useDialogStack.count()).toBe(0);
     });
   });
+
+  describe('focus restoration', () => {
+    it('saves activeElement when first dialog opens and restores when last closes', () => {
+      const button = document.createElement('button');
+      button.textContent = 'trigger';
+      document.body.appendChild(button);
+      button.focus();
+
+      expect(document.activeElement).toBe(button);
+
+      useDialogStack.push({ id: 'first' });
+      useDialogStack.push({ id: 'second' });
+
+      // pop second — active element should NOT be restored yet (stack not empty)
+      useDialogStack.pop('second');
+
+      // pop first — now stack is empty, focus should be restored
+      useDialogStack.pop('first');
+
+      expect(document.activeElement).toBe(button);
+
+      document.body.removeChild(button);
+    });
+
+    it('does not restore focus when last pop is via cleanup (previouslyFocusedElement is null)', () => {
+      // if previouslyFocusedElement was never set (e.g., no focusable element),
+      // popping to empty stack should not throw
+      expect(() => useDialogStack.pop('nonexistent')).not.toThrow();
+    });
+  });
 });

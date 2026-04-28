@@ -1,21 +1,14 @@
 <script setup lang="ts">
 import { useTemplateRef, useSlots, ref, computed, watch, onBeforeUnmount } from 'vue';
 import { onKeyStroke, useEventListener } from '@vueuse/core';
+import type { VueModalDialogProps } from '@/types';
 import { useDialogState } from '@/composables/useDialogState';
 import { useDialogSize } from '@/composables/useDialogSize';
 import { useDialogMode } from '@/composables/useDialogMode';
 import { useDialogStack } from '@/composables/useDialogStack';
 
-interface Props {
-  backdrop?: boolean | 'static';
-  escape?: boolean;
-  position?: 'center' | 'top';
-  width?: string;
-  mode?: 'light' | 'dark' | null;
-}
-
 // props / emit
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<VueModalDialogProps>(), {
   backdrop: true,
   escape: true,
   position: 'center',

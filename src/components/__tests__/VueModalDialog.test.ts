@@ -459,5 +459,30 @@ describe('VueModalDialog', () => {
       wrapper1.unmount();
       wrapper2.unmount();
     });
+
+    it('restores focus to previously active element on close', async () => {
+      const button = document.createElement('button');
+      button.textContent = 'trigger';
+      document.body.appendChild(button);
+      button.focus();
+
+      expect(document.activeElement).toBe(button);
+
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false },
+      });
+      await openDialog(wrapper);
+
+      // dialog should be open and activeElement now inside dialog
+      expect(useDialogStack.count()).toBe(1);
+
+      await closeDialog(wrapper);
+
+      // focus should be restored to the button
+      expect(document.activeElement).toBe(button);
+
+      wrapper.unmount();
+      document.body.removeChild(button);
+    });
   });
 });

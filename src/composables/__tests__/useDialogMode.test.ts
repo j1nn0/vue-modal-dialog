@@ -50,7 +50,7 @@ describe('useDialogMode lifecycle', () => {
       removeEventListener: vi.fn(),
     };
     matchMediaFn = vi.fn().mockReturnValue(mmObj);
-    window.matchMedia = matchMediaFn;
+    window.matchMedia = matchMediaFn as unknown as typeof window.matchMedia;
   });
 
   afterEach(() => {
@@ -66,7 +66,7 @@ describe('useDialogMode lifecycle', () => {
     expect(matchMediaFn).toHaveBeenCalledWith('(prefers-color-scheme: dark)');
     expect(mmObj.addEventListener).toHaveBeenCalledWith('change', expect.any(Function));
 
-    const handler = mmObj.addEventListener.mock.calls[0][1] as (e: { matches: boolean }) => void;
+    const handler = mmObj.addEventListener.mock.calls[0]![1] as (e: { matches: boolean }) => void;
 
     handler({ matches: true });
     await wrapper.vm.$nextTick();
@@ -84,7 +84,7 @@ describe('useDialogMode lifecycle', () => {
 
     expect(wrapper.find('div').classes()).toContain('mode-dark');
 
-    const handler = mmObj.addEventListener.mock.calls[0][1] as (e: { matches: boolean }) => void;
+    const handler = mmObj.addEventListener.mock.calls[0]![1] as (e: { matches: boolean }) => void;
 
     handler({ matches: false });
     await wrapper.vm.$nextTick();
