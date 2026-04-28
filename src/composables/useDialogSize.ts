@@ -1,10 +1,21 @@
 import type { ComputedRef, MaybeRef } from 'vue';
 import { computed, unref } from 'vue';
 
+/** Props shape expected by `useDialogSize`. */
 export interface DialogSizeProps {
   width?: MaybeRef<string>;
 }
 
+/**
+ * Composable that maps a width prop to CSS class and inline-style values.
+ *
+ * Preset widths (`sm`, `md`, `lg`, `fullscreen`) map to CSS custom
+ * property references; any other value is passed through as-is.
+ *
+ * @returns `dialogWidthClass` — an object of `{ 'dialog-sm': true, ... }`
+ *          for scoped CSS classes, and `dialogWidthStyle` — a `max-width`
+ *          value for the inline `style` attribute.
+ */
 export function useDialogSize(props: DialogSizeProps): {
   dialogWidthClass: ComputedRef<Record<string, boolean>>;
   dialogWidthStyle: ComputedRef<string | undefined>;

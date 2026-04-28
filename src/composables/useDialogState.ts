@@ -8,6 +8,23 @@ type DialogEmit = ((event: 'opened') => void) & ((event: 'closed') => void);
 
 export type { DialogEmit };
 
+/**
+ * Composable that manages dialog open/close state and focus trapping.
+ *
+ * When called **without** a `dialogId` (backward-compatible path) the
+ * composable manages the `vue-modal-open` body class and focus trap
+ * directly.
+ *
+ * When called **with** a `dialogId` (stack-aware path) the composable
+ * delegates body-class and focus management to {@link useDialogStack}.
+ *
+ * @param isOpen    - Model ref for v-model binding.
+ * @param dialogRef - Template ref pointing to the dialog root element.
+ * @param emit      - Emits `'opened'` and `'closed'` events.
+ * @param _props    - Reserved for internal component usage.
+ * @param dialogId  - Unique dialog identifier for stack-aware operation.
+ * @returns `close` — a function that sets `isOpen` to `false`.
+ */
 export function useDialogState(
   isOpen: Ref<boolean>,
   dialogRef: Ref<HTMLElement | null>,
@@ -54,7 +71,6 @@ export function useDialogState(
         deactivateFocusTrap();
       }
     } catch (err) {
-      // ignore
       console.warn('useDialogState updateFocus error', err);
     }
   }
