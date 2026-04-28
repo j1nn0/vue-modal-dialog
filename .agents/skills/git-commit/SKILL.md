@@ -1,14 +1,10 @@
 ---
-allowed-tools: Bash
+name: git-commit
 description: 'Execute git commit with conventional commit message analysis, intelligent staging, and message generation. Use when user asks to commit changes, create a git commit, or mentions "/commit". Supports: (1) Auto-detecting type and scope from changes, (2) Generating conventional commit messages from diff, (3) Interactive commit with optional type/scope/description overrides, (4) Intelligent file staging for logical grouping'
 license: MIT
-metadata:
-    github-path: skills/git-commit
-    github-ref: refs/heads/main
-    github-repo: https://github.com/github/awesome-copilot
-    github-tree-sha: 883a6a7466f55a9cd9f22cf1cce2d9333fc9b998
-name: git-commit
+allowed-tools: Bash
 ---
+
 # Git Commit with Conventional Commits
 
 ## Overview
