@@ -16,7 +16,7 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 #### 🛠 Tech Stack
 
 [![Vue](https://img.shields.io/badge/Vue-v3.5-41b883?style=flat-square&logo=vue.js&logoColor=white)](https://vuejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-v5.9-f7df1e?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-v5.9-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESLint](https://img.shields.io/badge/Linting-ESLint-4B32C3?style=flat-square&logo=eslint&logoColor=white)](https://eslint.org/)
 [![Oxlint](https://img.shields.io/badge/Linting-Oxlint-4B32C3?style=flat-square&logo=oxc&logoColor=white)](https://oxc.rs/)
 [![Oxfmt](https://img.shields.io/badge/Formatting-Oxfmt-F7B93E?style=flat-square&logo=oxc&logoColor=white)](https://oxc.rs/)
@@ -316,22 +316,22 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ## 📌 Props
 
-| Prop                 | Type                       | Default    | Description                                                                                                              |
-| -------------------- | -------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `backdrop`           | `Boolean` \| `String`      | `true`     | `true` = backdrop click closes dialog, `false` = no backdrop, `"static"` = backdrop shown but click does not close       |
-| `escape`             | `Boolean`                  | `true`     | Pressing Escape key closes the dialog                                                                                    |
-| `role`               | `String`                   | `"dialog"` | ARIA role: `"dialog"` or `"alertdialog"`                                                                                 |
-| `initialFocus`       | `String` \| `HTMLElement`  | `undefined`| Element selector or element to focus when the dialog opens                                                               |
-| `modal`              | `Boolean`                  | `true`     | `true` = blocks background interaction and traps focus                                                                   |
-| `teleport`           | `Boolean` \| `String`      | `false`    | `true` = teleports to `body`, or specify a CSS selector target                                                           |
-| `scrollLock`         | `Boolean`                  | `true`     | Locks page scrolling while the dialog is open                                                                            |
-| `draggable`          | `Boolean`                  | `false`    | Enables dragging the dialog by its header                                                                                |
-| `transition`         | `String`                   | `"fade"`   | Transition name for the dialog panel                                                                                     |
-| `backdropTransition` | `String`                   | `"fade-backdrop"` | Transition name for the backdrop layer                                                                            |
-| `beforeClose`        | `Function`                 | `undefined`| Async or sync callback; return `false` to prevent closing                                                                |
-| `position`           | `String`                   | `"center"` | Position: `"center"`, `"top"`, `"bottom"`, `"left"`, `"right"`, `"topleft"`, `"topright"`, `"bottomleft"`, `"bottomright"` |
-| `width`              | `String`                   | `"md"`     | Dialog width. Presets: `sm`, `md`, `lg`, `fullscreen`. Also supports custom CSS width, e.g. `"400px"`, `"50%"`, `"80vw"` |
-| `mode`               | `String` \| `null`         | `null`     | Dialog color mode: `"light"` for light mode, `"dark"` for dark mode, null to follow the OS/browser preference            |
+| Prop                 | Type                      | Default           | Description                                                                                                                |
+| -------------------- | ------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `backdrop`           | `Boolean` \| `String`     | `true`            | `true` = backdrop click closes dialog, `false` = no backdrop, `"static"` = backdrop shown but click does not close         |
+| `escape`             | `Boolean`                 | `true`            | Pressing Escape key closes the dialog                                                                                      |
+| `role`               | `String`                  | `"dialog"`        | ARIA role: `"dialog"` or `"alertdialog"`                                                                                   |
+| `initialFocus`       | `String` \| `HTMLElement` | `undefined`       | Element selector or element to focus when the dialog opens                                                                 |
+| `modal`              | `Boolean`                 | `true`            | `true` = blocks background interaction and traps focus                                                                     |
+| `teleport`           | `Boolean` \| `String`     | `false`           | `true` = teleports to `body`, or specify a CSS selector target                                                             |
+| `scrollLock`         | `Boolean`                 | `true`            | Locks page scrolling while the dialog is open                                                                              |
+| `draggable`          | `Boolean`                 | `false`           | Enables dragging the dialog by its header                                                                                  |
+| `transition`         | `String`                  | `"fade"`          | Transition name for the dialog panel                                                                                       |
+| `backdropTransition` | `String`                  | `"fade-backdrop"` | Transition name for the backdrop layer                                                                                     |
+| `beforeClose`        | `Function`                | `undefined`       | Async or sync callback; return `false` to prevent closing                                                                  |
+| `position`           | `String`                  | `"center"`        | Position: `"center"`, `"top"`, `"bottom"`, `"left"`, `"right"`, `"topleft"`, `"topright"`, `"bottomleft"`, `"bottomright"` |
+| `width`              | `String`                  | `"md"`            | Dialog width. Presets: `sm`, `md`, `lg`, `fullscreen`. Also supports custom CSS width, e.g. `"400px"`, `"50%"`, `"80vw"`   |
+| `mode`               | `String` \| `null`        | `null`            | Dialog color mode: `"light"` for light mode, `"dark"` for dark mode, null to follow the OS/browser preference              |
 
 ---
 
@@ -347,14 +347,14 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ## 🔔 Events
 
-| Event          | Payload   | Description                                            |
-| -------------- | --------- | ------------------------------------------------------ |
-| `before-open`  | `void`    | Fired before the dialog begins its opening sequence    |
-| `opening`      | `void`    | Fired when the opening transition starts               |
-| `opened`       | `void`    | Fired when the opening transition completes            |
-| `before-close` | `void`    | Fired before the dialog begins its closing sequence    |
-| `closing`      | `void`    | Fired when the closing transition starts               |
-| `closed`       | `void`    | Fired when the closing transition completes            |
+| Event          | Payload | Description                                         |
+| -------------- | ------- | --------------------------------------------------- |
+| `before-open`  | `void`  | Fired before the dialog begins its opening sequence |
+| `opening`      | `void`  | Fired when the opening transition starts            |
+| `opened`       | `void`  | Fired when the opening transition completes         |
+| `before-close` | `void`  | Fired before the dialog begins its closing sequence |
+| `closing`      | `void`  | Fired when the closing transition starts            |
+| `closed`       | `void`  | Fired when the closing transition completes         |
 
 ---
 
