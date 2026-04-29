@@ -34,3 +34,4 @@ coverage
 
 storybook-static
 .env
+.sisyphus
