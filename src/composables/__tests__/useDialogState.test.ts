@@ -82,7 +82,7 @@ describe('useDialogState', () => {
       const localIsOpen = ref(false);
       const props = { modal: false };
       useDialogState(localIsOpen, dialogRef, emit, props);
-      
+
       localIsOpen.value = true;
       await nextTick();
       await nextTick();
@@ -96,7 +96,7 @@ describe('useDialogState', () => {
       const localIsOpen = ref(false);
       const props = { modal: false };
       useDialogState(localIsOpen, dialogRef, emit, props, 'dialog-test-1');
-      
+
       useDialogStack.push({ id: 'dialog-test-1' });
 
       localIsOpen.value = true;
@@ -105,7 +105,7 @@ describe('useDialogState', () => {
 
       expect(activateSpy).not.toHaveBeenCalled();
       expect(emit).toBeCalledWith('opened');
-      
+
       useDialogStack.pop('dialog-test-1');
     });
   });

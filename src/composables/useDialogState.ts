@@ -31,6 +31,7 @@ export function useDialogState(
   emit: DialogEmit,
   _props: Record<string, unknown> = {},
   dialogId?: string,
+  closeCallback?: () => void,
 ): { close: () => void } {
   const { activate: activateFocusTrap, deactivate: deactivateFocusTrap } = useFocusTrap(dialogRef, {
     initialFocus: () => {
@@ -46,14 +47,19 @@ export function useDialogState(
   });
 
   const close = (): void => {
-    isOpen.value = false;
+    if (closeCallback) {
+      closeCallback();
+    } else {
+      isOpen.value = false;
+    }
   };
 
   // Backward-compatible behavior: if no dialogId provided, keep original body-class + focus logic
   if (!dialogId) {
     watch(isOpen, async (val) => {
       if (val) {
-        if (typeof document !== 'undefined' && _props.modal !== false) document.body.classList.add('vue-modal-open');
+        if (typeof document !== 'undefined' && _props.modal !== false)
+          document.body.classList.add('vue-modal-open');
         await nextTick();
         if (_props.modal !== false) {
           activateFocusTrap();

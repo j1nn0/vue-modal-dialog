@@ -623,4 +623,196 @@ describe('VueModalDialog', () => {
       document.body.removeChild(button);
     });
   });
+
+  describe('lifecycle emits (Task 10)', () => {
+    it('emits before-open and opening when dialog opens', async () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false },
+      });
+      await openDialog(wrapper);
+
+      const emits = Object.keys(wrapper.emitted());
+      expect(emits).toContain('before-open');
+      expect(emits).toContain('opening');
+
+      const beforeOpenIdx = emits.indexOf('before-open');
+      const openingIdx = emits.indexOf('opening');
+      expect(beforeOpenIdx).toBeLessThan(openingIdx);
+    });
+
+    it('emits before-close and closing when close is requested', async () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false },
+      });
+      await openDialog(wrapper);
+
+      await wrapper.find('.dialog-close').trigger('click');
+      await nextTick();
+      await nextTick();
+      await nextTick();
+
+      const emits = Object.keys(wrapper.emitted());
+      expect(emits).toContain('before-close');
+      expect(emits).toContain('closing');
+      
+      const beforeCloseIdx = emits.indexOf('before-close');
+      const closingIdx = emits.indexOf('closing');
+      expect(beforeCloseIdx).toBeLessThan(closingIdx);
+    });
+
+    it('emits before-close BEFORE evaluating beforeClose prop, and skips closing if prevented', async () => {
+      const beforeCloseMock = vi.fn(() => false);
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, beforeClose: beforeCloseMock },
+      });
+      await openDialog(wrapper);
+
+      await wrapper.find('.dialog-close').trigger('click');
+      await nextTick();
+      await nextTick();
+
+      expect(wrapper.emitted('before-close')).toBeTruthy();
+      expect(beforeCloseMock).toHaveBeenCalled();
+      expect(wrapper.emitted('closing')).toBeFalsy();
+    });
+  });
+  describe('role prop', () => {
+    it('sets role to dialog by default', async () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false },
+      });
+      await openDialog(wrapper);
+
+      const dialog = wrapper.find('[role="dialog"]');
+      expect(dialog.exists()).toBe(true);
+    });
+
+    it('sets role to alertdialog when specified', async () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, role: 'alertdialog' },
+      });
+      await openDialog(wrapper);
+
+      const dialog = wrapper.find('[role="alertdialog"]');
+      expect(dialog.exists()).toBe(true);
+    });
+
+    it('defaults backdrop to static when role is alertdialog', async () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, role: 'alertdialog' },
+      });
+      await openDialog(wrapper);
+
+      const backdrop = wrapper.find('.backdrop');
+      await backdrop.trigger('click');
+      await nextTick();
+
+      expect(wrapper.emitted('update:modelValue')).toBeFalsy();
+    });
+
+    it('respects explicit backdrop=false when role is alertdialog', async () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, role: 'alertdialog', backdrop: false },
+      });
+      await openDialog(wrapper);
+
+      const backdrop = wrapper.find('.backdrop');
+      await backdrop.trigger('click');
+      await nextTick();
+
+      expect(wrapper.emitted('update:modelValue')).toBeFalsy();
+    });
+
+    it('emits console.warn if role="alertdialog" and modal=false', async () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, role: 'alertdialog', modal: false },
+      });
+      await openDialog(wrapper);
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[VueModalDialog] role="alertdialog" with modal=false is contradictory: alertdialogs require focus to stay inside.',
+      );
+
+      consoleWarnSpy.mockRestore();
+    });
+  });
+
+  describe('beforeClose prop', () => {
+    it('prevents closing when returning false', async () => {
+      const beforeClose = vi.fn(() => false);
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, beforeClose },
+      });
+      await openDialog(wrapper);
+
+      await wrapper.find('.dialog-close').trigger('click');
+      await nextTick();
+
+      expect(beforeClose).toHaveBeenCalled();
+      expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    });
+
+    it('allows closing when returning true', async () => {
+      const beforeClose = vi.fn(() => true);
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, beforeClose },
+      });
+      await openDialog(wrapper);
+
+      await wrapper.find('.dialog-close').trigger('click');
+      await nextTick();
+      await nextTick();
+      await nextTick();
+
+      expect(beforeClose).toHaveBeenCalled();
+      expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
+    });
+
+    it('prevents closing when returning Promise<false>', async () => {
+      const beforeClose = vi.fn(() => Promise.resolve(false));
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, beforeClose },
+      });
+      await openDialog(wrapper);
+
+      await wrapper.find('.dialog-close').trigger('click');
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      await nextTick();
+
+      expect(beforeClose).toHaveBeenCalled();
+      expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    });
+
+    it('allows closing when returning Promise<true>', async () => {
+      const beforeClose = vi.fn(() => Promise.resolve(true));
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, beforeClose },
+      });
+      await openDialog(wrapper);
+
+      await wrapper.find('.dialog-close').trigger('click');
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      await nextTick();
+
+      expect(beforeClose).toHaveBeenCalled();
+      expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
+    });
+
+    it('requestClose() exposed method triggers close when no beforeClose', async () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false },
+      });
+      await openDialog(wrapper);
+
+      await wrapper.vm.requestClose();
+      await nextTick();
+      await nextTick();
+      await nextTick();
+
+      expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
+    });
+  });
+
 });

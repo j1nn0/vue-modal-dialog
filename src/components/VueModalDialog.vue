@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { useTemplateRef, useSlots, ref, computed, watch, onBeforeUnmount, nextTick } from 'vue';
+import {
+  useTemplateRef,
+  useSlots,
+  ref,
+  computed,
+  watch,
+  watchEffect,
+  onBeforeUnmount,
+  nextTick,
+} from 'vue';
 import { onKeyStroke, useEventListener } from '@vueuse/core';
 import type { VueModalDialogProps } from '@/types';
 import { useDialogState } from '@/composables/useDialogState';
@@ -24,6 +33,10 @@ const props = withDefaults(defineProps<VueModalDialogProps>(), {
 const emit = defineEmits<{
   opened: [];
   closed: [];
+  'before-open': [];
+  opening: [];
+  'before-close': [];
+  closing: [];
 }>();
 const dialogRef = useTemplateRef('dialogRef');
 const slots = useSlots();
@@ -37,8 +50,17 @@ const teleportTarget = computed(() =>
   props.teleport === true ? 'body' : typeof props.teleport === 'string' ? props.teleport : 'body',
 );
 
+async function requestClose() {
+  emit('before-close');
+  if (props.beforeClose) {
+    const allow = await props.beforeClose();
+    if (!allow) return;
+  }
+  isOpen.value = false;
+}
+
 // composables (pass dialogId to useDialogState so focus-trap can react to stack)
-const { close } = useDialogState(isOpen, dialogRef, emit, props, dialogId);
+const { close } = useDialogState(isOpen, dialogRef, emit, props, dialogId, requestClose);
 const { dialogWidthClass, dialogWidthStyle, dialogPositionClass } = useDialogSize(props);
 const { modeClass } = useDialogMode(props);
 
@@ -65,7 +87,20 @@ const zIndexValue = computed(() => {
 });
 
 const isTop = computed(() => currentTopId.value === dialogId);
-const canCloseByBackdrop = computed(() => props.backdrop !== false && props.backdrop !== 'static');
+const effectiveBackdrop = computed(() =>
+  props.role === 'alertdialog' && props.backdrop === true ? 'static' : props.backdrop,
+);
+const canCloseByBackdrop = computed(
+  () => effectiveBackdrop.value !== false && effectiveBackdrop.value !== 'static',
+);
+
+watchEffect(() => {
+  if (props.role === 'alertdialog' && props.modal === false) {
+    console.warn(
+      '[VueModalDialog] role="alertdialog" with modal=false is contradictory: alertdialogs require focus to stay inside.',
+    );
+  }
+});
 
 function updateStackIndex() {
   stackIndex.value = useDialogStack.indexOf(dialogId);
@@ -78,18 +113,21 @@ useDialogStack.subscribe(updateStackIndex);
 // Watch open state to register/unregister in stack
 watch(isOpen, (val) => {
   if (val) {
+    emit('before-open');
     const idx = useDialogStack.push({
       id: dialogId,
       el: dialogRef,
       onClose: close,
       propsSnapshot: {
         ...props,
-        scrollLock: props.modal === false ? false : props.scrollLock
+        scrollLock: props.modal === false ? false : props.scrollLock,
       },
     });
     stackIndex.value = idx;
     updateStackIndex();
+    emit('opening');
   } else {
+    emit('closing');
     useDialogStack.pop(dialogId);
     // Defer closed emit to let Vue process the DOM change (and any
     // transition) before notifying the parent.
@@ -105,7 +143,7 @@ onBeforeUnmount(() => {
 // Backdrop click responds only on the topmost modal.
 function handleBackdropClick() {
   if (!isOpen.value) return;
-  if (canCloseByBackdrop.value && isTop.value) close();
+  if (canCloseByBackdrop.value && isTop.value) requestClose();
 }
 
 // Fallback for environments where backdrop click can be swallowed by overlays/tooling.
@@ -123,7 +161,7 @@ useEventListener(
     if (!root || !target) return;
 
     if (!root.contains(target)) {
-      close();
+      requestClose();
     }
   },
   { capture: true },
@@ -134,13 +172,15 @@ onKeyStroke('Escape', (e) => {
   if (!isOpen.value) return;
   if (props.escape && isTop.value) {
     e.preventDefault();
-    close();
+    requestClose();
   }
 });
 
 // Random ID（for ARIA）
 const headerId = `dialog-header-${Math.random().toString(36).slice(2)}`;
 const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
+
+defineExpose({ requestClose });
 </script>
 
 <template>
@@ -162,12 +202,8 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
         :open="isOpen"
         :style="{ maxWidth: dialogWidthStyle, zIndex: zIndexValue }"
         class="dialog"
-        :class="[
-          dialogPositionClass,
-          dialogWidthClass,
-          modeClass,
-        ]"
-        role="dialog"
+        :class="[dialogPositionClass, dialogWidthClass, modeClass]"
+        :role="props.role ?? 'dialog'"
         :aria-modal="isTop && props.modal !== false"
         :aria-hidden="!isTop"
         :aria-labelledby="headerId"
@@ -178,7 +214,7 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
             <div class="dialog-title">
               <slot name="header"></slot>
             </div>
-            <button class="dialog-close" @click="close" aria-label="Close">×</button>
+            <button class="dialog-close" @click="requestClose" aria-label="Close">×</button>
           </header>
 
           <div class="dialog-body" :id="bodyId">

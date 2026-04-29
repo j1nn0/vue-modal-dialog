@@ -13,9 +13,24 @@ describe('useDialogSize composable', () => {
     it('returns correct class for preset widths', () => {
       const presets = ['sm', 'md', 'lg', 'fullscreen'] as const;
       const expectedClasses: Record<string, Record<string, boolean>> = {
-        sm: { 'dialog-sm': true, 'dialog-md': false, 'dialog-lg': false, 'dialog-fullscreen': false },
-        md: { 'dialog-sm': false, 'dialog-md': true, 'dialog-lg': false, 'dialog-fullscreen': false },
-        lg: { 'dialog-sm': false, 'dialog-md': false, 'dialog-lg': true, 'dialog-fullscreen': false },
+        sm: {
+          'dialog-sm': true,
+          'dialog-md': false,
+          'dialog-lg': false,
+          'dialog-fullscreen': false,
+        },
+        md: {
+          'dialog-sm': false,
+          'dialog-md': true,
+          'dialog-lg': false,
+          'dialog-fullscreen': false,
+        },
+        lg: {
+          'dialog-sm': false,
+          'dialog-md': false,
+          'dialog-lg': true,
+          'dialog-fullscreen': false,
+        },
         fullscreen: {
           'dialog-sm': false,
           'dialog-md': false,
