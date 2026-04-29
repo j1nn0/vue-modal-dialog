@@ -32,6 +32,36 @@ describe('useDialogStack', () => {
     expect(events.length).toBeGreaterThanOrEqual(2);
   });
 
+  describe('scrollLock behavior', () => {
+    it('adds body class for default scrollLock', () => {
+      useDialogStack.push({ id: 'default-lock' });
+
+      expect(document.body.classList.contains('vue-modal-open')).toBeTruthy();
+
+      useDialogStack.pop('default-lock');
+    });
+
+    it('does not add body class when all dialogs disable scrollLock', () => {
+      useDialogStack.push({ id: 'no-lock', propsSnapshot: { scrollLock: false } });
+
+      expect(document.body.classList.contains('vue-modal-open')).toBeFalsy();
+
+      useDialogStack.pop('no-lock');
+    });
+
+    it('keeps body class when any stacked dialog enables scrollLock', () => {
+      useDialogStack.push({ id: 'no-lock', propsSnapshot: { scrollLock: false } });
+      useDialogStack.push({ id: 'yes-lock', propsSnapshot: { scrollLock: true } });
+
+      expect(document.body.classList.contains('vue-modal-open')).toBeTruthy();
+
+      useDialogStack.pop('yes-lock');
+      expect(document.body.classList.contains('vue-modal-open')).toBeFalsy();
+
+      useDialogStack.pop('no-lock');
+    });
+  });
+
   describe('top()', () => {
     it('returns null for empty stack', () => {
       expect(useDialogStack.top()).toBeNull();

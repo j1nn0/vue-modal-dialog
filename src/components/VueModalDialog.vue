@@ -14,6 +14,8 @@ const props = withDefaults(defineProps<VueModalDialogProps>(), {
   position: 'center',
   width: 'md',
   mode: null,
+  teleport: false,
+  scrollLock: true,
 });
 const emit = defineEmits<{
   opened: [];
@@ -27,6 +29,9 @@ const isOpen = defineModel<boolean>({ required: true });
 const dialogId = `dialog-${Math.random().toString(36).slice(2)}`;
 const stackIndex = ref(-1);
 const currentTopId = ref<string | null>(null);
+const teleportTarget = computed(() =>
+  props.teleport === true ? 'body' : typeof props.teleport === 'string' ? props.teleport : 'body',
+);
 
 // composables (pass dialogId to useDialogState so focus-trap can react to stack)
 const { close } = useDialogState(isOpen, dialogRef, emit, props, dialogId);
@@ -132,52 +137,54 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
 </script>
 
 <template>
-  <transition name="fade-backdrop" appear>
-    <div
-      v-if="isOpen && isTop && width !== 'fullscreen'"
-      class="backdrop"
-      :class="modeClass"
-      :style="{ zIndex: BASE_Z + (stackIndex >= 0 ? stackIndex * 2 : 0) }"
-      @click="handleBackdropClick"
-    ></div>
-  </transition>
+  <Teleport :to="teleportTarget" :disabled="!props.teleport">
+    <transition name="fade-backdrop" appear>
+      <div
+        v-if="isOpen && isTop && width !== 'fullscreen'"
+        class="backdrop"
+        :class="modeClass"
+        :style="{ zIndex: BASE_Z + (stackIndex >= 0 ? stackIndex * 2 : 0) }"
+        @click="handleBackdropClick"
+      ></div>
+    </transition>
 
-  <transition name="fade" appear>
-    <div
-      ref="dialogRef"
-      v-if="isOpen"
-      :open="isOpen"
-      :style="{ maxWidth: dialogWidthStyle, zIndex: zIndexValue }"
-      class="dialog"
-      :class="[
-        { 'is-center': props.position === 'center', 'is-top': props.position === 'top' },
-        dialogWidthClass,
-        modeClass,
-      ]"
-      role="dialog"
-      :aria-modal="isTop"
-      :aria-hidden="!isTop"
-      :aria-labelledby="headerId"
-      :aria-describedby="bodyId"
-    >
-      <div class="dialog-content">
-        <header class="dialog-header" :id="headerId">
-          <div class="dialog-title">
-            <slot name="header"></slot>
+    <transition name="fade" appear>
+      <div
+        ref="dialogRef"
+        v-if="isOpen"
+        :open="isOpen"
+        :style="{ maxWidth: dialogWidthStyle, zIndex: zIndexValue }"
+        class="dialog"
+        :class="[
+          { 'is-center': props.position === 'center', 'is-top': props.position === 'top' },
+          dialogWidthClass,
+          modeClass,
+        ]"
+        role="dialog"
+        :aria-modal="isTop"
+        :aria-hidden="!isTop"
+        :aria-labelledby="headerId"
+        :aria-describedby="bodyId"
+      >
+        <div class="dialog-content">
+          <header class="dialog-header" :id="headerId">
+            <div class="dialog-title">
+              <slot name="header"></slot>
+            </div>
+            <button class="dialog-close" @click="close" aria-label="Close">×</button>
+          </header>
+
+          <div class="dialog-body" :id="bodyId">
+            <slot></slot>
           </div>
-          <button class="dialog-close" @click="close" aria-label="Close">×</button>
-        </header>
 
-        <div class="dialog-body" :id="bodyId">
-          <slot></slot>
+          <footer v-if="slots.footer" class="dialog-footer">
+            <slot name="footer"></slot>
+          </footer>
         </div>
-
-        <footer v-if="slots.footer" class="dialog-footer">
-          <slot name="footer"></slot>
-        </footer>
       </div>
-    </div>
-  </transition>
+    </transition>
+  </Teleport>
 </template>
 
 <style>

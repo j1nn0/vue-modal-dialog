@@ -26,6 +26,13 @@ async function closeDialog(wrapper: VueWrapper): Promise<void> {
   await nextTick();
 }
 
+function createTeleportTarget(className = 'my-container'): HTMLDivElement {
+  const target = document.createElement('div');
+  target.className = className;
+  document.body.appendChild(target);
+  return target;
+}
+
 describe('VueModalDialog', () => {
   afterEach(() => {
     const stack = useDialogStack._getStack();
@@ -62,6 +69,62 @@ describe('VueModalDialog', () => {
       await closeDialog(wrapper);
 
       expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+    });
+
+    it('renders in-place when teleport is false', async () => {
+      const container = document.createElement('div');
+
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, teleport: false },
+        attachTo: container,
+      });
+      await openDialog(wrapper);
+
+      const dialog = container.querySelector('[role="dialog"]');
+
+      expect(dialog).not.toBeNull();
+      expect(container.contains(dialog)).toBe(true);
+      expect(document.body.contains(dialog)).toBe(false);
+
+      wrapper.unmount();
+    });
+
+    it('teleports to body when teleport is true', async () => {
+      const container = document.createElement('div');
+
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, teleport: true },
+        attachTo: container,
+      });
+      await openDialog(wrapper);
+
+      const dialog = document.body.querySelector('[role="dialog"]');
+
+      expect(dialog).not.toBeNull();
+      expect(document.body.contains(dialog)).toBe(true);
+      expect(container.contains(dialog)).toBe(false);
+
+      wrapper.unmount();
+    });
+
+    it('teleports to a custom selector target', async () => {
+      const target = createTeleportTarget();
+      const container = document.createElement('div');
+
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, teleport: '.my-container' },
+        attachTo: container,
+      });
+      await openDialog(wrapper);
+
+      const dialog = target.querySelector('[role="dialog"]');
+
+      expect(dialog).not.toBeNull();
+      expect(target.contains(dialog)).toBe(true);
+      expect(container.contains(dialog)).toBe(false);
+
+      wrapper.unmount();
+      target.remove();
     });
   });
 

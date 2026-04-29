@@ -33,7 +33,9 @@ function notify(): void {
 
 function applyBodyClass(): void {
   if (typeof document === 'undefined') return;
-  if (stack.length > 0) document.body.classList.add('vue-modal-open');
+  const shouldLockScroll = stack.some((entry) => entry.propsSnapshot?.scrollLock !== false);
+
+  if (shouldLockScroll) document.body.classList.add('vue-modal-open');
   else document.body.classList.remove('vue-modal-open');
 }
 
