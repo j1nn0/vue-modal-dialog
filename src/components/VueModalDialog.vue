@@ -11,11 +11,15 @@ import { useDialogStack } from '@/composables/useDialogStack';
 const props = withDefaults(defineProps<VueModalDialogProps>(), {
   backdrop: true,
   escape: true,
+  transition: 'fade',
+  backdropTransition: 'fade-backdrop',
   position: 'center',
   width: 'md',
   mode: null,
   teleport: false,
   scrollLock: true,
+  initialFocus: undefined,
+  modal: true,
 });
 const emit = defineEmits<{
   opened: [];
@@ -35,7 +39,7 @@ const teleportTarget = computed(() =>
 
 // composables (pass dialogId to useDialogState so focus-trap can react to stack)
 const { close } = useDialogState(isOpen, dialogRef, emit, props, dialogId);
-const { dialogWidthClass, dialogWidthStyle } = useDialogSize(props);
+const { dialogWidthClass, dialogWidthStyle, dialogPositionClass } = useDialogSize(props);
 const { modeClass } = useDialogMode(props);
 
 // read base z-index safely
@@ -78,7 +82,10 @@ watch(isOpen, (val) => {
       id: dialogId,
       el: dialogRef,
       onClose: close,
-      propsSnapshot: props,
+      propsSnapshot: {
+        ...props,
+        scrollLock: props.modal === false ? false : props.scrollLock
+      },
     });
     stackIndex.value = idx;
     updateStackIndex();
@@ -138,9 +145,9 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
 
 <template>
   <Teleport :to="teleportTarget" :disabled="!props.teleport">
-    <transition name="fade-backdrop" appear>
+    <transition :name="backdropTransition" appear>
       <div
-        v-if="isOpen && isTop && width !== 'fullscreen'"
+        v-if="isOpen && isTop && width !== 'fullscreen' && props.modal !== false"
         class="backdrop"
         :class="modeClass"
         :style="{ zIndex: BASE_Z + (stackIndex >= 0 ? stackIndex * 2 : 0) }"
@@ -148,7 +155,7 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
       ></div>
     </transition>
 
-    <transition name="fade" appear>
+    <transition :name="transition" appear>
       <div
         ref="dialogRef"
         v-if="isOpen"
@@ -156,12 +163,12 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
         :style="{ maxWidth: dialogWidthStyle, zIndex: zIndexValue }"
         class="dialog"
         :class="[
-          { 'is-center': props.position === 'center', 'is-top': props.position === 'top' },
+          dialogPositionClass,
           dialogWidthClass,
           modeClass,
         ]"
         role="dialog"
-        :aria-modal="isTop"
+        :aria-modal="isTop && props.modal !== false"
         :aria-hidden="!isTop"
         :aria-labelledby="headerId"
         :aria-describedby="bodyId"
@@ -203,6 +210,7 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
   --j1nn0-vue-modal-dialog-max-width-lg: 900px;
   --j1nn0-vue-modal-dialog-max-height: 80vh;
   --j1nn0-vue-modal-dialog-text-color: #000000;
+  --j1nn0-vue-modal-dialog-position-offset: 2rem;
 
   /* Header */
   --j1nn0-vue-modal-dialog-header-background: #f5f5f5;
@@ -295,6 +303,44 @@ const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
     max-width: var(--j1nn0-vue-modal-dialog-width);
     box-sizing: border-box;
     margin: 0;
+  }
+
+  &.is-bottom {
+    bottom: var(--j1nn0-vue-modal-dialog-position-offset, 2rem);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  &.is-left {
+    left: var(--j1nn0-vue-modal-dialog-position-offset, 2rem);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &.is-right {
+    right: var(--j1nn0-vue-modal-dialog-position-offset, 2rem);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &.is-topleft {
+    top: var(--j1nn0-vue-modal-dialog-position-offset, 2rem);
+    left: var(--j1nn0-vue-modal-dialog-position-offset, 2rem);
+  }
+
+  &.is-topright {
+    top: var(--j1nn0-vue-modal-dialog-position-offset, 2rem);
+    right: var(--j1nn0-vue-modal-dialog-position-offset, 2rem);
+  }
+
+  &.is-bottomleft {
+    bottom: var(--j1nn0-vue-modal-dialog-position-offset, 2rem);
+    left: var(--j1nn0-vue-modal-dialog-position-offset, 2rem);
+  }
+
+  &.is-bottomright {
+    bottom: var(--j1nn0-vue-modal-dialog-position-offset, 2rem);
+    right: var(--j1nn0-vue-modal-dialog-position-offset, 2rem);
   }
 
   &.mode-light {

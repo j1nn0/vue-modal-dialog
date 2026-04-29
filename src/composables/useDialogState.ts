@@ -33,7 +33,15 @@ export function useDialogState(
   dialogId?: string,
 ): { close: () => void } {
   const { activate: activateFocusTrap, deactivate: deactivateFocusTrap } = useFocusTrap(dialogRef, {
-    initialFocus: false,
+    initialFocus: () => {
+      const target = _props.initialFocus as string | HTMLElement | undefined;
+      if (target === undefined) return false;
+      if (typeof target === 'string') {
+        if (typeof document === 'undefined') return false;
+        return dialogRef.value?.querySelector<HTMLElement>(target) || false;
+      }
+      return target;
+    },
     escapeDeactivates: false,
   });
 
@@ -45,9 +53,11 @@ export function useDialogState(
   if (!dialogId) {
     watch(isOpen, async (val) => {
       if (val) {
-        if (typeof document !== 'undefined') document.body.classList.add('vue-modal-open');
+        if (typeof document !== 'undefined' && _props.modal !== false) document.body.classList.add('vue-modal-open');
         await nextTick();
-        activateFocusTrap();
+        if (_props.modal !== false) {
+          activateFocusTrap();
+        }
         emit('opened');
       } else {
         if (typeof document !== 'undefined') document.body.classList.remove('vue-modal-open');
@@ -65,7 +75,7 @@ export function useDialogState(
   function updateFocus(): void {
     try {
       const topId = useDialogStack.topId();
-      if (isOpen.value && topId === dialogId) {
+      if (isOpen.value && topId === dialogId && _props.modal !== false) {
         activateFocusTrap();
       } else {
         deactivateFocusTrap();

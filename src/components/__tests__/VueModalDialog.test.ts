@@ -128,6 +128,81 @@ describe('VueModalDialog', () => {
     });
   });
 
+  describe('modal prop', () => {
+    it('does not render backdrop when modal is false', async () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, modal: false },
+      });
+      await openDialog(wrapper);
+
+      expect(wrapper.find('.backdrop').exists()).toBe(false);
+    });
+
+    it('sets aria-modal to false when modal is false', async () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, modal: false },
+      });
+      await openDialog(wrapper);
+
+      const dialog = wrapper.find('[role="dialog"]');
+      expect(dialog.attributes('aria-modal')).toBe('false');
+    });
+
+    it('derives scrollLock as false when modal is false', async () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, modal: false },
+      });
+      await openDialog(wrapper);
+
+      const stack = useDialogStack._getStack();
+      expect(stack.length).toBe(1);
+      expect(stack[0].propsSnapshot?.scrollLock).toBe(false);
+      expect(document.body.classList.contains('vue-modal-open')).toBe(false);
+    });
+
+    it('retains stack participation even if non-modal', async () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, modal: false },
+      });
+      await openDialog(wrapper);
+      
+      expect(useDialogStack.count()).toBe(1);
+    });
+  });
+
+  describe('transition props', () => {
+    it('uses the default transition names', () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false },
+      });
+
+      expect(wrapper.props('transition')).toBe('fade');
+      expect(wrapper.props('backdropTransition')).toBe('fade-backdrop');
+    });
+
+    it('passes a custom transition name to the dialog transition', async () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, transition: 'slide' },
+      });
+      await openDialog(wrapper);
+
+      const names = wrapper.findAll('transition-stub').map((node) => node.attributes('name'));
+
+      expect(names).toContain('slide');
+    });
+
+    it('passes a custom backdrop transition name to the backdrop transition', async () => {
+      const wrapper = mount(VueModalDialog, {
+        props: { modelValue: false, backdropTransition: 'my-backdrop' },
+      });
+      await openDialog(wrapper);
+
+      const names = wrapper.findAll('transition-stub').map((node) => node.attributes('name'));
+
+      expect(names).toContain('my-backdrop');
+    });
+  });
+
   describe('slots', () => {
     it('renders header slot content', async () => {
       const wrapper = mount(VueModalDialog, {
