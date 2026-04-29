@@ -36,6 +36,12 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 - [🌐 CDN Usage](#-cdn-usage)
 - [📌 Props](#-props)
 - [🎛 Slots](#-slots)
+- [🔔 Events](#-events)
+- [🔓 Expose](#-expose)
+- [🎯 Programmatic API](#-programmatic-api)
+- [🖱 Draggable Dialogs](#-draggable-dialogs)
+- [🚪 Non-modal Dialogs](#-non-modal-dialogs)
+- [🔒 Prevent Close](#-prevent-close)
 - [♿ Accessibility](#-accessibility)
 - [🎨 Styles](#-styles)
 - [📝 Notes on Multiple Modals](#-notes-on-multiple-modals)
@@ -57,6 +63,19 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 - Configurable dialog size: `sm`, `md`, `lg`, `fullscreen`
 - Configurable dialog width (supports custom widths via width prop for flexible layouts)
 - Supports dark mode and light mode via the `mode` prop (`"light"`, `"dark"`, or `null` to follow OS/browser preference)
+- **New v0.12.0 Features**:
+  - Teleport support: render dialog anywhere in the DOM (e.g., to `body`)
+  - Non-modal support: allow background interaction
+  - Draggable dialogs: reposition dialog by dragging the header
+  - Programmatic API: control dialog state via `useDialog()` composable
+  - Before-close guard: prevent closing based on logic (e.g., unsaved changes)
+  - Custom transitions: configurable entry/exit animations for dialog and backdrop
+  - Initial focus: explicitly define which element to focus on open
+  - Role configuration: choose between `dialog` or `alertdialog`
+  - Body scroll locking: automatically prevent background scrolling
+  - Expanded positioning: 9-way positioning system (center, top, bottom, corners, etc.)
+  - New lifecycle events: `before-open`, `opening`, `before-close`, `closing`
+  - Programmatic close: `requestClose()` method exposed to parents
 
 ---
 
@@ -297,13 +316,22 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ## 📌 Props
 
-| Prop       | Type                  | Default    | Description                                                                                                              |
-| ---------- | --------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `backdrop` | `Boolean` \| `String` | `true`     | `true` = backdrop click closes dialog, `false` = no backdrop, `"static"` = backdrop shown but click does not close       |
-| `escape`   | `Boolean`             | `true`     | Pressing Escape key closes the dialog                                                                                    |
-| `position` | `String`              | `"center"` | Position of the dialog: `"center"` or `"top"`                                                                            |
-| `width`    | `String`              | `"md"`     | Dialog width. Presets: `sm`, `md`, `lg`, `fullscreen`. Also supports custom CSS width, e.g. `"400px"`, `"50%"`, `"80vw"` |
-| `mode`     | `String` \| `null`    | `null`     | Dialog color mode: `"light"` for light mode, `"dark"` for dark mode, null to follow the OS/browser preference            |
+| Prop                 | Type                       | Default    | Description                                                                                                              |
+| -------------------- | -------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `backdrop`           | `Boolean` \| `String`      | `true`     | `true` = backdrop click closes dialog, `false` = no backdrop, `"static"` = backdrop shown but click does not close       |
+| `escape`             | `Boolean`                  | `true`     | Pressing Escape key closes the dialog                                                                                    |
+| `role`               | `String`                   | `"dialog"` | ARIA role: `"dialog"` or `"alertdialog"`                                                                                 |
+| `initialFocus`       | `String` \| `HTMLElement`  | `undefined`| Element selector or element to focus when the dialog opens                                                               |
+| `modal`              | `Boolean`                  | `true`     | `true` = blocks background interaction and traps focus                                                                   |
+| `teleport`           | `Boolean` \| `String`      | `false`    | `true` = teleports to `body`, or specify a CSS selector target                                                           |
+| `scrollLock`         | `Boolean`                  | `true`     | Locks page scrolling while the dialog is open                                                                            |
+| `draggable`          | `Boolean`                  | `false`    | Enables dragging the dialog by its header                                                                                |
+| `transition`         | `String`                   | `"fade"`   | Transition name for the dialog panel                                                                                     |
+| `backdropTransition` | `String`                   | `"fade-backdrop"` | Transition name for the backdrop layer                                                                            |
+| `beforeClose`        | `Function`                 | `undefined`| Async or sync callback; return `false` to prevent closing                                                                |
+| `position`           | `String`                   | `"center"` | Position: `"center"`, `"top"`, `"bottom"`, `"left"`, `"right"`, `"topleft"`, `"topright"`, `"bottomleft"`, `"bottomright"` |
+| `width`              | `String`                   | `"md"`     | Dialog width. Presets: `sm`, `md`, `lg`, `fullscreen`. Also supports custom CSS width, e.g. `"400px"`, `"50%"`, `"80vw"` |
+| `mode`               | `String` \| `null`         | `null`     | Dialog color mode: `"light"` for light mode, `"dark"` for dark mode, null to follow the OS/browser preference            |
 
 ---
 
@@ -314,6 +342,27 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 | `header` | Optional. Content for the header. × button always present |
 | default  | Content for the body of the dialog                        |
 | `footer` | Optional. Content for footer, not rendered if empty       |
+
+---
+
+## 🔔 Events
+
+| Event          | Payload   | Description                                            |
+| -------------- | --------- | ------------------------------------------------------ |
+| `before-open`  | `void`    | Fired before the dialog begins its opening sequence    |
+| `opening`      | `void`    | Fired when the opening transition starts               |
+| `opened`       | `void`    | Fired when the opening transition completes            |
+| `before-close` | `void`    | Fired before the dialog begins its closing sequence    |
+| `closing`      | `void`    | Fired when the closing transition starts               |
+| `closed`       | `void`    | Fired when the closing transition completes            |
+
+---
+
+## 🔓 Expose
+
+| Method         | Description                                                                 |
+| -------------- | --------------------------------------------------------------------------- |
+| `requestClose` | Programmatically request to close the dialog. Respects `beforeClose` guard. |
 
 ---
 
@@ -397,6 +446,74 @@ When dialogs are stacked:
 - Focus is restored to the element that triggered the first dialog when all dialogs are closed
 
 No additional configuration is required to use stack behavior.
+
+---
+
+## 🎯 Programmatic API
+
+You can use the `useDialog` composable to control the dialog state from any child component or logic.
+
+```vue
+<script setup>
+import { VueModalDialog, useDialog } from '@j1nn0/vue-modal-dialog';
+
+const { isOpen, open, close } = useDialog();
+</script>
+
+<template>
+  <button @click="open">Open via API</button>
+
+  <VueModalDialog v-model="isOpen">
+    <p>Controlled via useDialog()</p>
+    <button @click="close">Close</button>
+  </VueModalDialog>
+</template>
+```
+
+---
+
+## 🖱 Draggable Dialogs
+
+Enable header-based dragging by adding the `draggable` prop.
+
+```vue
+<VueModalDialog v-model="isOpen" draggable>
+  <template #header>Drag Me</template>
+  <p>You can move this dialog anywhere on the screen.</p>
+</VueModalDialog>
+```
+
+---
+
+## 🚪 Non-modal Dialogs
+
+Set `modal` to `false` to allow interaction with the background while the dialog is open.
+
+```vue
+<VueModalDialog v-model="isOpen" :modal="false" backdrop="static">
+  <p>The background remains interactive.</p>
+</VueModalDialog>
+```
+
+---
+
+## 🔒 Prevent Close
+
+Use `beforeClose` to add validation or confirmation before the dialog closes.
+
+```vue
+<script setup>
+const handleBeforeClose = async () => {
+  return window.confirm('You have unsaved changes. Close anyway?');
+};
+</script>
+
+<template>
+  <VueModalDialog v-model="isOpen" :beforeClose="handleBeforeClose">
+    <p>Try to close me.</p>
+  </VueModalDialog>
+</template>
+```
 
 ---
 

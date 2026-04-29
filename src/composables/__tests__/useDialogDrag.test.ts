@@ -29,19 +29,26 @@ describe('useDialogDrag', () => {
   it('updates offset on pointermove when enabled', () => {
     const isOpen = ref(true);
     const enabled = ref(true);
-    const { onPointerDown, offsetX, offsetY, isDragging, dragStyle } = useDialogDrag(isOpen, enabled);
+    const { onPointerDown, offsetX, offsetY, isDragging, dragStyle } = useDialogDrag(
+      isOpen,
+      enabled,
+    );
 
     onPointerDown(new PointerEvent('pointerdown', { clientX: 100, clientY: 100 }));
     expect(isDragging.value).toBe(true);
 
-    const moveHandler = addEventListenerSpy.mock.calls.find((call: unknown[]) => call[0] === 'pointermove')[1];
+    const moveHandler = addEventListenerSpy.mock.calls.find(
+      (call: unknown[]) => call[0] === 'pointermove',
+    )[1];
     moveHandler(new PointerEvent('pointermove', { clientX: 150, clientY: 120 }));
 
     expect(offsetX.value).toBe(50);
     expect(offsetY.value).toBe(20);
     expect(dragStyle.value).toEqual({ transform: 'translate(50px, 20px)' });
 
-    const upHandler = addEventListenerSpy.mock.calls.find((call: unknown[]) => call[0] === 'pointerup')[1];
+    const upHandler = addEventListenerSpy.mock.calls.find(
+      (call: unknown[]) => call[0] === 'pointerup',
+    )[1];
     upHandler(new PointerEvent('pointerup'));
 
     expect(isDragging.value).toBe(false);
@@ -65,7 +72,9 @@ describe('useDialogDrag', () => {
     const { onPointerDown, offsetX, offsetY, dragStyle } = useDialogDrag(isOpen, enabled);
 
     onPointerDown(new PointerEvent('pointerdown', { clientX: 100, clientY: 100 }));
-    const moveHandler = addEventListenerSpy.mock.calls.find((call: unknown[]) => call[0] === 'pointermove')[1];
+    const moveHandler = addEventListenerSpy.mock.calls.find(
+      (call: unknown[]) => call[0] === 'pointermove',
+    )[1];
     moveHandler(new PointerEvent('pointermove', { clientX: 150, clientY: 120 }));
 
     expect(offsetX.value).toBe(50);
@@ -86,7 +95,9 @@ describe('useDialogDrag', () => {
     const { onPointerDown, dragStyle } = useDialogDrag(isOpen, enabled);
 
     onPointerDown(new PointerEvent('pointerdown', { clientX: 100, clientY: 100 }));
-    const moveHandler = addEventListenerSpy.mock.calls.find((call: unknown[]) => call[0] === 'pointermove')[1];
+    const moveHandler = addEventListenerSpy.mock.calls.find(
+      (call: unknown[]) => call[0] === 'pointermove',
+    )[1];
     moveHandler(new PointerEvent('pointermove', { clientX: 150, clientY: 120 }));
 
     expect(dragStyle.value).toEqual({ transform: 'translate(50px, 20px)' });

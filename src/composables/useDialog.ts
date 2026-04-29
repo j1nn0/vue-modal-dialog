@@ -18,14 +18,15 @@ export function useDialog() {
 
     const Root = defineComponent({
       setup() {
-        return () => h(VueModalDialog, {
-          ...props,
-          modelValue: isOpen.value,
-          'onUpdate:modelValue': (val: boolean) => {
-            isOpen.value = val;
-            if (!val) close();
-          },
-        });
+        return () =>
+          h(VueModalDialog, {
+            ...props,
+            modelValue: isOpen.value,
+            'onUpdate:modelValue': (val: boolean) => {
+              isOpen.value = val;
+              if (!val) close();
+            },
+          });
       },
     });
 

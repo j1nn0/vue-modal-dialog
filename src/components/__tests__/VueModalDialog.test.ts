@@ -165,7 +165,7 @@ describe('VueModalDialog', () => {
         props: { modelValue: false, modal: false },
       });
       await openDialog(wrapper);
-      
+
       expect(useDialogStack.count()).toBe(1);
     });
   });
@@ -654,7 +654,7 @@ describe('VueModalDialog', () => {
       const emits = Object.keys(wrapper.emitted());
       expect(emits).toContain('before-close');
       expect(emits).toContain('closing');
-      
+
       const beforeCloseIdx = emits.indexOf('before-close');
       const closingIdx = emits.indexOf('closing');
       expect(beforeCloseIdx).toBeLessThan(closingIdx);
@@ -814,5 +814,4 @@ describe('VueModalDialog', () => {
       expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
     });
   });
-
 });

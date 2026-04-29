@@ -1,9 +1,6 @@
 import { ref, watch, computed, type Ref } from 'vue';
 
-export function useDialogDrag(
-  isOpen: Ref<boolean>,
-  enabled: Ref<boolean>,
-) {
+export function useDialogDrag(isOpen: Ref<boolean>, enabled: Ref<boolean>) {
   const offsetX = ref(0);
   const offsetY = ref(0);
   const isDragging = ref(false);
@@ -44,7 +41,7 @@ export function useDialogDrag(
   const dragStyle = computed(() =>
     enabled.value && (offsetX.value !== 0 || offsetY.value !== 0)
       ? { transform: `translate(${offsetX.value}px, ${offsetY.value}px)` }
-      : {}
+      : {},
   );
 
   return { onPointerDown, dragStyle, isDragging, offsetX, offsetY };

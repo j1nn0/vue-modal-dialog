@@ -213,7 +213,12 @@ defineExpose({ requestClose });
         :aria-describedby="bodyId"
       >
         <div class="dialog-content">
-          <header class="dialog-header" :id="headerId" :style="isDraggable ? { cursor: 'grab' } : {}" @pointerdown="onPointerDown">
+          <header
+            class="dialog-header"
+            :id="headerId"
+            :style="isDraggable ? { cursor: 'grab' } : {}"
+            @pointerdown="onPointerDown"
+          >
             <div class="dialog-title">
               <slot name="header"></slot>
             </div>
