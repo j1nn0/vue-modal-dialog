@@ -27,4 +27,5 @@ export const VueModalDialogPlugin: Plugin = {
 };
 
 export { VueModalDialog };
+export { useDialog } from '@/composables/useDialog';
 export type { VueModalDialogProps } from '@/types';

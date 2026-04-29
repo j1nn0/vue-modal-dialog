@@ -15,6 +15,7 @@ import { useDialogState } from '@/composables/useDialogState';
 import { useDialogSize } from '@/composables/useDialogSize';
 import { useDialogMode } from '@/composables/useDialogMode';
 import { useDialogStack } from '@/composables/useDialogStack';
+import { useDialogDrag } from '@/composables/useDialogDrag';
 
 // props / emit
 const props = withDefaults(defineProps<VueModalDialogProps>(), {
@@ -63,6 +64,8 @@ async function requestClose() {
 const { close } = useDialogState(isOpen, dialogRef, emit, props, dialogId, requestClose);
 const { dialogWidthClass, dialogWidthStyle, dialogPositionClass } = useDialogSize(props);
 const { modeClass } = useDialogMode(props);
+const isDraggable = computed(() => props.draggable === true && props.width !== 'fullscreen');
+const { onPointerDown, dragStyle } = useDialogDrag(isOpen, isDraggable);
 
 // read base z-index safely
 const BASE_Z =
@@ -200,7 +203,7 @@ defineExpose({ requestClose });
         ref="dialogRef"
         v-if="isOpen"
         :open="isOpen"
-        :style="{ maxWidth: dialogWidthStyle, zIndex: zIndexValue }"
+        :style="[{ maxWidth: dialogWidthStyle, zIndex: zIndexValue }, dragStyle]"
         class="dialog"
         :class="[dialogPositionClass, dialogWidthClass, modeClass]"
         :role="props.role ?? 'dialog'"
@@ -210,7 +213,7 @@ defineExpose({ requestClose });
         :aria-describedby="bodyId"
       >
         <div class="dialog-content">
-          <header class="dialog-header" :id="headerId">
+          <header class="dialog-header" :id="headerId" :style="isDraggable ? { cursor: 'grab' } : {}" @pointerdown="onPointerDown">
             <div class="dialog-title">
               <slot name="header"></slot>
             </div>
