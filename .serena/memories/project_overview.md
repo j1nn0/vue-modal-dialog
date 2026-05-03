@@ -1,0 +1,1 @@
+Vue 3 single-package component library published as @j1nn0/vue-modal-dialog. Local demo app runs via src/main.js + src/App.vue; published library entry is src/index.ts. Main component is src/components/VueModalDialog.vue with composables for state, stack, mode, size, drag, and programmatic API. Vitest/jsdom tests live under src/**/__tests__ and src/__tests__.

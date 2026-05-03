@@ -1,0 +1,1 @@
+Match CI with `pnpm format:check && pnpm lint && pnpm test && pnpm build`. Note pre-commit only runs `pnpm lint` and `pnpm test`, so format/build failures can still remain if not run manually. Node >=24 and pnpm >=10 are required.

@@ -1,0 +1,1 @@
+Use Vue 3 Composition API with `<script setup lang="ts">`. Alias `@/` maps to `src/`. Formatting is 2 spaces, LF, single quotes, semicolons, max line length 100. Oxfmt only targets src/ and ignores .github/. Unused TS vars/args must be prefixed with `_` for ESLint.
