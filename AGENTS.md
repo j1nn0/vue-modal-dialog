@@ -1,112 +1,59 @@
 # AGENTS.md — @j1nn0/vue-modal-dialog
 
-A single-package Vue 3 modal dialog component library. Published to npm as `@j1nn0/vue-modal-dialog`.
+Single-package Vue 3 component library published as `@j1nn0/vue-modal-dialog`.
+`pnpm dev` runs the local demo app (`src/main.js` + `src/App.vue`); the shipped library entry is `src/index.ts`.
 
 ## Commands
 
-| Action | Command | Notes |
-|---|---|---|
-| Dev server | `pnpm dev` | Vite, bound to `127.0.0.1` |
-| Build | `pnpm build` | `vue-tsc --noEmit` first, then `vite build` |
-| Test | `pnpm test` | `vitest run`, jsdom environment |
-| Coverage | `pnpm coverage` | v8 provider; target >= 80% |
-| Lint | `pnpm lint` | oxlint + eslint via npm-run-all2; no warnings tolerated |
-| Format | `pnpm format` | oxfmt targeting `src/` |
-| Format check | `pnpm format:check` | `oxfmt --check src/` |
-| Storybook | `pnpm storybook` | port 6006, `--no-open` |
+- `pnpm dev` — Vite dev server on `127.0.0.1`
+- `pnpm storybook` / `pnpm build-storybook`
+- `pnpm test` — full Vitest run in jsdom
+- `pnpm test -- src/components/__tests__/VueModalDialog.test.ts` — single test file
+- `pnpm test -- -t "emits closed"` — single test name
+- `pnpm lint` — runs `oxlint . --fix` then `eslint . --fix`
+- `pnpm format` / `pnpm format:check` — only targets `src/`
+- `pnpm build` — `vue-tsc --noEmit -p tsconfig.build.json && vite build`
 
-## Available tools (MCP / Serena)
+## Validation Order
 
-This workspace is configured with two OpenCode MCP servers (`opencode.json`):
+- Match CI: `pnpm format:check && pnpm lint && pnpm test && pnpm build`
+- Pre-commit only runs `pnpm lint` and `pnpm test`; it does not run format or build checks.
 
-- **context7** — Remote MCP. Query library docs with `Context7 Query Docs`. Always `Context7 Resolve` a library ID first. Useful for Vue, vitest, focus-trap, Sass, etc.
-- **serena** — Local MCP via `uvx`. Provides codebase-aware symbolic operations: `find_symbol`, `find_referencing_symbols`, `replace_symbol_body`, `serena_replace_content`. Preferred over raw grep/sed for structural edits.
-- **Skills** — Agent skills in `.agents/skills/` (9 installed):
-  - `vue` — Vue 3 Composition API, `<script setup>` macros, reactivity, built-in components (Anthony Fu)
-  - `vue-best-practices` — MUST-use for Vue.js tasks; Composition API + TypeScript standard, SSR, vue-tsc
-  - `vue-testing-best-practices` — Vue component/composable testing with Vitest and Vue Test Utils
-  - `vueuse-functions` — Apply VueUse composables appropriately (this project uses `@vueuse/core` + `@vueuse/integrations`)
-  - `vite` — Vite build config, plugin API, SSR, library mode, Rolldown migration (Anthony Fu)
-  - `typescript-advanced-types` — Generics, conditional/mapped types, template literals, type utilities
-  - `accessibility` — WCAG 2.2 audit, keyboard nav, screen reader support, focus management (Addy Osmani)
-  - `git-commit` — Conventional commit workflow with auto-staging and message generation
-  - `find-skills` — Discover and install additional agent skills
+## Toolchain Gotchas
 
-## Validation pipeline
+- Requires Node `>=24`, pnpm `>=10`; repo pins `pnpm@10.33.0`.
+- `.npmrc` uses `registry=https://npm.flatt.tech/` with `engine-strict=true`; CI also installs `flatt-security/setup-takumi-guard-npm@v1` before `pnpm install`.
+- `pnpm-workspace.yaml` enables `minimumReleaseAge: 10080` and `trustPolicy: no-downgrade`.
+- Vite ESLint plugin has `failOnWarning: true`; warnings break both `pnpm dev` and `pnpm build`.
+- Library build excludes tests and stories via `tsconfig.build.json`; peer deps (`vue`, `@vueuse/core`, `@vueuse/integrations`, `focus-trap`) are externalized.
 
-```
-format:check → lint → test → build
-```
+## Structure
 
-- **Pre-commit hook** (`.husky/pre-commit`): runs `pnpm lint && pnpm test`. It does NOT run format — run `pnpm format` manually before committing.
-- **CI** (`.github/workflows/ci.yml`): two parallel jobs — `lint` (format:check + oxlint + eslint) and `test-and-build` (vitest + vue-tsc + vite build). Triggers on `push`/`pull_request` to `main`.
+- `src/index.ts` exports `VueModalDialog`, `VueModalDialogPlugin`, `useDialog`, and `VueModalDialogProps`.
+- `src/components/VueModalDialog.vue` owns stacking, teleport, ARIA attrs, keyboard/backdrop close, and lifecycle emits.
+- `src/composables/useDialogState.ts` manages open/close lifecycle and focus trap behavior.
+- `src/composables/useDialogStack.ts` is a singleton stack manager for shared backdrop, z-index, body scroll lock, and focus restoration.
+- `src/composables/useDialog.ts` is the programmatic API; it mounts a temporary app into `document.body` and no-ops under SSR.
+- Tests live in `src/components/__tests__`, `src/composables/__tests__`, and `src/__tests__`.
+- Storybook entry is `src/components/VueModalDialog.stories.ts`.
 
-## Key gotchas
+## Behavior Worth Preserving
 
-- **Build fails without type-check**: `vue-tsc --noEmit -p tsconfig.build.json` must pass before vite build.
-- **Lint is zero-tolerance**: Vite ESLint plugin has `failOnWarning: true` — warnings fail the dev server and builds.
-- **ESLint enforces no-unused-vars**: unused imports break both lint and build. Remove them or prefix with `_`.
-- **Custom npm registry**: `.npmrc` sets `registry=https://npm.flatt.tech/`, `engine-strict=true`.
-- **Engine requirements**: Node >= 24, pnpm >= 10 (`package.json` engines). `packageManager: pnpm@10.33.0`.
-- **Peer deps externalized at build**: `vue`, `@vueuse/core`, `@vueuse/integrations`, `focus-trap`.
-- **pnpm-workspace**: `minimumReleaseAge: 10080` (7 days), `trustPolicy: no-downgrade`.
+- Only the topmost dialog handles Escape/backdrop close and gets `aria-modal="true"`; lower stacked dialogs are `aria-hidden="true"`.
+- Focus is saved when the first dialog opens and restored only after the last dialog closes.
+- `closed` is emitted on `nextTick()`, not synchronously with `modelValue = false`.
+- `alertdialog` with `modal=false` intentionally warns in dev.
+- Non-modal dialogs force `scrollLock` off when added to the stack.
 
-## Architecture
+## Conventions
 
-```
-src/
-├── types.ts                  # Shared VueModalDialogProps (also reused in StackEntry)
-├── index.ts                  # Public API: component + plugin + type exports
-├── components/
-│   ├── VueModalDialog.vue    # Main component (orchestrates 4 composables)
-│   ├── __tests__/            # Component-level tests
-│   └── VueModalDialog.stories.js
-└── composables/
-    ├── useDialogState.ts     # Open/close, focus trap, body class, lifecycle emits
-    ├── useDialogSize.ts      # Preset/custom width → CSS class + style
-    ├── useDialogMode.ts      # light/dark mode, reactive to prefers-color-scheme
-    ├── useDialogStack.ts     # Singleton stack manager (push/pop/top/subscribe)
-    └── __tests__/            # Composable unit tests
-```
-
-- **Import alias**: `@/` → `src/` (tsconfig.json, vite.config.ts).
-- **Public API** (`src/index.ts`): exports `VueModalDialog`, `VueModalDialogPlugin`, `VueModalDialogProps` (type), `VueModalDialogPluginOptions` (type).
-- **Focus restoration**: `useDialogStack` saves `document.activeElement` when the first dialog opens and restores it when the last one closes.
-- **`closed` emit timing**: emitted via `nextTick()` from the component's `watch(isOpen)` handler — not synchronously — to let Vue process the DOM change first.
-
-## Testing
-
-- Framework: Vitest + jsdom. `@vue/test-utils` for component mounts.
-- Tests colocated with source:
-  - `src/composables/__tests__/*.test.ts` — composable unit tests
-  - `src/components/__tests__/*.test.ts` — component integration tests
-  - `src/__tests__/*.test.ts` — public API tests (plugin)
-- Mocking: `vi.mock()` with factory functions. See `useDialogState.test.ts` for the focus-trap mock pattern.
-- Coverage target: >= 80% (branches, lines).
-- Component tests: use `mount(VueModalDialog, { props: { modelValue: ... } })`. Open dialogs with `setProps({ modelValue: true })` rather than mounting with `true` (so watchers fire).
-
-## Code conventions
-
-- Vue 3 Composition API, `<script setup>`, `defineProps`, `defineEmits`, `defineModel`.
-- 2-space indent, LF, max 100 cols (`.editorconfig`, `.oxfmtrc.json`).
-- Single quotes, semicolons required (oxfmt).
-- Composable naming: `use*` prefix, one file per composable.
-- CSS: custom properties prefixed `--j1nn0-vue-modal-dialog-*`. Scoped SCSS in the component. Autoprefixer via PostCSS.
-- JSDoc: all public functions, composable return types, and exported interfaces should have JSDoc (`@param`, `@returns`, `@default`, `@example`).
-- SSR guards: always wrap browser APIs in `typeof document !== 'undefined'` / `typeof window !== 'undefined'`.
+- Vue 3 Composition API with `<script setup lang="ts">`; alias `@/` maps to `src/`.
+- Formatting: 2 spaces, LF, single quotes, semicolons, max 100 cols.
+- Oxfmt ignores `.github/**`; formatting commands only touch `src/`, so Markdown/config edits are not auto-formatted.
+- Unused TypeScript vars/args must be prefixed with `_` to satisfy ESLint.
+- Consumer docs exist in both `README.md` and `README.ja.md`.
 
 ## Release
 
-1. `pnpm build`
-2. `npm version patch|minor|major`
-3. `make push` (or `make release-*`)
-4. CI publishes to npm on version tags — no manual publish step.
-
-## Reference docs
-
-- `.github/copilot-instructions.md` — primary architecture/code style reference
-- `.github/instructions/testing.instructions.md` — test writing rules
-- `.github/instructions/readme-sync.instructions.md` — README maintenance
-- `.github/prompts/api-compat-check.prompt.md` — breaking-change checklist
-- `.github/release-maintainer-guide.md` — release flow details
-- `README.md` / `README.ja.md` — consumer-facing docs
+- `make release-patch|minor|major` runs `npm version ...` then `git push origin main --tags`.
+- Publish is tag-driven: pushing `v*.*.*` runs `.github/workflows/publish.yml`, which builds and publishes with `pnpm publish --registry https://registry.npmjs.org/ --provenance`.
