@@ -87,3 +87,35 @@ export interface VueModalDialogProps {
   /** Color mode. `null` follows the OS `prefers-color-scheme` setting. @default null */
   mode?: 'light' | 'dark' | null;
 }
+
+/** Events emitted by the VueModalDialog component. */
+export interface VueModalDialogEmits {
+  /** Fired after the dialog has fully opened (after enter transition). */
+  opened: [];
+  /** Fired after the dialog has fully closed (after leave transition). */
+  closed: [];
+  /** Fired before the dialog starts opening. */
+  'before-open': [];
+  /** Fired while the dialog is opening (before transition completes). */
+  opening: [];
+  /** Fired before the dialog starts closing. */
+  'before-close': [];
+  /** Fired while the dialog is closing (before transition completes). */
+  closing: [];
+}
+
+/** Slots provided by the VueModalDialog component. */
+export interface VueModalDialogSlots {
+  /** Header area of the dialog. Contains the title and close button. */
+  header: [];
+  /** Default body content of the dialog. */
+  default: [];
+  /** Footer area of the dialog. Only rendered when the slot is provided. */
+  footer: [];
+}
+
+/** Public API exposed via template ref on the VueModalDialog component. */
+export interface VueModalDialogExpose {
+  /** Request the dialog to close, respecting `beforeClose` guard if provided. */
+  requestClose: () => void;
+}

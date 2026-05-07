@@ -1,12 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { clearDialogStack } from '@/test-utils';
 
 import { useDialogStack } from '../useDialogStack';
 
 describe('useDialogStack', () => {
   afterEach(() => {
-    // cleanup stack
-    const s = useDialogStack._getStack();
-    s.forEach((e) => useDialogStack.pop(e.id));
+    clearDialogStack();
     document.body.classList.remove('vue-modal-open');
   });
 
@@ -152,7 +151,10 @@ describe('useDialogStack', () => {
       useDialogStack.subscribe(throwingSub);
       useDialogStack.push({ id: 'err' });
 
-      expect(warnSpy).toHaveBeenCalledWith('useDialogStack subscriber error', expect.any(Error));
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[Vue warn]: useDialogStack subscriber error',
+        expect.any(Error),
+      );
 
       // stack should still be updated despite the error
       expect(useDialogStack.count()).toBe(1);

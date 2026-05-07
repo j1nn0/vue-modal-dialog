@@ -5,13 +5,10 @@ push:
 	git push origin main --tags
 
 release-patch:
-	npm version patch
-	@make push
+	pnpm release patch
 
 release-minor:
-	npm version minor
-	@make push
+	pnpm release minor
 
 release-major:
-	npm version major
-	@make push
+	pnpm release major

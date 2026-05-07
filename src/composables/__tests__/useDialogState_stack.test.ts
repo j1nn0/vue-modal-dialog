@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { nextTick, ref } from 'vue';
 import type { Ref } from 'vue';
+import { clearDialogStack } from '@/test-utils';
 
 import { useDialogState } from '../useDialogState';
 import type { DialogEmit } from '../useDialogState';
@@ -27,15 +28,12 @@ describe('useDialogState (stack-aware)', () => {
     emit = vi.fn() as unknown as DialogEmit;
     activateSpy.mockClear();
     deactivateSpy.mockClear();
-    // clear any existing stack
-    const s = useDialogStack._getStack();
-    s.forEach((e) => useDialogStack.pop(e.id));
+    clearDialogStack();
     document.body.classList.remove('vue-modal-open');
   });
 
   afterEach(() => {
-    const s = useDialogStack._getStack();
-    s.forEach((e) => useDialogStack.pop(e.id));
+    clearDialogStack();
   });
 
   it('activates focus trap only when top of stack', async () => {

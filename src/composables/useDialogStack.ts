@@ -1,3 +1,4 @@
+import { warn as vueWarn } from 'vue';
 import type { Ref } from 'vue';
 import type { VueModalDialogProps } from '@/types';
 
@@ -26,7 +27,7 @@ function notify(): void {
     try {
       fn(snapshot);
     } catch (err) {
-      console.warn('useDialogStack subscriber error', err);
+      vueWarn('useDialogStack subscriber error', err);
     }
   });
 }
@@ -53,7 +54,7 @@ function restoreFocus(): void {
     try {
       previouslyFocusedElement.focus();
     } catch (err) {
-      console.warn('useDialogStack focus restore error', err);
+      vueWarn('useDialogStack focus restore error', err);
     } finally {
       previouslyFocusedElement = null;
     }

@@ -12,6 +12,10 @@ export default mergeConfig(
       root: fileURLToPath(new URL('./', import.meta.url)),
       coverage: {
         exclude: [...configDefaults.exclude, 'postcss.config.js'],
+        thresholds: {
+          branches: 80,
+          lines: 80,
+        },
       },
     },
   }),

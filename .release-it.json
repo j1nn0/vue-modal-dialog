@@ -1,0 +1,35 @@
+{
+  "git": {
+    "commitMessage": "chore(release): v${version}",
+    "tagName": "v${version}"
+  },
+  "github": {
+    "release": true
+  },
+  "npm": {
+    "publish": false
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "infile": "CHANGELOG.md",
+      "preset": {
+        "name": "conventionalcommits"
+      },
+      "header": "# Changelog",
+      "types": [
+        { "type": "feat", "section": "Features" },
+        { "type": "fix", "section": "Bug Fixes" },
+        { "type": "perf", "section": "Performance" },
+        { "type": "refactor", "section": "Refactor" },
+        { "type": "docs", "section": "Documentation" },
+        { "type": "test", "section": "Tests" },
+        { "type": "chore", "section": "Chore" },
+        { "type": "revert", "section": "Reverts" }
+      ]
+    }
+  },
+  "hooks": {
+    "after:bump": "pnpm build",
+    "after:release": "echo Successfully released ${name} v${version} to GitHub."
+  }
+}

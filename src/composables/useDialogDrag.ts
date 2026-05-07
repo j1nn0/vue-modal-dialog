@@ -1,5 +1,23 @@
 import { ref, watch, computed, type Ref } from 'vue';
 
+/**
+ * Composable that adds drag-to-move behavior to a dialog.
+ *
+ * Listens for pointer events on the dialog header and applies a CSS
+ * `translate()` transform to reposition the dialog. The offset resets
+ * automatically when the dialog closes.
+ *
+ * @param isOpen  - Reactive ref tracking whether the dialog is open.
+ * @param enabled - Reactive ref controlling whether dragging is active.
+ * @returns An object with `onPointerDown` event handler, `dragStyle`
+ *          computed style, and `isDragging` state.
+ *
+ * @example
+ * ```ts
+ * const isDraggable = computed(() => props.draggable === true && props.width !== 'fullscreen');
+ * const { onPointerDown, dragStyle } = useDialogDrag(isOpen, isDraggable);
+ * ```
+ */
 export function useDialogDrag(isOpen: Ref<boolean>, enabled: Ref<boolean>) {
   const offsetX = ref(0);
   const offsetY = ref(0);

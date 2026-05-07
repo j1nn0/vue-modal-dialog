@@ -1,13 +1,8 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "eslint",
-    "oxc",
-    "vue"
-  ],
+  "plugins": ["eslint", "oxc", "vue"],
   "env": {
-    "browser": true,
-    "jquery": true,
+    "browser": true
   },
   "categories": {
     "correctness": "error"
@@ -17,6 +12,6 @@
     "**/dist-ssr/**",
     "**/coverage/**",
     "**/storybook-static/**",
-    "**/node_modules/**",
-  ],
+    "**/node_modules/**"
+  ]
 }

@@ -2,6 +2,23 @@ import { createApp, defineComponent, h, ref, type App } from 'vue';
 import VueModalDialog from '@/components/VueModalDialog.vue';
 import type { VueModalDialogProps } from '@/types';
 
+/**
+ * Imperative dialog API for opening modal dialogs programmatically.
+ *
+ * Creates a standalone Vue app instance for each dialog, mounting it
+ * into the document body. Useful when you need to open a dialog
+ * without placing a `<VueModalDialog>` component in your template.
+ *
+ * @returns An object with `open`, `close`, and `isOpen` reactive reference.
+ *
+ * @example
+ * ```ts
+ * const { open, close, isOpen } = useDialog();
+ * open({ width: 'sm', backdrop: 'static' });
+ * // later...
+ * close();
+ * ```
+ */
 export function useDialog() {
   let app: App | null = null;
   let container: HTMLElement | null = null;

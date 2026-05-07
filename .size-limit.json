@@ -1,0 +1,17 @@
+[
+  {
+    "name": "ES bundle",
+    "path": "dist/vue-modal-dialog.es.js",
+    "limit": "15 KB"
+  },
+  {
+    "name": "UMD bundle",
+    "path": "dist/vue-modal-dialog.umd.js",
+    "limit": "13 KB"
+  },
+  {
+    "name": "CSS",
+    "path": "dist/vue-modal-dialog.css",
+    "limit": "8 KB"
+  }
+]

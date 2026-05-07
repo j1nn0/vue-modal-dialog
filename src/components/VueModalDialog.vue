@@ -8,9 +8,10 @@ import {
   watchEffect,
   onBeforeUnmount,
   nextTick,
+  warn as vueWarn,
 } from 'vue';
 import { onKeyStroke, useEventListener } from '@vueuse/core';
-import type { VueModalDialogProps } from '@/types';
+import type { VueModalDialogProps, VueModalDialogEmits, VueModalDialogSlots } from '@/types';
 import { useDialogState } from '@/composables/useDialogState';
 import { useDialogSize } from '@/composables/useDialogSize';
 import { useDialogMode } from '@/composables/useDialogMode';
@@ -22,7 +23,7 @@ const props = withDefaults(defineProps<VueModalDialogProps>(), {
   backdrop: true,
   escape: true,
   transition: 'fade',
-  backdropTransition: 'fade-backdrop',
+  backdropTransition: 'fade',
   position: 'center',
   width: 'md',
   mode: null,
@@ -31,14 +32,8 @@ const props = withDefaults(defineProps<VueModalDialogProps>(), {
   initialFocus: undefined,
   modal: true,
 });
-const emit = defineEmits<{
-  opened: [];
-  closed: [];
-  'before-open': [];
-  opening: [];
-  'before-close': [];
-  closing: [];
-}>();
+const emit = defineEmits<VueModalDialogEmits>();
+defineSlots<VueModalDialogSlots>();
 const dialogRef = useTemplateRef('dialogRef');
 const slots = useSlots();
 const isOpen = defineModel<boolean>({ required: true });
@@ -78,7 +73,7 @@ const BASE_Z =
           const n = parseInt(v, 10);
           return Number.isFinite(n) ? n : 1000;
         } catch (err) {
-          console.warn('getComputedStyle error', err);
+          vueWarn('getComputedStyle error', err);
           return 1000;
         }
       })()
@@ -99,8 +94,16 @@ const canCloseByBackdrop = computed(
 
 watchEffect(() => {
   if (props.role === 'alertdialog' && props.modal === false) {
-    console.warn(
+    vueWarn(
       '[VueModalDialog] role="alertdialog" with modal=false is contradictory: alertdialogs require focus to stay inside.',
+    );
+  }
+  if (props.draggable && props.width === 'fullscreen') {
+    vueWarn('[VueModalDialog] draggable=true has no effect when width="fullscreen".');
+  }
+  if (props.backdrop === 'static' && props.escape === false) {
+    vueWarn(
+      '[VueModalDialog] backdrop="static" with escape=false means the user has no way to dismiss the dialog.',
     );
   }
 });

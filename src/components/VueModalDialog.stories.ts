@@ -77,6 +77,79 @@ const meta: Meta = {
         defaultValue: { summary: 'null' },
       },
     },
+    role: {
+      description: 'ARIA role applied to the dialog container.',
+      control: 'inline-radio',
+      options: ['dialog', 'alertdialog'],
+      table: {
+        type: { summary: '"dialog" | "alertdialog"' },
+        defaultValue: { summary: 'dialog' },
+      },
+    },
+    initialFocus: {
+      description: 'Element selector or element to focus when the dialog opens.',
+      control: 'text',
+      table: {
+        type: { summary: 'string | HTMLElement | undefined' },
+        defaultValue: { summary: 'undefined' },
+      },
+    },
+    modal: {
+      description: 'Enables modal behavior (blocks background interaction, traps focus).',
+      control: 'boolean',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    teleport: {
+      description: 'Teleport the dialog to a target element. `true` teleports to `body`.',
+      control: 'boolean',
+      table: {
+        type: { summary: 'boolean | string' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    scrollLock: {
+      description: 'Locks page scrolling while the dialog is open.',
+      control: 'boolean',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    draggable: {
+      description: 'Enables dragging the dialog by its header area.',
+      control: 'boolean',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    transition: {
+      description: 'Transition name used for the dialog panel.',
+      control: 'text',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: 'fade' },
+      },
+    },
+    backdropTransition: {
+      description: 'Transition name used for the backdrop layer.',
+      control: 'text',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: 'fade-backdrop' },
+      },
+    },
+    beforeClose: {
+      description: 'Callback invoked before closing. Return `false` to cancel.',
+      control: false,
+      table: {
+        type: { summary: '() => boolean | Promise<boolean>' },
+        defaultValue: { summary: 'undefined' },
+      },
+    },
   },
 };
 
@@ -532,6 +605,68 @@ export const FormInDialog: Story = {
             </div>
           </template>
         </VueModalDialog>
+      </div>
+    `,
+  }),
+};
+
+// ── LifecycleEvents ────────────────────────────────────────────────────────
+
+/** Demonstrates all six lifecycle events emitted by the dialog. */
+export const LifecycleEvents: Story = {
+  args: {
+    backdrop: true,
+    escape: true,
+    position: 'center',
+    width: 'md',
+    mode: null,
+  },
+  render: (args) => ({
+    components: { VueModalDialog },
+    setup() {
+      const isOpen = ref(false);
+      const events = ref<string[]>([]);
+      const log = (name: string) =>
+        events.value.push(`${name} @ ${new Date().toLocaleTimeString()}`);
+      const clear = () => (events.value = []);
+      return { args, isOpen, events, log, clear };
+    },
+    template: `
+      <div style="min-width: 320px;">
+        <button type="button" @click="isOpen = true">Open Dialog</button>
+
+        <VueModalDialog
+          v-model="isOpen"
+          :backdrop="args.backdrop"
+          :escape="args.escape"
+          :position="args.position"
+          :width="args.width"
+          :mode="args.mode"
+          @before-open="log('before-open')"
+          @opening="log('opening')"
+          @opened="log('opened')"
+          @before-close="log('before-close')"
+          @closing="log('closing')"
+          @closed="log('closed')"
+        >
+          <template #header>
+            <strong>Lifecycle Events Demo</strong>
+          </template>
+
+          <p>Open and close this dialog to see the lifecycle events in the log below.</p>
+
+          <template #footer>
+            <button type="button" @click="isOpen = false">Close</button>
+          </template>
+        </VueModalDialog>
+
+        <div v-if="events.length" style="margin-top: 1rem; padding: 0.5rem; border: 1px solid #ccc; background: #f9f9f9;">
+          <strong>Event Log</strong>
+          <button type="button" @click="clear" style="margin-left: 0.5rem;">Clear</button>
+          <ul style="margin: 0.5rem 0 0; padding-left: 1.2rem;">
+            <li v-for="(e, i) in events" :key="i">{{ e }}</li>
+          </ul>
+        </div>
       </div>
     `,
   }),

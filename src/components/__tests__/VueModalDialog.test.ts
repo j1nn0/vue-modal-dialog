@@ -1,16 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
 import type { VueWrapper } from '@vue/test-utils';
-import { mount } from '@vue/test-utils';
-import VueModalDialog from '../VueModalDialog.vue';
+import { mountDialog, clearDialogStack } from '@/test-utils';
 import { useDialogStack } from '@/composables/useDialogStack';
 
-vi.mock('@vueuse/integrations/useFocusTrap', () => ({
-  useFocusTrap: vi.fn(() => ({
-    activate: vi.fn(),
-    deactivate: vi.fn(),
-  })),
+const useFocusTrapMock = vi.hoisted(() => ({
+  useFocusTrap: vi.fn(() => ({ activate: vi.fn(), deactivate: vi.fn() })),
 }));
+vi.mock('@vueuse/integrations/useFocusTrap', () => useFocusTrapMock);
 
 async function openDialog(wrapper: VueWrapper): Promise<void> {
   await wrapper.setProps({ modelValue: true });
@@ -35,23 +32,18 @@ function createTeleportTarget(className = 'my-container'): HTMLDivElement {
 
 describe('VueModalDialog', () => {
   afterEach(() => {
-    const stack = useDialogStack._getStack();
-    stack.forEach((e) => useDialogStack.pop(e.id));
+    clearDialogStack();
     document.body.classList.remove('vue-modal-open');
   });
 
   describe('rendering', () => {
     it('does not render when modelValue is false', () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
     });
 
     it('renders dialog structure when open', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       expect(wrapper.find('[role="dialog"]').exists()).toBe(true);
@@ -62,9 +54,7 @@ describe('VueModalDialog', () => {
     });
 
     it('does not render after closing', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
       await closeDialog(wrapper);
 
@@ -74,10 +64,7 @@ describe('VueModalDialog', () => {
     it('renders in-place when teleport is false', async () => {
       const container = document.createElement('div');
 
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, teleport: false },
-        attachTo: container,
-      });
+      const wrapper = mountDialog({ teleport: false }, { attachTo: container });
       await openDialog(wrapper);
 
       const dialog = container.querySelector('[role="dialog"]');
@@ -92,10 +79,7 @@ describe('VueModalDialog', () => {
     it('teleports to body when teleport is true', async () => {
       const container = document.createElement('div');
 
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, teleport: true },
-        attachTo: container,
-      });
+      const wrapper = mountDialog({ teleport: true }, { attachTo: container });
       await openDialog(wrapper);
 
       const dialog = document.body.querySelector('[role="dialog"]');
@@ -111,10 +95,7 @@ describe('VueModalDialog', () => {
       const target = createTeleportTarget();
       const container = document.createElement('div');
 
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, teleport: '.my-container' },
-        attachTo: container,
-      });
+      const wrapper = mountDialog({ teleport: '.my-container' }, { attachTo: container });
       await openDialog(wrapper);
 
       const dialog = target.querySelector('[role="dialog"]');
@@ -130,18 +111,14 @@ describe('VueModalDialog', () => {
 
   describe('modal prop', () => {
     it('does not render backdrop when modal is false', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, modal: false },
-      });
+      const wrapper = mountDialog({ modal: false });
       await openDialog(wrapper);
 
       expect(wrapper.find('.backdrop').exists()).toBe(false);
     });
 
     it('sets aria-modal to false when modal is false', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, modal: false },
-      });
+      const wrapper = mountDialog({ modal: false });
       await openDialog(wrapper);
 
       const dialog = wrapper.find('[role="dialog"]');
@@ -149,9 +126,7 @@ describe('VueModalDialog', () => {
     });
 
     it('derives scrollLock as false when modal is false', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, modal: false },
-      });
+      const wrapper = mountDialog({ modal: false });
       await openDialog(wrapper);
 
       const stack = useDialogStack._getStack();
@@ -161,9 +136,7 @@ describe('VueModalDialog', () => {
     });
 
     it('retains stack participation even if non-modal', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, modal: false },
-      });
+      const wrapper = mountDialog({ modal: false });
       await openDialog(wrapper);
 
       expect(useDialogStack.count()).toBe(1);
@@ -172,18 +145,14 @@ describe('VueModalDialog', () => {
 
   describe('transition props', () => {
     it('uses the default transition names', () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
 
       expect(wrapper.props('transition')).toBe('fade');
       expect(wrapper.props('backdropTransition')).toBe('fade-backdrop');
     });
 
     it('passes a custom transition name to the dialog transition', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, transition: 'slide' },
-      });
+      const wrapper = mountDialog({ transition: 'slide' });
       await openDialog(wrapper);
 
       const names = wrapper.findAll('transition-stub').map((node) => node.attributes('name'));
@@ -192,9 +161,7 @@ describe('VueModalDialog', () => {
     });
 
     it('passes a custom backdrop transition name to the backdrop transition', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, backdropTransition: 'my-backdrop' },
-      });
+      const wrapper = mountDialog({ backdropTransition: 'my-backdrop' });
       await openDialog(wrapper);
 
       const names = wrapper.findAll('transition-stub').map((node) => node.attributes('name'));
@@ -205,30 +172,36 @@ describe('VueModalDialog', () => {
 
   describe('slots', () => {
     it('renders header slot content', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-        slots: { header: '<span class="test-header">Title</span>' },
-      });
+      const wrapper = mountDialog(
+        {},
+        {
+          slots: { header: '<span class="test-header">Title</span>' },
+        },
+      );
       await openDialog(wrapper);
 
       expect(wrapper.find('.test-header').text()).toBe('Title');
     });
 
     it('renders default slot content', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-        slots: { default: '<p class="test-body">Body content</p>' },
-      });
+      const wrapper = mountDialog(
+        {},
+        {
+          slots: { default: '<p class="test-body">Body content</p>' },
+        },
+      );
       await openDialog(wrapper);
 
       expect(wrapper.find('.test-body').text()).toBe('Body content');
     });
 
     it('renders footer slot when provided', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-        slots: { footer: '<button class="test-footer">OK</button>' },
-      });
+      const wrapper = mountDialog(
+        {},
+        {
+          slots: { footer: '<button class="test-footer">OK</button>' },
+        },
+      );
       await openDialog(wrapper);
 
       expect(wrapper.find('.dialog-footer').exists()).toBe(true);
@@ -236,9 +209,7 @@ describe('VueModalDialog', () => {
     });
 
     it('does not render footer when slot not provided', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       expect(wrapper.find('.dialog-footer').exists()).toBe(false);
@@ -247,9 +218,7 @@ describe('VueModalDialog', () => {
 
   describe('ARIA attributes', () => {
     it('sets role, aria-modal, aria-hidden and aria-label', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       const dialog = wrapper.find('[role="dialog"]');
@@ -263,9 +232,7 @@ describe('VueModalDialog', () => {
     });
 
     it('aria-labelledby points to header element', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       const labelledby = wrapper.find('[role="dialog"]').attributes('aria-labelledby');
@@ -274,9 +241,7 @@ describe('VueModalDialog', () => {
     });
 
     it('aria-describedby points to body element', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       const describedby = wrapper.find('[role="dialog"]').attributes('aria-describedby');
@@ -287,18 +252,14 @@ describe('VueModalDialog', () => {
 
   describe('backdrop behavior', () => {
     it('renders backdrop when open', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       expect(wrapper.find('.backdrop').exists()).toBe(true);
     });
 
     it('clicking backdrop closes dialog', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       await wrapper.find('.backdrop').trigger('click');
@@ -311,9 +272,7 @@ describe('VueModalDialog', () => {
     });
 
     it('backdrop="static" does not close on click', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, backdrop: 'static' },
-      });
+      const wrapper = mountDialog({ backdrop: 'static' });
       await openDialog(wrapper);
 
       expect(wrapper.find('.backdrop').exists()).toBe(true);
@@ -325,9 +284,7 @@ describe('VueModalDialog', () => {
     });
 
     it('backdrop=false still renders backdrop but does not close on click', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, backdrop: false },
-      });
+      const wrapper = mountDialog({ backdrop: false });
       await openDialog(wrapper);
 
       // backdrop still renders with backdrop=false
@@ -343,9 +300,7 @@ describe('VueModalDialog', () => {
 
   describe('escape key', () => {
     it('Escape key closes dialog', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
@@ -357,9 +312,7 @@ describe('VueModalDialog', () => {
     });
 
     it('escape=false does not close on Escape', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, escape: false },
-      });
+      const wrapper = mountDialog({ escape: false });
       await openDialog(wrapper);
 
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
@@ -371,9 +324,7 @@ describe('VueModalDialog', () => {
 
   describe('close button', () => {
     it('clicking close button closes dialog', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       await wrapper.find('.dialog-close').trigger('click');
@@ -387,9 +338,7 @@ describe('VueModalDialog', () => {
 
   describe('position prop', () => {
     it('position="center" adds is-center class', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, position: 'center' },
-      });
+      const wrapper = mountDialog({ position: 'center' });
       await openDialog(wrapper);
 
       expect(wrapper.find('.dialog').classes()).toContain('is-center');
@@ -397,9 +346,7 @@ describe('VueModalDialog', () => {
     });
 
     it('position="top" adds is-top class', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, position: 'top' },
-      });
+      const wrapper = mountDialog({ position: 'top' });
       await openDialog(wrapper);
 
       expect(wrapper.find('.dialog').classes()).toContain('is-top');
@@ -409,9 +356,7 @@ describe('VueModalDialog', () => {
 
   describe('width prop', () => {
     it('applies preset width class and style', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, width: 'sm' },
-      });
+      const wrapper = mountDialog({ width: 'sm' });
       await openDialog(wrapper);
 
       const dialog = wrapper.find('.dialog');
@@ -420,9 +365,7 @@ describe('VueModalDialog', () => {
     });
 
     it('applies custom width style', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, width: '500px' },
-      });
+      const wrapper = mountDialog({ width: '500px' });
       await openDialog(wrapper);
 
       expect(wrapper.find('.dialog').attributes('style')).toContain('500px');
@@ -431,18 +374,14 @@ describe('VueModalDialog', () => {
 
   describe('mode prop', () => {
     it('applies mode-light class', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, mode: 'light' },
-      });
+      const wrapper = mountDialog({ mode: 'light' });
       await openDialog(wrapper);
 
       expect(wrapper.find('.dialog').classes()).toContain('mode-light');
     });
 
     it('applies mode-dark class', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, mode: 'dark' },
-      });
+      const wrapper = mountDialog({ mode: 'dark' });
       await openDialog(wrapper);
 
       expect(wrapper.find('.dialog').classes()).toContain('mode-dark');
@@ -451,18 +390,14 @@ describe('VueModalDialog', () => {
 
   describe('fullscreen', () => {
     it('does not render backdrop', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, width: 'fullscreen' },
-      });
+      const wrapper = mountDialog({ width: 'fullscreen' });
       await openDialog(wrapper);
 
       expect(wrapper.find('.backdrop').exists()).toBe(false);
     });
 
     it('has fullscreen class and 100vw style', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, width: 'fullscreen' },
-      });
+      const wrapper = mountDialog({ width: 'fullscreen' });
       await openDialog(wrapper);
 
       const dialog = wrapper.find('.dialog');
@@ -473,18 +408,14 @@ describe('VueModalDialog', () => {
 
   describe('emits', () => {
     it('emits opened when dialog opens', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       expect(wrapper.emitted('opened')).toBeTruthy();
     });
 
     it('emits closed when dialog closes', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
       await closeDialog(wrapper);
 
@@ -494,9 +425,7 @@ describe('VueModalDialog', () => {
 
   describe('z-index', () => {
     it('dialog has higher z-index than backdrop', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       const dialogStyle = wrapper.find('.dialog').attributes('style') || '';
@@ -511,9 +440,7 @@ describe('VueModalDialog', () => {
 
   describe('pointerdown fallback', () => {
     it('closes dialog on pointerdown outside dialog', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       document.dispatchEvent(new PointerEvent('pointerdown'));
@@ -525,9 +452,7 @@ describe('VueModalDialog', () => {
     });
 
     it('does not close on pointerdown when backdrop=static', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, backdrop: 'static' },
-      });
+      const wrapper = mountDialog({ backdrop: 'static' });
       await openDialog(wrapper);
 
       document.dispatchEvent(new PointerEvent('pointerdown'));
@@ -537,9 +462,7 @@ describe('VueModalDialog', () => {
     });
 
     it('does not close on pointerdown when fullscreen', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, width: 'fullscreen' },
-      });
+      const wrapper = mountDialog({ width: 'fullscreen' });
       await openDialog(wrapper);
 
       document.dispatchEvent(new PointerEvent('pointerdown'));
@@ -551,9 +474,7 @@ describe('VueModalDialog', () => {
 
   describe('stack integration', () => {
     it('pushes to stack on open and pops on close', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       expect(useDialogStack.count()).toBe(1);
@@ -564,9 +485,7 @@ describe('VueModalDialog', () => {
     });
 
     it('cleans up stack on unmount', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       expect(useDialogStack.count()).toBe(1);
@@ -577,12 +496,8 @@ describe('VueModalDialog', () => {
     });
 
     it('handles multiple stacked dialogs', async () => {
-      const wrapper1 = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
-      const wrapper2 = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper1 = mountDialog();
+      const wrapper2 = mountDialog();
 
       await openDialog(wrapper1);
       expect(useDialogStack.count()).toBe(1);
@@ -606,9 +521,7 @@ describe('VueModalDialog', () => {
 
       expect(document.activeElement).toBe(button);
 
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       // dialog should be open and activeElement now inside dialog
@@ -626,9 +539,7 @@ describe('VueModalDialog', () => {
 
   describe('lifecycle emits (Task 10)', () => {
     it('emits before-open and opening when dialog opens', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       const emits = Object.keys(wrapper.emitted());
@@ -641,9 +552,7 @@ describe('VueModalDialog', () => {
     });
 
     it('emits before-close and closing when close is requested', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       await wrapper.find('.dialog-close').trigger('click');
@@ -662,9 +571,7 @@ describe('VueModalDialog', () => {
 
     it('emits before-close BEFORE evaluating beforeClose prop, and skips closing if prevented', async () => {
       const beforeCloseMock = vi.fn(() => false);
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, beforeClose: beforeCloseMock },
-      });
+      const wrapper = mountDialog({ beforeClose: beforeCloseMock });
       await openDialog(wrapper);
 
       await wrapper.find('.dialog-close').trigger('click');
@@ -678,9 +585,7 @@ describe('VueModalDialog', () => {
   });
   describe('role prop', () => {
     it('sets role to dialog by default', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       const dialog = wrapper.find('[role="dialog"]');
@@ -688,9 +593,7 @@ describe('VueModalDialog', () => {
     });
 
     it('sets role to alertdialog when specified', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, role: 'alertdialog' },
-      });
+      const wrapper = mountDialog({ role: 'alertdialog' });
       await openDialog(wrapper);
 
       const dialog = wrapper.find('[role="alertdialog"]');
@@ -698,9 +601,7 @@ describe('VueModalDialog', () => {
     });
 
     it('defaults backdrop to static when role is alertdialog', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, role: 'alertdialog' },
-      });
+      const wrapper = mountDialog({ role: 'alertdialog' });
       await openDialog(wrapper);
 
       const backdrop = wrapper.find('.backdrop');
@@ -711,9 +612,7 @@ describe('VueModalDialog', () => {
     });
 
     it('respects explicit backdrop=false when role is alertdialog', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, role: 'alertdialog', backdrop: false },
-      });
+      const wrapper = mountDialog({ role: 'alertdialog', backdrop: false });
       await openDialog(wrapper);
 
       const backdrop = wrapper.find('.backdrop');
@@ -726,13 +625,12 @@ describe('VueModalDialog', () => {
     it('emits console.warn if role="alertdialog" and modal=false', async () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, role: 'alertdialog', modal: false },
-      });
+      const wrapper = mountDialog({ role: 'alertdialog', modal: false });
       await openDialog(wrapper);
 
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        '[VueModalDialog] role="alertdialog" with modal=false is contradictory: alertdialogs require focus to stay inside.',
+      const [warnMessage] = consoleWarnSpy.mock.calls[0];
+      expect(warnMessage).toBe(
+        '[Vue warn]: [VueModalDialog] role="alertdialog" with modal=false is contradictory: alertdialogs require focus to stay inside.',
       );
 
       consoleWarnSpy.mockRestore();
@@ -742,9 +640,7 @@ describe('VueModalDialog', () => {
   describe('beforeClose prop', () => {
     it('prevents closing when returning false', async () => {
       const beforeClose = vi.fn(() => false);
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, beforeClose },
-      });
+      const wrapper = mountDialog({ beforeClose });
       await openDialog(wrapper);
 
       await wrapper.find('.dialog-close').trigger('click');
@@ -756,9 +652,7 @@ describe('VueModalDialog', () => {
 
     it('allows closing when returning true', async () => {
       const beforeClose = vi.fn(() => true);
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, beforeClose },
-      });
+      const wrapper = mountDialog({ beforeClose });
       await openDialog(wrapper);
 
       await wrapper.find('.dialog-close').trigger('click');
@@ -772,9 +666,7 @@ describe('VueModalDialog', () => {
 
     it('prevents closing when returning Promise<false>', async () => {
       const beforeClose = vi.fn(() => Promise.resolve(false));
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, beforeClose },
-      });
+      const wrapper = mountDialog({ beforeClose });
       await openDialog(wrapper);
 
       await wrapper.find('.dialog-close').trigger('click');
@@ -787,9 +679,7 @@ describe('VueModalDialog', () => {
 
     it('allows closing when returning Promise<true>', async () => {
       const beforeClose = vi.fn(() => Promise.resolve(true));
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false, beforeClose },
-      });
+      const wrapper = mountDialog({ beforeClose });
       await openDialog(wrapper);
 
       await wrapper.find('.dialog-close').trigger('click');
@@ -801,9 +691,7 @@ describe('VueModalDialog', () => {
     });
 
     it('requestClose() exposed method triggers close when no beforeClose', async () => {
-      const wrapper = mount(VueModalDialog, {
-        props: { modelValue: false },
-      });
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
       await wrapper.vm.requestClose();

@@ -2,12 +2,10 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { useDialog } from '@/composables/useDialog';
 import { nextTick } from 'vue';
 
-vi.mock('@vueuse/integrations/useFocusTrap', () => ({
-  useFocusTrap: vi.fn(() => ({
-    activate: vi.fn(),
-    deactivate: vi.fn(),
-  })),
+const useFocusTrapMock = vi.hoisted(() => ({
+  useFocusTrap: vi.fn(() => ({ activate: vi.fn(), deactivate: vi.fn() })),
 }));
+vi.mock('@vueuse/integrations/useFocusTrap', () => useFocusTrapMock);
 
 describe('useDialog', () => {
   beforeEach(() => {
