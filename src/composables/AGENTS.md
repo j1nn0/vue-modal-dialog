@@ -1,50 +1,58 @@
 # AGENTS.md — src/composables
 
-Composable-specific guidance for the dialog internals. Use this with the root `AGENTS.md`, not instead of it; the root file still owns repo-wide conventions.
+Composable-specific guidance for dialog internals. Use this with the root `AGENTS.md`; component-layer orchestration lives in `../components/AGENTS.md`.
 
-## Overview
+## OVERVIEW
 
-- Keep one concern per file. Current split is state, stack, size, mode, drag, and imperative open/close.
+- One concern per file: imperative API, state, stack, size, mode, drag.
 - Preserve SSR guards around `window` / `document` access.
-- Keep public composable APIs typed and documented with JSDoc.
+- Keep exported APIs typed and documented with JSDoc.
 
-## Composable catalog
+## COMPOSABLE CATALOG
 
 - `useDialog.ts` — imperative API that mounts a standalone Vue app into `document.body`.
-- `useDialogState.ts` — open/close lifecycle, focus-trap activation, and legacy vs stack-aware behavior.
+- `useDialogState.ts` — open/close lifecycle, focus trap, body class, legacy vs stack-aware behavior.
 - `useDialogSize.ts` — width preset/custom width and position → class/style mapping.
-- `useDialogMode.ts` — explicit mode or `prefers-color-scheme` driven reactive mode.
+- `useDialogMode.ts` — explicit mode or `prefers-color-scheme` reactive mode.
 - `useDialogStack.ts` — module-level stack manager for top dialog, scroll lock, and focus restore.
 - `useDialogDrag.ts` — pointer-driven drag offsets and inline transform style.
 
-## Singleton pattern
+## WHERE TO LOOK
 
-- `useDialogStack` is a singleton object, not a composable function returning fresh state.
+| Task                         | Location            | Notes                                  |
+| ---------------------------- | ------------------- | -------------------------------------- |
+| Programmatic open/close      | `useDialog.ts`      | Creates and tears down standalone apps |
+| Focus trap / lifecycle emits | `useDialogState.ts` | Two execution paths                    |
+| Multi-dialog ordering        | `useDialogStack.ts` | Singleton object; global test state    |
+| Width / position mapping     | `useDialogSize.ts`  | Presets and custom widths              |
+| Theme behavior               | `useDialogMode.ts`  | Explicit mode vs media query           |
+| Drag behavior                | `useDialogDrag.ts`  | Must stay inert when closed/fullscreen |
+
+## SINGLETON PATTERN
+
+- `useDialogStack` is a singleton object, not a factory composable.
 - Import it and call methods directly (`push`, `pop`, `top`, `topId`, `count`, `indexOf`, `subscribe`, `unsubscribe`).
-- Treat stack state as global process state in tests; always clean it up between cases.
-- Preserve the first-open / last-close focus restoration behavior when changing stack logic.
-- `_getStack()` exists for test introspection; treat it as internal rather than production API.
+- Preserve first-open / last-close focus restoration when changing stack logic.
+- `_getStack()` is test introspection only, not production API.
 
-## Inter-composable contracts
+## INTER-COMPOSABLE CONTRACTS
 
-- `VueModalDialog.vue` coordinates these files; avoid moving orchestration back into one composable.
-- `useDialogState()` has two modes:
-  - without `dialogId` → legacy path manages body class and focus trap directly
-  - with `dialogId` → stack-aware path delegates top-dialog coordination to `useDialogStack`
-- `useDialogState` and `useDialogStack` must stay aligned on modal semantics, focus-trap activation, and close timing.
-- `useDialogDrag` must stay inert when the dialog is closed or fullscreen.
+- `VueModalDialog.vue` coordinates these files; keep orchestration in the component layer.
+- `useDialogState()` without `dialogId` uses the legacy path and manages focus/body state directly.
+- `useDialogState()` with `dialogId` becomes stack-aware and must stay aligned with `useDialogStack` on modal semantics, focus trap activation, and close timing.
+- `useDialogDrag` must no-op when the dialog is closed or fullscreen.
 
-## Testing patterns
+## TESTING PATTERNS
 
-- Composable tests live in `src/composables/__tests__/` and follow the repo's colocated Vitest style.
-- Prefer `vi.mock()` factory mocks in composable tests; see `useDialogState.test.ts`.
-- Reuse `createUseFocusTrapMock()` from `src/test-utils.ts` when a focus-trap mock is needed.
+- Tests live in `src/composables/__tests__/` and use colocated Vitest style.
+- Prefer `vi.mock()` factory mocks in composable tests; reuse `createUseFocusTrapMock()` from `src/test-utils.ts`.
 - Call `clearDialogStack()` in `afterEach` for stack-aware tests.
 - When asserting watcher-driven behavior, wait for the required `nextTick()` chain instead of mutating internal state directly.
+- Cover success path, cleanup path, and SSR-safe behavior for new composables.
 
-## Adding or changing a composable
+## ANTI-PATTERNS
 
-- Keep the `use*` naming convention and one primary concern per file.
-- Add or update colocated `*.test.ts` coverage for success path, cleanup path, and SSR-safe behavior.
-- Keep return types explicit when the API is exported or consumed across files.
-- If a new composable introduces shared state, document whether it is per-instance or singleton.
+- Do not move shared stack state into per-instance composables.
+- Do not change one `useDialogState` path without checking the other.
+- Do not expose `_getStack()` semantics as consumer API.
+- Do not add browser API access without SSR guards.

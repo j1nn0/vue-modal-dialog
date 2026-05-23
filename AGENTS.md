@@ -1,121 +1,101 @@
-# AGENTS.md — @j1nn0/vue-modal-dialog
+# PROJECT KNOWLEDGE BASE
 
-A single-package Vue 3 modal dialog component library. Published to npm as `@j1nn0/vue-modal-dialog`.
+**Generated:** 2026-05-24 00:40 JST  
+**Commit:** d56b74c  
+**Branch:** main
 
-## Commands
+## OVERVIEW
 
-| Action       | Command             | Notes                                                   |
-| ------------ | ------------------- | ------------------------------------------------------- |
-| Dev server   | `pnpm dev`          | Vite, bound to `127.0.0.1`                              |
-| Build        | `pnpm build`        | `vue-tsc --noEmit` first, then `vite build`             |
-| Test         | `pnpm test`         | `vitest run`, jsdom environment                         |
-| Coverage     | `pnpm coverage`     | v8 provider; target >= 80%                              |
-| Lint         | `pnpm lint`         | oxlint + eslint via npm-run-all2; no warnings tolerated |
-| Format       | `pnpm format`       | oxfmt targeting `src/`                                  |
-| Format check | `pnpm format:check` | `oxfmt --check src/`                                    |
-| Storybook    | `pnpm storybook`    | port 6006, `--no-open`                                  |
+Vue 3 modal dialog component library published as `@j1nn0/vue-modal-dialog`.
+Library-mode Vite build, colocated Vitest coverage, and a small source tree with two real hotspots: `src/components/` and `src/composables/`.
 
-## Available tools (MCP / Serena)
+## STRUCTURE
 
-This workspace is configured with two OpenCode MCP servers (`opencode.json`):
-
-- **context7** — Remote MCP. Query library docs with `Context7 Query Docs`. Always `Context7 Resolve` a library ID first. Useful for Vue, vitest, focus-trap, Sass, etc.
-- **serena** — Local MCP via `uvx`. Provides codebase-aware symbolic operations: `find_symbol`, `find_referencing_symbols`, `replace_symbol_body`, `serena_replace_content`. Preferred over raw grep/sed for structural edits.
-- **Skills** — Agent skills in `.agents/skills/` (11 installed):
-  - `vue` — Vue 3 Composition API, `<script setup>` macros, reactivity, built-in components (Anthony Fu)
-  - `vue-best-practices` — MUST-use for Vue.js tasks; Composition API + TypeScript standard, SSR, vue-tsc
-  - `vue-testing-best-practices` — Vue component/composable testing with Vitest and Vue Test Utils
-  - `vueuse-functions` — Apply VueUse composables appropriately (uses `@vueuse/core` + `@vueuse/integrations`)
-  - `vite` — Vite build config, plugin API, SSR, library mode, Rolldown migration (Anthony Fu)
-  - `typescript-advanced-types` — Generics, conditional/mapped types, template literals, type utilities
-  - `accessibility` — WCAG 2.2 audit, keyboard nav, screen reader support, focus management (Addy Osmani)
-  - `git-commit` — Conventional commit workflow with auto-staging and message generation
-  - `find-skills` — Discover and install additional agent skills
-  - `grill-me` — Interview the user relentlessly about a plan or design until reaching shared understanding
-  - `handoff` — Compact the current conversation into a handoff document for another agent to pick up
-
-## Validation pipeline
-
-```
-format:check → lint → test → build
+```text
+.
+├── src/
+│   ├── index.ts              # public API exports
+│   ├── types.ts              # shared props/emits/slots/expose types
+│   ├── components/           # dialog component, stories, integration tests
+│   ├── composables/          # state/stack/size/mode/drag/imperative API
+│   └── __tests__/            # public API tests
+├── .github/workflows/        # CI + npm publish automation
+├── .storybook/               # Storybook config
+└── AGENTS.md                 # repo-wide guidance; child docs below
 ```
 
-- **Pre-commit hook** (`.husky/pre-commit`): runs `pnpm lint && pnpm test`. It does NOT run format — run `pnpm format` manually before committing.
-- **CI** (`.github/workflows/ci.yml`): two parallel jobs — `lint` (format:check + oxlint + eslint) and `test-and-build` (vitest + vue-tsc + vite build). Triggers on `push`/`pull_request` to `main`.
+## AGENTS HIERARCHY
 
-## Key gotchas
+- `AGENTS.md` — repo-wide commands, release/build constraints, top-level routing.
+- `src/components/AGENTS.md` — component orchestration, Storybook, integration-test patterns.
+- `src/composables/AGENTS.md` — composable contracts, singleton stack rules, composable tests.
 
-- **Build fails without type-check**: `vue-tsc --noEmit -p tsconfig.build.json` must pass before vite build.
-- **Lint is zero-tolerance**: Vite ESLint plugin has `failOnWarning: true` — warnings fail the dev server and builds.
-- **ESLint enforces no-unused-vars**: unused imports break both lint and build. Remove them or prefix with `_`.
-- **Custom npm registry**: `.npmrc` sets `registry=https://npm.flatt.tech/`, `engine-strict=true`.
-- **Engine requirements**: Node >= 24, pnpm >= 10 (`package.json` engines). `packageManager: pnpm@10.33.0`.
-- **Peer deps externalized at build**: `vue`, `@vueuse/core`, `@vueuse/integrations`, `focus-trap`.
-- **pnpm-workspace**: `minimumReleaseAge: 10080` (7 days), `trustPolicy: no-downgrade`.
+## WHERE TO LOOK
 
-## Architecture
+| Task                                | Location                                                                         | Notes                                        |
+| ----------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------- |
+| Public API/export changes           | `src/index.ts`, `src/types.ts`                                                   | Consumer-facing contract                     |
+| Dialog rendering/ARIA/Teleport      | `src/components/VueModalDialog.vue`                                              | Main orchestration layer                     |
+| Add/change stories                  | `src/components/VueModalDialog.stories.ts`                                       | Storybook coverage of props and flows        |
+| Programmatic API                    | `src/composables/useDialog.ts`                                                   | Mounts standalone Vue app                    |
+| Test helpers / mocks                | `src/test-utils.ts`                                                              | Shared across component and composable tests |
+| Multi-dialog stack/focus restore    | `src/composables/useDialogStack.ts`                                              | Singleton state; clean up in tests           |
+| Open/close lifecycle and focus trap | `src/composables/useDialogState.ts`                                              | Legacy vs stack-aware paths                  |
+| Build/lint/test pipeline            | `package.json`, `vite.config.ts`, `vitest.config.js`, `.github/workflows/ci.yml` | Zero-tolerance validation                    |
+| Release flow                        | `Makefile`, `.github/workflows/publish.yml`                                      | Tag-driven npm publish                       |
 
+## CODE MAP
+
+| Symbol                         | Type                                        | Location                            | Role                              |
+| ------------------------------ | ------------------------------------------- | ----------------------------------- | --------------------------------- |
+| `VueModalDialogPlugin.install` | method                                      | `src/index.ts`                      | Global registration entry         |
+| `VueModalDialogProps`          | interface                                   | `src/types.ts`                      | Shared prop contract              |
+| `requestClose`                 | function                                    | `src/components/VueModalDialog.vue` | Guarded close path                |
+| `useDialog`                    | function                                    | `src/composables/useDialog.ts`      | Imperative consumer API           |
+| `useDialogState`               | function                                    | `src/composables/useDialogState.ts` | Lifecycle + focus-trap logic      |
+| `useDialogStack`               | singleton object (not a factory composable) | `src/composables/useDialogStack.ts` | Stack, scroll lock, focus restore |
+
+## CONVENTIONS
+
+- Vue 3 Composition API with `<script setup lang="ts">`; keep logic typed and small.
+- `@/` resolves to `src/`; prefer it over long relative imports.
+- Oxfmt style is strict: 2 spaces, LF, single quotes, semicolons, 100 columns.
+- Public exports and shared interfaces need JSDoc.
+- Browser APIs always need SSR guards (`typeof document/window !== 'undefined'`).
+- Tests are colocated; mount dialogs closed, then open with `setProps({ modelValue: true })`.
+
+## ANTI-PATTERNS (THIS PROJECT)
+
+- Do not bypass `vue-tsc --noEmit -p tsconfig.build.json`; build depends on it.
+- Do not ignore lint warnings; `vite-plugin-eslint` runs with `failOnWarning: true`.
+- Do not leave unused imports; lint/build fail unless intentionally `_`-prefixed.
+- Do not treat `useDialogStack` as per-instance state.
+- Do not mount component tests initially open when watcher behavior matters.
+- Do not reference the removed `.github/instructions/*` or prompt docs; they are not in this repo.
+
+## UNIQUE STYLES
+
+- CSS custom properties are namespaced `--j1nn0-vue-modal-dialog-*`.
+- Peer deps (`vue`, `@vueuse/core`, `@vueuse/integrations`, `focus-trap`) stay external in library build.
+- Storybook and tests both exercise stacked dialogs, lifecycle emits, and accessibility behavior.
+
+## COMMANDS
+
+```bash
+pnpm dev
+pnpm storybook
+pnpm format:check
+pnpm lint
+pnpm test
+pnpm build
+pnpm coverage
+make release-patch|release-minor|release-major
 ```
-src/
-├── types.ts                  # Shared VueModalDialogProps (also reused in StackEntry)
-├── index.ts                  # Public API: component + plugin + type exports
-├── components/
-│   ├── VueModalDialog.vue    # Main component (orchestrates 5 composables)
-│   ├── __tests__/            # Component-level tests
-│   ├── VueModalDialog.stories.ts
-│   └── App.vue               # Demo application featuring the dialog
-└── composables/
-    ├── useDialog.ts          # Imperative API (open/close via standalone Vue apps)
-    ├── useDialogState.ts     # Open/close, focus trap, body class, lifecycle emits
-    ├── useDialogSize.ts      # Preset/custom width → CSS class + style
-    ├── useDialogMode.ts      # light/dark mode, reactive to prefers-color-scheme
-    ├── useDialogStack.ts     # Singleton stack manager (push/pop/top/subscribe)
-    └── useDialogDrag.ts      # Pointer-based drag-to-move behavior
-```
 
-- **Import alias**: `@/` → `src/` (tsconfig.json, vite.config.ts).
-- **Public API** (`src/index.ts`): exports `VueModalDialog`, `VueModalDialogPlugin`, `VueModalDialogProps` (type), `VueModalDialogPluginOptions` (type), `useDialog`, `VueModalDialogEmits`, `VueModalDialogSlots`, `VueModalDialogExpose`.
-- **Singleton stack manager**: `useDialogStack` is a module-level object, not a per-call composable; import it and call methods directly.
-- **Focus restoration**: `useDialogStack` saves `document.activeElement` when the first dialog opens and restores it when the last one closes.
-- **`closed` emit timing**: in the legacy non-stack path `useDialogState` emits `closed` from its watcher; in the stack-aware path the component emits `closed` after the leave transition work is deferred.
-- **`beforeClose` guard**: supports async callbacks; dialog stays open if the guard returns (or resolves to) `false`.
+## NOTES
 
-## Testing
-
-- Framework: Vitest + jsdom. `@vue/test-utils` for component mounts.
-- Tests colocated with source:
-  - `src/composables/__tests__/*.test.ts` — composable unit tests
-  - `src/components/__tests__/*.test.ts` — component integration tests
-  - `src/__tests__/*.test.ts` — public API tests (plugin, useDialog)
-- Mocking: composable tests in `src/composables/__tests__/` usually use `vi.mock()` factory functions, while `src/components/__tests__/VueModalDialog.test.ts` and `src/__tests__/useDialog.test.ts` use `vi.hoisted()` for the focus-trap mock.
-- Coverage target: >= 80% (branches, lines).
-- Component tests: use `mount(VueModalDialog, { props: { modelValue: ... } })`. Open dialogs with `setProps({ modelValue: true })` rather than mounting with `true` (so watchers fire).
-- Test helpers: `src/test-utils.ts` provides `mountDialog()`, `openDialog()`, `closeDialog()`, `clearDialogStack()`, and focus-trap mocking factories.
-- For composable-specific contracts and stack/focus-trap gotchas, see `src/composables/AGENTS.md`.
-
-## Code conventions
-
-- Vue 3 Composition API, `<script setup>`, `defineProps`, `defineEmits`, `defineModel`.
-- 2-space indent, LF, max 100 cols (`.editorconfig`, `.oxfmtrc.json`).
-- Single quotes, semicolons required (oxfmt).
-- Composable naming: `use*` prefix, one file per composable.
-- CSS: custom properties prefixed `--j1nn0-vue-modal-dialog-*`. Scoped SCSS in the component. Autoprefixer via PostCSS.
-- JSDoc: all public functions, composable return types, and exported interfaces should have JSDoc (`@param`, `@returns`, `@default`, `@example`).
-- SSR guards: always wrap browser APIs in `typeof document !== 'undefined'` / `typeof window !== 'undefined'`.
-
-## Release
-
-1. `pnpm build`
-2. `npm version patch|minor|major`
-3. `make push` (or `make release-*`)
-4. CI publishes to npm on version tags — no manual publish step.
-
-## Reference docs
-
-- `.github/copilot-instructions.md` — primary architecture/code style reference
-- `.github/instructions/testing.instructions.md` — test writing rules
-- `.github/instructions/readme-sync.instructions.md` — README maintenance
-- `.github/_README.md` — index of `.github` customizations, prompts, agents, and hooks
-- `.github/prompts/api-compat-check.prompt.md` — breaking-change checklist
-- `.github/release-maintainer-guide.md` — release flow details
-- `README.md` / `README.ja.md` — consumer-facing docs
+- Validation order: `format:check -> lint -> test -> build`.
+- CI splits into `lint` and `test-and-build`; publish runs only on `v*.*.*` tags.
+- Pre-commit runs `pnpm lint-staged` and `pnpm test`; format is still manual.
+- Node >= 24 and pnpm >= 10 are enforced; `.npmrc` points installs at `https://npm.flatt.tech/`.
+- Read the child AGENTS before changing `src/components/` or `src/composables/` internals.
