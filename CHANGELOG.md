@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.13.4](https://github.com/j1nn0/vue-modal-dialog/compare/v0.13.3...v0.13.4) (2026-07-01)
+
+### Bug Fixes
+
+* update pnpm version to 10.34.4 in CI configuration ([9c2a7fd](https://github.com/j1nn0/vue-modal-dialog/commit/9c2a7fd19fc3359915c373013c78f42d0036aee9))
+
 ## [0.13.3](https://github.com/j1nn0/vue-modal-dialog/compare/v0.13.1...v0.13.3) (2026-07-01)
 
 ### Features
