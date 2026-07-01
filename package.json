@@ -85,6 +85,7 @@
     "oxfmt": "^0.56.0",
     "oxlint": "^1.71.0",
     "postcss": "^8.5.15",
+    "release-it": "^20.2.0",
     "sass-embedded": "^1.100.0",
     "storybook": "^10.4.6",
     "typescript": "^5.9.3",
