@@ -12,10 +12,20 @@
   ],
   "author": "j1nn0 <j1nn0.github@gmail.com>",
   "license": "MIT",
-  "main": "dist/vue-modal-dialog.umd.js",
+  "main": "dist/vue-modal-dialog.umd.cjs",
   "module": "dist/vue-modal-dialog.es.js",
   "types": "dist/index.d.ts",
   "style": "dist/vue-modal-dialog.css",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/vue-modal-dialog.es.js",
+      "require": "./dist/vue-modal-dialog.umd.cjs"
+    },
+    "./style.css": "./dist/vue-modal-dialog.css",
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
+  },
   "type": "module",
   "files": [
     "dist"

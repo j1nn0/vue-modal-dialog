@@ -142,7 +142,7 @@ yarn add vue @vueuse/core @vueuse/integrations focus-trap
 <script setup>
 import { ref } from 'vue';
 import { VueModalDialog } from '@j1nn0/vue-modal-dialog';
-import '@j1nn0/vue-modal-dialog/dist/vue-modal-dialog.css';
+import '@j1nn0/vue-modal-dialog/style.css';
 
 const isOpen = ref(false);
 
@@ -216,7 +216,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 
 import { VueModalDialogPlugin } from '@j1nn0/vue-modal-dialog';
-import '@j1nn0/vue-modal-dialog/dist/vue-modal-dialog.css';
+import '@j1nn0/vue-modal-dialog/style.css';
 
 const app = createApp(App);
 
@@ -262,7 +262,7 @@ app.mount('#app');
       rel="stylesheet"
       href="https://unpkg.com/@j1nn0/vue-modal-dialog/dist/vue-modal-dialog.css"
     />
-    <script src="https://unpkg.com/@j1nn0/vue-modal-dialog/dist/vue-modal-dialog.umd.js"></script>
+    <script src="https://unpkg.com/@j1nn0/vue-modal-dialog/dist/vue-modal-dialog.umd.cjs"></script>
   </head>
   <body>
     <div id="app">

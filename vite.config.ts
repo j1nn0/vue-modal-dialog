@@ -40,15 +40,22 @@ export default defineConfig({
       entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
       name: 'J1nn0VueModalDialog',
       formats: ['es', 'umd'],
-      fileName: (format) => `vue-modal-dialog.${format}.js`,
+      fileName: (format) =>
+        format === 'umd' ? 'vue-modal-dialog.umd.cjs' : 'vue-modal-dialog.es.js',
     },
     rollupOptions: {
-      external: ['vue', '@vueuse/core', '@vueuse/integrations', 'focus-trap'], // 外部依存
+      external: [
+        /^vue(?:\/|$)/,
+        /^@vueuse\/core(?:\/|$)/,
+        /^@vueuse\/integrations(?:\/|$)/,
+        /^focus-trap(?:\/|$)/,
+      ], // 外部依存
       output: {
         globals: {
           vue: 'Vue',
           '@vueuse/core': 'VueUse',
-          '@vueuse/integrations': 'VueUseIntegrations',
+          '@vueuse/integrations': 'VueUse',
+          '@vueuse/integrations/useFocusTrap': 'VueUse',
           'focus-trap': 'focusTrap',
         },
       },
