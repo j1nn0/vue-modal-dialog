@@ -30,6 +30,7 @@ export { VueModalDialog };
 export { useDialog } from '@/composables/useDialog';
 export type { DialogContent, DialogOptions } from '@/composables/useDialog';
 export type {
+  DialogWidth,
   VueModalDialogProps,
   VueModalDialogEmits,
   VueModalDialogSlots,

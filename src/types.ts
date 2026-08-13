@@ -1,4 +1,12 @@
 /**
+ * Dialog width: one of the built-in presets, or any CSS length.
+ *
+ * The `(string & {})` member keeps arbitrary CSS values assignable while
+ * still offering the presets as editor completions.
+ */
+export type DialogWidth = 'sm' | 'md' | 'lg' | 'fullscreen' | (string & {});
+
+/**
  * Props for the VueModalDialog component.
  *
  * All properties are optional with sensible defaults.
@@ -85,7 +93,7 @@ export interface VueModalDialogProps {
     | 'bottomleft'
     | 'bottomright';
   /** Width preset (`'sm'`, `'md'`, `'lg'`, `'fullscreen'`) or any CSS value. @default 'md' */
-  width?: string;
+  width?: DialogWidth;
   /** Color mode. `null` follows the OS `prefers-color-scheme` setting. @default null */
   mode?: 'light' | 'dark' | null;
 }
