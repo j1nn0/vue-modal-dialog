@@ -5,34 +5,30 @@ import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 import { useDialogStack } from '@/composables/useDialogStack';
 import type { VueModalDialogProps } from '@/types';
 
-type DialogEmit = ((event: 'opened') => void) & ((event: 'closed') => void);
+type DialogEmit = (event: 'opened') => void;
 
 export type { DialogEmit };
 
 /**
- * Composable that manages dialog open/close state and focus trapping.
+ * Composable that manages focus trapping for a stack-aware dialog.
  *
- * When called **without** a `dialogId` (backward-compatible path) the
- * composable manages the `vue-modal-open` body class and focus trap
- * directly.
+ * Body-class and focus management are delegated to {@link useDialogStack}.
  *
- * When called **with** a `dialogId` (stack-aware path) the composable
- * delegates body-class and focus management to {@link useDialogStack}.
- *
- * @param isOpen    - Model ref for v-model binding.
- * @param dialogRef - Template ref pointing to the dialog root element.
- * @param emit      - Emits `'opened'` and `'closed'` events.
- * @param _props    - Snapshot of dialog props for focus-trap and modal behavior.
- * @param dialogId  - Unique dialog identifier for stack-aware operation.
- * @returns `close` — a function that sets `isOpen` to `false`.
+ * @param isOpen         - Model ref for v-model binding.
+ * @param dialogRef      - Template ref pointing to the dialog root element.
+ * @param emit           - Emits the `'opened'` event.
+ * @param _props         - Snapshot of dialog props for focus-trap and modal behavior.
+ * @param dialogId       - Unique dialog identifier.
+ * @param closeCallback  - Callback invoked when `close` is called.
+ * @returns `close` — a function that invokes the close callback.
  */
 export function useDialogState(
   isOpen: Ref<boolean>,
   dialogRef: Ref<HTMLElement | null>,
   emit: DialogEmit,
-  _props: Partial<VueModalDialogProps> = {},
-  dialogId?: string,
-  closeCallback?: () => void,
+  _props: Partial<VueModalDialogProps>,
+  dialogId: string,
+  closeCallback: () => void,
 ): { close: () => void } {
   const { activate: activateFocusTrap, deactivate: deactivateFocusTrap } = useFocusTrap(dialogRef, {
     initialFocus: () => {
@@ -48,35 +44,9 @@ export function useDialogState(
   });
 
   const close = (): void => {
-    if (closeCallback) {
-      closeCallback();
-    } else {
-      isOpen.value = false;
-    }
+    closeCallback();
   };
 
-  // Backward-compatible behavior: if no dialogId provided, keep original body-class + focus logic
-  if (!dialogId) {
-    watch(isOpen, async (val) => {
-      if (val) {
-        if (typeof document !== 'undefined' && _props.modal !== false)
-          document.body.classList.add('vue-modal-open');
-        await nextTick();
-        if (_props.modal !== false) {
-          activateFocusTrap();
-        }
-        emit('opened');
-      } else {
-        if (typeof document !== 'undefined') document.body.classList.remove('vue-modal-open');
-        deactivateFocusTrap();
-        emit('closed');
-      }
-    });
-
-    return { close };
-  }
-
-  // Stack-aware behavior when dialogId is provided
   let subscribed = false;
 
   function updateFocus(): void {
@@ -94,17 +64,15 @@ export function useDialogState(
 
   watch(isOpen, async (val) => {
     if (val) {
-      // opened
-      emit('opened');
       await nextTick();
       if (!subscribed) {
         useDialogStack.subscribe(updateFocus);
         subscribed = true;
       }
       updateFocus();
+      emit('opened');
     } else {
-      // closed — deactivate focus trap but defer 'closed' emit to the
-      // component so it fires after the leave transition completes.
+      // Deactivate focus trap; the component emits 'closed' after Vue applies the DOM change.
       deactivateFocusTrap();
       if (subscribed) {
         useDialogStack.unsubscribe(updateFocus);

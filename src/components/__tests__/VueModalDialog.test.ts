@@ -536,36 +536,46 @@ describe('VueModalDialog', () => {
     });
   });
 
-  describe('lifecycle emits (Task 10)', () => {
-    it('emits before-open and opening when dialog opens', async () => {
+  describe('lifecycle emits', () => {
+    it('emits open events in order', async () => {
       const wrapper = mountDialog();
       await openDialog(wrapper);
 
-      const emits = Object.keys(wrapper.emitted());
-      expect(emits).toContain('before-open');
-      expect(emits).toContain('opening');
+      const events = Object.keys(wrapper.emitted()).filter((event) =>
+        ['before-open', 'opening', 'opened'].includes(event),
+      );
 
-      const beforeOpenIdx = emits.indexOf('before-open');
-      const openingIdx = emits.indexOf('opening');
-      expect(beforeOpenIdx).toBeLessThan(openingIdx);
+      expect(events).toEqual(['before-open', 'opening', 'opened']);
     });
 
-    it('emits before-close and closing when close is requested', async () => {
+    it('emits opened after the dialog is present in the DOM', async () => {
+      // Recorded rather than asserted inline: an assertion thrown inside an emit
+      // handler is swallowed by Vue's error handling and would not fail the test.
+      let dialogInDomWhenOpened: boolean | null = null;
+      const onOpened = vi.fn(() => {
+        dialogInDomWhenOpened = document.body.querySelector('[role="dialog"]') !== null;
+      });
+      const wrapper = mountDialog({ onOpened }, { attachTo: document.body });
+
+      await openDialog(wrapper);
+
+      expect(onOpened).toHaveBeenCalledOnce();
+      expect(dialogInDomWhenOpened).toBe(true);
+      wrapper.unmount();
+    });
+
+    it('emits close events in order', async () => {
       const wrapper = mountDialog();
       await openDialog(wrapper);
 
       await wrapper.find('.dialog-close').trigger('click');
-      await nextTick();
-      await nextTick();
-      await nextTick();
+      await closeDialog(wrapper);
 
-      const emits = Object.keys(wrapper.emitted());
-      expect(emits).toContain('before-close');
-      expect(emits).toContain('closing');
+      const events = Object.keys(wrapper.emitted()).filter((event) =>
+        ['before-close', 'closing', 'closed'].includes(event),
+      );
 
-      const beforeCloseIdx = emits.indexOf('before-close');
-      const closingIdx = emits.indexOf('closing');
-      expect(beforeCloseIdx).toBeLessThan(closingIdx);
+      expect(events).toEqual(['before-close', 'closing', 'closed']);
     });
 
     it('emits before-close BEFORE evaluating beforeClose prop, and skips closing if prevented', async () => {

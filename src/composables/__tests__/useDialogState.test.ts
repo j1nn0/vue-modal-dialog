@@ -5,6 +5,7 @@ import type { Ref } from 'vue';
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 import { useDialogState } from '../useDialogState';
 import { useDialogStack } from '../useDialogStack';
+import { clearDialogStack } from '@/test-utils';
 import type { DialogEmit } from '../useDialogState';
 
 // useFocusTrap をモック
@@ -31,71 +32,56 @@ describe('useDialogState', () => {
     activateSpy.mockClear();
     deactivateSpy.mockClear();
     vi.mocked(useFocusTrap).mockClear();
-    document.body.style.overflow = '';
-    dialogState = useDialogState(isOpen, dialogRef, emit);
+    clearDialogStack();
+    dialogState = useDialogState(isOpen, dialogRef, emit, {}, 'dialog-test', () => {
+      isOpen.value = false;
+    });
   });
 
   afterEach(() => {
+    clearDialogStack();
     document.body.classList.remove('vue-modal-open');
   });
 
-  it('activates focus trap and sets overflow when opened', async () => {
-    // 開く
+  it('activates focus trap while the stack owns body class state', async () => {
+    useDialogStack.push({ id: 'dialog-test', propsSnapshot: { scrollLock: true } });
     isOpen.value = true;
     await nextTick();
-    await nextTick(); // watch 内の非同期処理完了を待つ
+    await nextTick();
 
     expect(document.body.classList.contains('vue-modal-open')).toBeTruthy();
     expect(activateSpy).toHaveBeenCalled();
     expect(emit).toBeCalledWith('opened');
 
-    // 閉じる
     isOpen.value = false;
     await nextTick();
-    await nextTick();
 
-    expect(document.body.classList.contains('vue-modal-open')).toBeFalsy();
     expect(deactivateSpy).toHaveBeenCalled();
-    expect(emit).toBeCalledWith('closed');
+
+    useDialogStack.pop('dialog-test');
+    expect(document.body.classList.contains('vue-modal-open')).toBeFalsy();
   });
 
-  it('close() sets isOpen to false and triggers closing logic', async () => {
-    // 一度開く
+  it('close() invokes the callback and triggers focus cleanup', async () => {
+    useDialogStack.push({ id: 'dialog-test', propsSnapshot: { scrollLock: true } });
     isOpen.value = true;
     await nextTick();
     await nextTick();
 
-    // close() 呼ぶ
     dialogState.close();
     expect(isOpen.value).toBe(false);
 
     await nextTick();
-    await nextTick();
 
-    expect(document.body.classList.contains('vue-modal-open')).toBeFalsy();
     expect(deactivateSpy).toHaveBeenCalled();
-    expect(emit).toBeCalledWith('closed');
+    useDialogStack.pop('dialog-test');
   });
 
   describe('modal prop', () => {
-    it('does not activate focus trap or body class when modal=false in legacy path', async () => {
+    it('does not activate focus trap when modal=false', async () => {
       const localIsOpen = ref(false);
       const props = { modal: false };
-      useDialogState(localIsOpen, dialogRef, emit, props);
-
-      localIsOpen.value = true;
-      await nextTick();
-      await nextTick();
-
-      expect(document.body.classList.contains('vue-modal-open')).toBeFalsy();
-      expect(activateSpy).not.toHaveBeenCalled();
-      expect(emit).toBeCalledWith('opened');
-    });
-
-    it('does not activate focus trap when modal=false in stack-aware path', async () => {
-      const localIsOpen = ref(false);
-      const props = { modal: false };
-      useDialogState(localIsOpen, dialogRef, emit, props, 'dialog-test-1');
+      useDialogState(localIsOpen, dialogRef, emit, props, 'dialog-test-1', vi.fn());
 
       useDialogStack.push({ id: 'dialog-test-1' });
 
@@ -113,7 +99,7 @@ describe('useDialogState', () => {
   describe('initialFocus', () => {
     it('returns false when props.initialFocus is undefined', () => {
       const props = { initialFocus: undefined };
-      useDialogState(isOpen, dialogRef, emit, props);
+      useDialogState(isOpen, dialogRef, emit, props, 'dialog-test', vi.fn());
 
       const trapCalls = vi.mocked(useFocusTrap).mock.calls;
       const lastCall = trapCalls[trapCalls.length - 1];
@@ -130,7 +116,7 @@ describe('useDialogState', () => {
       dialogRef.value = rootElement;
 
       const props = { initialFocus: '.my-input' };
-      useDialogState(isOpen, dialogRef, emit, props);
+      useDialogState(isOpen, dialogRef, emit, props, 'dialog-test', vi.fn());
 
       const trapCalls = vi.mocked(useFocusTrap).mock.calls;
       const lastCall = trapCalls[trapCalls.length - 1];
@@ -147,7 +133,7 @@ describe('useDialogState', () => {
       dialogRef.value = rootElement;
 
       const props = { initialFocus: '.non-existent' };
-      useDialogState(isOpen, dialogRef, emit, props);
+      useDialogState(isOpen, dialogRef, emit, props, 'dialog-test', vi.fn());
 
       const trapCalls = vi.mocked(useFocusTrap).mock.calls;
       const lastCall = trapCalls[trapCalls.length - 1];
@@ -161,7 +147,7 @@ describe('useDialogState', () => {
     it('returns HTMLElement directly', () => {
       const dummyElement = document.createElement('button');
       const props = { initialFocus: dummyElement };
-      useDialogState(isOpen, dialogRef, emit, props);
+      useDialogState(isOpen, dialogRef, emit, props, 'dialog-test', vi.fn());
 
       const trapCalls = vi.mocked(useFocusTrap).mock.calls;
       const lastCall = trapCalls[trapCalls.length - 1];

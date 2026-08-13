@@ -90,18 +90,18 @@ export interface VueModalDialogProps {
 
 /** Events emitted by the VueModalDialog component. */
 export interface VueModalDialogEmits {
-  /** Fired after the dialog has fully opened (after enter transition). */
-  opened: [];
-  /** Fired after the dialog has fully closed (after leave transition). */
-  closed: [];
-  /** Fired before the dialog starts opening. */
+  /** Fired when opening is requested, before the dialog is added to the DOM. */
   'before-open': [];
-  /** Fired while the dialog is opening (before transition completes). */
+  /** Fired when the dialog starts opening. */
   opening: [];
-  /** Fired before the dialog starts closing. */
+  /** Fired once the dialog is in the DOM and focus has been handled; the enter transition may still be playing. */
+  opened: [];
+  /** Fired before closing begins and before the `beforeClose` guard runs; a cancelled guard may prevent any close. */
   'before-close': [];
-  /** Fired while the dialog is closing (before transition completes). */
+  /** Fired when the dialog starts closing. */
   closing: [];
+  /** Fired once Vue has applied the close; the leave transition may still be playing. */
+  closed: [];
 }
 
 /** Slots provided by the VueModalDialog component. */

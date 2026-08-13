@@ -347,14 +347,14 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ## 🔔 Events
 
-| Event          | Payload | Description                                         |
-| -------------- | ------- | --------------------------------------------------- |
-| `before-open`  | `void`  | Fired before the dialog begins its opening sequence |
-| `opening`      | `void`  | Fired when the opening transition starts            |
-| `opened`       | `void`  | Fired when the opening transition completes         |
-| `before-close` | `void`  | Fired before the dialog begins its closing sequence |
-| `closing`      | `void`  | Fired when the closing transition starts            |
-| `closed`       | `void`  | Fired when the closing transition completes         |
+| Event          | Payload | Description                                                                                                                                       |
+| -------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `before-open`  | `void`  | Fired when opening is requested, before the dialog is added to the DOM.                                                                           |
+| `opening`      | `void`  | Fired when the dialog starts opening.                                                                                                             |
+| `opened`       | `void`  | Fired once the dialog is in the DOM and focus has been handled; the enter transition may still be playing.                                        |
+| `before-close` | `void`  | Fired before closing begins and before the `beforeClose` guard runs; a cancelled guard may prevent any close.                                     |
+| `closing`      | `void`  | Fired when the dialog starts closing.                                                                                                             |
+| `closed`       | `void`  | Fired once Vue has applied the close; the leave transition may still be playing.                                                                  |
 
 ---
 

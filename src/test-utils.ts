@@ -70,11 +70,12 @@ export const defaultMountProps: VueModalDialogProps = {
  * The dialog starts **closed** (`modelValue: false`). Use `setProps`
  * or `wrapper.vm` to open it in your test.
  *
- * @param overrides - Props to merge over the defaults.
+ * @param overrides - Props to merge over the defaults. Event listeners may be
+ *                    passed as `on*` props (e.g. `{ onOpened: fn }`).
  * @param mountOptions - Additional Vue Test Utils mount options.
  */
 export function mountDialog(
-  overrides: Partial<VueModalDialogProps> = {},
+  overrides: Partial<VueModalDialogProps> & Record<`on${string}`, unknown> = {},
   mountOptions: Record<string, unknown> = {},
 ): VueWrapper {
   return mount(VueModalDialog, {

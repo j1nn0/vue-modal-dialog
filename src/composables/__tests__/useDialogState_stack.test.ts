@@ -37,7 +37,7 @@ describe('useDialogState (stack-aware)', () => {
   });
 
   it('activates focus trap only when top of stack', async () => {
-    useDialogState(isOpen, dialogRef, emit, {}, 'd1');
+    useDialogState(isOpen, dialogRef, emit, {}, 'd1', vi.fn());
 
     // open and register
     isOpen.value = true;

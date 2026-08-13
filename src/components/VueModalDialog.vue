@@ -135,8 +135,7 @@ watch(isOpen, (val) => {
   } else {
     emit('closing');
     useDialogStack.pop(dialogId);
-    // Defer closed emit to let Vue process the DOM change (and any
-    // transition) before notifying the parent.
+    // Defer closed emit until Vue has applied the DOM change.
     nextTick().then(() => emit('closed'));
   }
 });
