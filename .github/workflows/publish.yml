@@ -44,9 +44,41 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # ビルド
+      # 公開前の品質チェック
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      - name: Full typecheck
+        run: pnpm exec vue-tsc --noEmit -p tsconfig.json
+
       - name: Build
         run: pnpm build
+
+      - name: Check package size
+        run: pnpm size
+
+      # 展開した tarball を消費者環境として検証
+      - name: Smoke test packed package
+        run: |
+          set -euo pipefail
+          tmp_dir="$(mktemp -d)"
+          trap 'rm -rf "$tmp_dir"' EXIT
+          pnpm pack --pack-destination "$tmp_dir" >/dev/null
+          archive="$(find "$tmp_dir" -maxdepth 1 -type f -name '*.tgz' -print -quit)"
+          package_dir="$tmp_dir/package"
+          mkdir "$package_dir"
+          tar -xzf "$archive" -C "$package_dir" --strip-components=1
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$package_dir/node_modules"
+          cd "$package_dir"
+          node --input-type=module -e "await import('@j1nn0/vue-modal-dialog')"
+          node -e "require('@j1nn0/vue-modal-dialog')"
+          node -e "require.resolve('@j1nn0/vue-modal-dialog/style.css')"
 
       # npm に公開（Git チェックをスキップ）
       - name: Publish to npm

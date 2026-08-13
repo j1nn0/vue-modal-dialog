@@ -350,9 +350,9 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 | Event          | Payload | Description                                                                                                                                       |
 | -------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `before-open`  | `void`  | Fired when opening is requested, before the dialog is added to the DOM.                                                                           |
+| `before-open`  | `void`  | Fired when opening is requested. For an initially-open dialog, it fires after the initial DOM mount.                                             |
 | `opening`      | `void`  | Fired when the dialog starts opening.                                                                                                             |
-| `opened`       | `void`  | Fired once the dialog is in the DOM and focus has been handled; the enter transition may still be playing.                                        |
+| `opened`       | `void`  | Fired after the DOM update and focus handling; it does not wait for the enter transition to complete.                                            |
 | `before-close` | `void`  | Fired before closing begins and before the `beforeClose` guard runs; a cancelled guard may prevent any close.                                     |
 | `closing`      | `void`  | Fired when the dialog starts closing.                                                                                                             |
 | `closed`       | `void`  | Fired once Vue has applied the close; the leave transition may still be playing.                                                                  |
@@ -374,7 +374,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 - `aria-modal="false"` + `aria-hidden="true"` on lower-layered dialogs
 - `aria-labelledby` points to the visible title when a header slot is supplied; otherwise provide `aria-label`
 - `aria-describedby` is not generated; pass it directly when a short description is available
-- Close button uses the `closeLabel` prop for its accessible label (`"Close"` by default)
+- Close button uses the customizable `closeLabel` prop for its accessible label (`"Close"` by default)
 - Additional attributes such as `aria-label`, `aria-describedby`, `data-*`, and `id` fall through to the dialog
 - Focus trap is active on the topmost dialog to keep keyboard navigation predictable
 - Focus is restored to the element that was focused before the first dialog opened when the last dialog closes

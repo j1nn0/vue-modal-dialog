@@ -125,7 +125,7 @@ export function useDialog(): {
     const instance: DialogInstance = {
       app: null,
       container: document.createElement('div'),
-      model: ref(false),
+      model: ref(true),
       dialog: null,
       resolve: (value) => resolvePromise(value as T | undefined),
       closeValue: undefined,

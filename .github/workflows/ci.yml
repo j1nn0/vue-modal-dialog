@@ -54,6 +54,8 @@ jobs:
 
       - run: pnpm test
 
+      - run: pnpm exec vue-tsc --noEmit -p tsconfig.json
+
       - run: pnpm build
 
       - run: pnpm size

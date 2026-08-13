@@ -321,6 +321,7 @@ app.mount('#app');
 | `backdrop`           | `Boolean` \| `String`     | `true`            | `true` = 背景クリックで閉じる, `false` = 背景なし, `"static"` = 背景ありだがクリックで閉じない                         |
 | `escape`             | `Boolean`                 | `true`            | Escapeキー押下でダイアログを閉じる                                                                                     |
 | `role`               | `String`                  | `"dialog"`        | ARIA role: `"dialog"` または `"alertdialog"`                                                                           |
+| `closeLabel`         | `String`                  | `"Close"`         | 閉じるボタンのアクセシブルなラベル                                                                                       |
 | `initialFocus`       | `String` \| `HTMLElement` | `undefined`       | ダイアログが開いたときにフォーカスする要素のセレクタまたは要素                                                         |
 | `modal`              | `Boolean`                 | `true`            | `true` = 背景の操作をブロックし、フォーカスをダイアログ内に閉じ込める                                                  |
 | `teleport`           | `Boolean` \| `String`     | `false`           | `true` = `body` にテレポート、または CSS セレクタでターゲットを指定                                                    |
@@ -347,15 +348,15 @@ app.mount('#app');
 
 ## 🔔 Events
 
-| Event          | Payload | Description                                            |
-| -------------- | ------- | ------------------------------------------------------ |
-| `before-open`  | `void`  | ダイアログが開く処理を開始する前に発火します           |
-| `opening`      | `void`  | オープニングトランジションが開始されたときに発火します |
-| `opened`       | `void`  | オープニングトランジションが完了したときに発火します   |
-| `before-close` | `void`  | ダイアログが閉じる処理を開始する前に発火します         |
-| `closing`      | `void`  | クロージングトランジションが開始されたときに発火します |
-| `closed`       | `void`  | Vue が close を適用したときに発火します。leave transition は継続中の場合があります |
-| `after-leave`  | `void`  | ダイアログパネルの leave transition 完了後に発火します   |
+| Event          | Payload | Description                                                                                 |
+| -------------- | ------- | ------------------------------------------------------------------------------------------- |
+| `before-open`  | `void`  | 開く要求時に発火します。initially-open の場合は、初回の DOM mount 後に発火します。             |
+| `opening`      | `void`  | ダイアログの開く処理が開始されたときに発火します。                                             |
+| `opened`       | `void`  | DOM 更新とフォーカス処理後に発火します。enter transition の完了は待ちません。                  |
+| `before-close` | `void`  | 閉じる前、`beforeClose` ガードの実行前に発火します。ガードでキャンセルされる場合があります。 |
+| `closing`      | `void`  | ダイアログの閉じる処理が開始されたときに発火します。                                           |
+| `closed`       | `void`  | Vue が close を適用した後に発火します。leave transition は継続中の場合があります。            |
+| `after-leave`  | `void`  | ダイアログパネルの leave transition 完了後に発火します。                                      |
 
 ---
 
@@ -369,14 +370,17 @@ app.mount('#app');
 
 ## ♿ Accessibility
 
-- `role="dialog"` + 最上位ダイアログに `aria-modal="true"`
+- `role="dialog"` をダイアログコンテナに設定し、モーダルな最上位ダイアログには `aria-modal="true"` を設定
 - 下層ダイアログには `aria-modal="false"` + `aria-hidden="true"`
-- `aria-labelledby` は header slot を参照
-- `aria-describedby` は body slot を参照
-- 閉じるボタンには `aria-label="Close"`
+- `aria-labelledby` は header slot がある場合に表示タイトルを参照します。ない場合は `aria-label` を指定してください
+- `aria-describedby` は自動生成されません。短い説明がある場合は属性を直接指定してください
+- 閉じるボタンのアクセシブルなラベルは `closeLabel` prop で変更できます（デフォルトは `"Close"`）
+- `aria-label`、`aria-describedby`、`data-*`、`id` などの追加属性はダイアログに fallthrough します
 - フォーカストラップは最上位ダイアログで有効化され、キーボード操作を一貫化
 - 最初のダイアログを開く前にフォーカスされていた要素に、最後のダイアログが閉じたときにフォーカスを復元
-- Escape でのクローズは有効時のみ（stack時は最上位ダイアログのみ）
+- Escape でのクローズは有効時のみ（stack 時は最上位ダイアログのみ）
+
+デフォルト設定では、背景ページのコンテンツに `inert` は設定されません。モーダル性は `aria-modal` とフォーカストラップで示し、モーダルダイアログの背景操作を防ぎます。ダイアログはインラインにも描画されるため、祖先要素に `inert` を設定するとダイアログ自身も対象になります。
 
 ---
 

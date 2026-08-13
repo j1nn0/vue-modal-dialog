@@ -38,6 +38,35 @@ describe('useDialog', () => {
     await promise;
   });
 
+  it('closes and cleans up when close() is called before the first render', async () => {
+    const dialog = useDialog();
+    const promise = dialog.open();
+
+    dialog.close();
+    await finishTransition();
+
+    await expect(promise).resolves.toBeUndefined();
+    expect(dialog.isOpen.value).toBe(false);
+    expect(document.body.querySelector('[role="dialog"]')).toBeNull();
+  });
+
+  it('replaces an instance immediately and leaves the second instance closable', async () => {
+    const dialog = useDialog();
+    const first = dialog.open({ width: 'sm' });
+    const firstContainer = document.body.lastElementChild;
+    const second = dialog.open({ width: 'lg' });
+
+    await finishTransition();
+
+    await expect(first).resolves.toBeUndefined();
+    expect(firstContainer?.isConnected).toBe(false);
+    expect(document.body.querySelector('.dialog-lg')).not.toBeNull();
+
+    dialog.close();
+    await finishTransition();
+    await expect(second).resolves.toBeUndefined();
+  });
+
   it('renders string and render-function content', async () => {
     const dialog = useDialog();
 
