@@ -14,8 +14,14 @@ const backdrop = ref<'default' | 'static'>('default');
 const escape = ref(true);
 const role = ref<'dialog' | 'alertdialog'>('dialog');
 const initialFocus = ref('');
-const teleport = ref(false);
+const teleport = ref(true);
 const scrollLock = ref(true);
+const alertDescriptionId = 'playground-description';
+const dialogRoleProps = computed(() =>
+  role.value === 'alertdialog'
+    ? { role: 'alertdialog' as const, describedBy: alertDescriptionId }
+    : { role: 'dialog' as const },
+);
 const draggable = ref(false);
 const transition = ref('fade');
 const backdropTransition = ref('fade-backdrop');
@@ -172,44 +178,42 @@ massa arcu lacinia leo, at finibus libero nulla nec lectus.
     <button type="button" @click="clearLog" v-if="eventLog.length">Clear Log</button>
   </div>
 
-  <Teleport to="body">
-    <VueModalDialog
-      v-model="isOpened"
-      :backdrop="backdrop"
-      :escape="escape"
-      :role="role"
-      :initial-focus="initialFocus || undefined"
-      :teleport="teleport"
-      :scroll-lock="scrollLock"
-      :draggable="draggable"
-      :transition="transition"
-      :backdrop-transition="backdropTransition"
-      :before-close="beforeClose"
-      :position="position"
-      :width="width"
-      :mode="mode"
-      @opened="logEvent('opened')"
-      @closed="logEvent('closed')"
-      @before-open="logEvent('before-open')"
-      @opening="logEvent('opening')"
-      @before-close="logEvent('before-close')"
-      @closing="logEvent('closing')"
-    >
-      <template #header>
-        <strong>VueModalDialog Playground</strong>
-      </template>
+  <VueModalDialog
+    v-model="isOpened"
+    v-bind="dialogRoleProps"
+    :backdrop="backdrop"
+    :escape="escape"
+    :initial-focus="initialFocus || undefined"
+    :teleport="teleport"
+    :scroll-lock="scrollLock"
+    :draggable="draggable"
+    :transition="transition"
+    :backdrop-transition="backdropTransition"
+    :before-close="beforeClose"
+    :position="position"
+    :width="width"
+    :mode="mode"
+    @opened="logEvent('opened')"
+    @closed="logEvent('closed')"
+    @before-open="logEvent('before-open')"
+    @opening="logEvent('opening')"
+    @before-close="logEvent('before-close')"
+    @closing="logEvent('closing')"
+  >
+    <template #header>
+      <strong>VueModalDialog Playground</strong>
+    </template>
 
-      <div>
-        <p>This is a scrollable body to test the scroll behavior.</p>
-        <p>{{ dummyText }}</p>
-        <button id="confirm-btn" type="button" @click="closeDialog">Confirm</button>
-      </div>
+    <div>
+      <p :id="alertDescriptionId">This is a scrollable body to test the scroll behavior.</p>
+      <p>{{ dummyText }}</p>
+      <button id="confirm-btn" type="button" @click="closeDialog">Confirm</button>
+    </div>
 
-      <template #footer>
-        <button type="button" @click="closeDialog">Close</button>
-      </template>
-    </VueModalDialog>
-  </Teleport>
+    <template #footer>
+      <button type="button" @click="closeDialog">Close</button>
+    </template>
+  </VueModalDialog>
 
   <!-- Event log -->
   <div class="event-log" v-if="eventLog.length">

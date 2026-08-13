@@ -6,23 +6,12 @@
  */
 export type DialogWidth = 'sm' | 'md' | 'lg' | 'fullscreen' | (string & {});
 
-/**
- * Props for the VueModalDialog component.
- *
- * All properties are optional with sensible defaults.
- */
-export interface VueModalDialogProps {
+/** Props shared by both supported dialog roles. */
+export interface VueModalDialogCommonProps {
   /** Interaction shield behavior for non-fullscreen dialogs: `'default'` closes the top dialog on click; `'static'` does not. @default 'default' */
   backdrop?: 'default' | 'static';
   /** Whether pressing Escape closes the dialog (topmost only). @default true */
   escape?: boolean;
-  /**
-   * ARIA role applied to the dialog container.
-   * @param Standard dialog semantics for most cases; use alertdialog for urgent interruptions.
-   * @default 'dialog'
-   * @example 'alertdialog'
-   */
-  role?: 'dialog' | 'alertdialog';
   /** Accessible label for the dialog close button. @default 'Close' */
   closeLabel?: string;
   /**
@@ -34,8 +23,8 @@ export interface VueModalDialogProps {
   initialFocus?: string | HTMLElement;
   /**
    * Controls whether the dialog is teleported or rendered in place.
-   * @param Pass a boolean to enable/disable teleporting, or a string CSS selector for the target.
-   * @default false
+   * @param Pass `false` to render in place, or a CSS selector to choose a teleport target.
+   * @default true
    * @example '#modal-root'
    */
   teleport?: boolean | string;
@@ -91,6 +80,24 @@ export interface VueModalDialogProps {
   mode?: 'light' | 'dark' | null;
 }
 
+/** Role-specific accessibility props. Alert dialogs must identify their description. */
+export type DialogRoleProps =
+  | {
+      /** Standard dialog semantics; this role may be omitted. */
+      role?: 'dialog';
+      /** Optional description element id for standard dialogs. */
+      describedBy?: string;
+    }
+  | {
+      /** Urgent interruption semantics. */
+      role: 'alertdialog';
+      /** Required description element id for alert dialogs. */
+      describedBy: string;
+    };
+
+/** Props for the VueModalDialog component. */
+export type VueModalDialogProps = VueModalDialogCommonProps & DialogRoleProps;
+
 /** Events emitted by the VueModalDialog component. */
 export interface VueModalDialogEmits {
   /**
@@ -123,6 +130,6 @@ export interface VueModalDialogSlots {
 
 /** Public API exposed via template ref on the VueModalDialog component. */
 export interface VueModalDialogExpose {
-  /** Request the dialog to close, respecting `beforeClose` guard if provided. */
-  requestClose: () => void;
+  /** Request the dialog to close; resolves `true` when closed and `false` when blocked or rejected. */
+  requestClose: () => Promise<boolean>;
 }

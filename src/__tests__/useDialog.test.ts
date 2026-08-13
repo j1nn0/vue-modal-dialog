@@ -177,6 +177,55 @@ describe('useDialog', () => {
     await promise;
   });
 
+  it('requires describedBy for imperative alertdialogs at runtime', async () => {
+    const warning = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const dialog = useDialog();
+    const promise = dialog.open({ role: 'alertdialog', describedBy: 'alert-description' });
+    await nextTick();
+
+    expect(
+      document.body.querySelector('[role="alertdialog"]')?.getAttribute('aria-describedby'),
+    ).toBe('alert-description');
+    expect(warning).not.toHaveBeenCalledWith(
+      '[Vue warn]: [VueModalDialog] role="alertdialog" requires a describedBy prop.',
+    );
+
+    dialog.close();
+    await finishTransition();
+    await promise;
+    warning.mockRestore();
+  });
+
+  it('does not run an async close guard twice', async () => {
+    let resolveGuard!: (value: boolean) => void;
+    const beforeClose = vi.fn(() => new Promise<boolean>((resolve) => (resolveGuard = resolve)));
+    const dialog = useDialog();
+    const promise = dialog.open({ beforeClose });
+    await nextTick();
+
+    dialog.close('first');
+    dialog.close('second');
+    expect(beforeClose).toHaveBeenCalledOnce();
+
+    resolveGuard(true);
+    await finishTransition();
+    await expect(promise).resolves.toBe('first');
+  });
+
+  it('does not retain a rejected programmatic close value', async () => {
+    const beforeClose = vi.fn<() => boolean>().mockReturnValueOnce(false).mockReturnValueOnce(true);
+    const dialog = useDialog();
+    const promise = dialog.open({ beforeClose });
+    await nextTick();
+
+    dialog.close('stale');
+    await Promise.resolve();
+    document.querySelector<HTMLButtonElement>('.dialog-close')?.click();
+    await finishTransition();
+
+    await expect(promise).resolves.toBeUndefined();
+  });
+
   it('does not report two dialogs as topmost across separate apps', async () => {
     // Each useDialog() dialog mounts its own Vue app; ids must not collide.
     const a = useDialog();
@@ -207,7 +256,7 @@ describe('useDialog', () => {
 
   it('keeps the container until the leave transition completes', async () => {
     const dialog = useDialog();
-    const promise = dialog.open();
+    const promise = dialog.open({ teleport: false });
     await nextTick();
 
     const container = document.body.querySelector('[role="dialog"]')?.parentElement;

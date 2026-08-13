@@ -318,10 +318,11 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 | -------------------- | ------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `backdrop`           | `String`                  | `"default"`      | `"default"` = topmost backdrop click closes the dialog, `"static"` = backdrop shown but click does not close                  |
 | `escape`             | `Boolean`                 | `true`            | Pressing Escape key closes the dialog                                                                                      |
-| `role`               | `String`                  | `"dialog"`        | ARIA role: `"dialog"` or `"alertdialog"`                                                                                   |
+| `role`               | `String`                  | `"dialog"`        | ARIA role: `"dialog"` or `"alertdialog"`; alert dialogs require `describedBy`                                             |
+| `describedBy`        | `String`                  | `undefined`        | Description element id(s), emitted as `aria-describedby`; required with `role="alertdialog"`                              |
 | `closeLabel`         | `String`                  | `"Close"`         | Accessible label for the close button                                                                                    |
 | `initialFocus`       | `String` \| `HTMLElement` | `undefined`       | Element selector or element to focus when the dialog opens                                                                 |
-| `teleport`           | `Boolean` \| `String`     | `false`           | `true` = teleports to `body`, or specify a CSS selector target                                                             |
+| `teleport`           | `Boolean` \| `String`     | `true`             | Teleports to `body` by default; pass `false` to render inline or a selector for a custom target                            |
 | `scrollLock`         | `Boolean`                 | `true`            | Locks page scrolling and compensates for the removed scrollbar width; changes apply immediately while open                 |
 | `draggable`          | `Boolean`                 | `false`           | Enables dragging the dialog by its header                                                                                  |
 | `transition`         | `String`                  | `"fade"`          | Transition name for the dialog panel                                                                                       |
@@ -336,6 +337,8 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 ## 🛠 v1.0 Migration
 
 v1.0 is modal-only. The `modal` prop and boolean `backdrop={true|false}` values are removed.
+Dialogs now teleport to `body` by default; pass `:teleport="false"` only when inline rendering is required.
+`role="alertdialog"` now requires `describedBy`, pointing to the alert message element.
 Use `backdrop="default"` (the default) to close on a topmost backdrop click, or
 `backdrop="static"` to keep the dialog open on backdrop clicks. Non-modal dialogs are not supported.
 
@@ -378,9 +381,9 @@ CSS custom property without renaming it:
 
 ## 🔓 Expose
 
-| Method         | Description                                                                 |
-| -------------- | --------------------------------------------------------------------------- |
-| `requestClose` | Programmatically request to close the dialog. Respects `beforeClose` guard. |
+| Method         | Description                                                                                                  |
+| -------------- | ------------------------------------------------------------------------------------------------------------ |
+| `requestClose` | Returns `Promise<boolean>`: `true` when closing starts; `false` when a guard rejects or is already pending. |
 
 ---
 
@@ -389,17 +392,18 @@ CSS custom property without renaming it:
 - Dialogs are always modal: the topmost dialog has `aria-modal="true"` and an active focus trap
 - Lower-layered dialogs have `aria-modal="false"` + `aria-hidden="true"`
 - `aria-labelledby` points to the visible title when a header slot is supplied; otherwise provide `aria-label`
-- `aria-describedby` is not generated; pass it directly when a short description is available
+- `role="alertdialog"` requires the `describedBy` prop, which is emitted as `aria-describedby`
+- For standard dialogs, a direct `aria-describedby` attribute remains a compatibility fallback; `describedBy` takes precedence
 - Close button uses the customizable `closeLabel` prop for its accessible label (`"Close"` by default)
-- Additional attributes such as `aria-label`, `aria-describedby`, `data-*`, and `id` fall through to the dialog
+- Additional attributes such as `aria-label`, `data-*`, and `id` fall through to the dialog
 - Focus trap is active on the topmost dialog to keep keyboard navigation predictable
 - Focus is restored to the element that was focused before the first dialog opened when the last dialog closes
 - Escape key closes the dialog if enabled (topmost dialog only when stacked)
 
 Background page content is **not** marked `inert`. Modality is conveyed with `aria-modal` and enforced
 with a focus trap. The backdrop is the interaction shield; make it visually transparent with the
-migration CSS above when needed. The dialog renders inline by default, so applying `inert` to an
-ancestor would also cover the dialog itself.
+migration CSS above when needed. Dialogs teleport to `body` by default, avoiding transformed ancestors
+and local stacking contexts.
 
 ---
 

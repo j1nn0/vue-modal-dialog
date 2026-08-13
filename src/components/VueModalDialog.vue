@@ -32,7 +32,7 @@ const props = withDefaults(defineProps<VueModalDialogProps>(), {
   position: 'center',
   width: 'md',
   mode: null,
-  teleport: false,
+  teleport: true,
   scrollLock: true,
   initialFocus: undefined,
   closeLabel: 'Close',
@@ -53,14 +53,35 @@ const hasHeader = computed(() => Boolean(slots.header));
 const teleportTarget = computed(() =>
   props.teleport === true ? 'body' : typeof props.teleport === 'string' ? props.teleport : 'body',
 );
+const describedBy = computed(() => {
+  const value = props.describedBy ?? attrs['aria-describedby'];
+  return typeof value === 'string' ? value : undefined;
+});
+let closePending = false;
 
-async function requestClose() {
-  emit('before-close');
-  if (props.beforeClose) {
-    const allow = await props.beforeClose();
-    if (!allow) return;
+async function requestClose(): Promise<boolean> {
+  if (!isOpen.value || closePending) return false;
+
+  if (!props.beforeClose) {
+    emit('before-close');
+    isOpen.value = false;
+    return true;
   }
-  isOpen.value = false;
+
+  closePending = true;
+  try {
+    emit('before-close');
+    const allow = await props.beforeClose();
+    if (!allow) return false;
+
+    isOpen.value = false;
+    return true;
+  } catch (err) {
+    vueWarn('[VueModalDialog] beforeClose rejected.', err);
+    return false;
+  } finally {
+    closePending = false;
+  }
 }
 
 // composables (pass dialogId to useDialogState so focus-trap can react to stack)
@@ -104,8 +125,11 @@ watchEffect(() => {
   }
   if (props.backdrop === 'static' && props.escape === false) {
     vueWarn(
-      '[VueModalDialog] backdrop="static" with escape=false means the user has no way to dismiss the dialog.',
+      '[VueModalDialog] backdrop="static" with escape=false leaves the close button as the only built-in dismissal mechanism.',
     );
+  }
+  if (props.role === 'alertdialog' && !props.describedBy) {
+    vueWarn('[VueModalDialog] role="alertdialog" requires a describedBy prop.');
   }
   if (!hasHeader.value && !attrs['aria-label']) {
     vueWarn('[VueModalDialog] dialog has no accessible name: provide a header slot or aria-label.');
@@ -207,6 +231,7 @@ defineExpose({ requestClose });
         :aria-modal="isTop"
         :aria-hidden="!isTop"
         :aria-labelledby="hasHeader ? titleId : undefined"
+        :aria-describedby="describedBy"
       >
         <div class="dialog-content">
           <header

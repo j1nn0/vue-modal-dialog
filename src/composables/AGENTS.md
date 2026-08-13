@@ -38,9 +38,10 @@ Composable-specific guidance for dialog internals. Use this with the root `AGENT
 ## INTER-COMPOSABLE CONTRACTS
 
 - `VueModalDialog.vue` coordinates these files; keep orchestration in the component layer.
-- `useDialogState()` requires `dialogId` and a close callback; it is stack-aware only and must stay aligned with `useDialogStack` on modal semantics, focus trap activation, and close timing.
+- `useDialogState()` requires `dialogId` and a `Promise<boolean>` close callback; it is stack-aware only and must stay aligned with `useDialogStack` on modal semantics, focus trap activation, and close timing.
 - `useDialogStack` is the single owner of the `vue-modal-open` body class and of scroll-lock padding; each entry stores only its `scrollLock` flag.
 - `setScrollLock(id, enabled)` updates registered entries immediately and notifies subscribers; unknown ids are no-ops.
+- `useDialog()` keeps its own pending guard around the component's `requestClose()` result; preserve both guards when changing imperative close timing.
 - Dialog ids come from `useDialogStack.nextId()`, never Vue's `useId()`: ids must not collide across the separate apps that `useDialog()` mounts.
 - `useDialogDrag` must no-op when the dialog is closed or fullscreen.
 

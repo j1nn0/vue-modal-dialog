@@ -28,7 +28,7 @@ export function useDialogState(
   emit: DialogEmit,
   _props: Pick<VueModalDialogProps, 'initialFocus'>,
   dialogId: string,
-  closeCallback: () => void,
+  closeCallback: () => Promise<boolean> | void,
 ): { close: () => void } {
   const { activate: activateFocusTrap, deactivate: deactivateFocusTrap } = useFocusTrap(dialogRef, {
     initialFocus: () => {
@@ -44,7 +44,7 @@ export function useDialogState(
   });
 
   const close = (): void => {
-    closeCallback();
+    void closeCallback();
   };
 
   let subscribed = false;

@@ -20,16 +20,16 @@ Component-layer guidance for the dialog UI. Use this with the root `AGENTS.md`; 
 ## ORCHESTRATION RULES
 
 - Keep cross-composable coordination in `VueModalDialog.vue`; do not push rendering concerns back into composables.
-- `requestClose()` is the guarded close path. It emits `before-close`, awaits `beforeClose`, and only then flips `modelValue`.
+- `requestClose()` is the guarded close path. It returns `Promise<boolean>`, suppresses concurrent async guards, emits `before-close`, and only then flips `modelValue`.
 - Stack lifecycle is component-owned: open pushes into `useDialogStack`, close pops, unmount always unsubscribes and pops.
 - `closed` is intentionally deferred with `nextTick()` after stack pop so DOM/transition work settles first.
 
 ## RENDERING AND ACCESSIBILITY
 
-- Teleport target is computed from `teleport`: `true -> body`, `string -> selector`, otherwise in-place rendering.
+- `teleport` defaults to `true` (`body`); use `false` only for explicit inline rendering, and a string selector for a custom target.
 - Dialogs are always modal: only the top dialog renders the backdrop and handles Escape/backdrop-close behavior.
 - `aria-modal` and `aria-hidden` depend on stack position; preserve that top-vs-lower dialog distinction.
-- Header/body IDs are generated for `aria-labelledby` and `aria-describedby`; keep those bindings intact when changing structure.
+- `describedBy` is the official `aria-describedby` API and is required for `role="alertdialog"`; direct `aria-describedby` is a standard-dialog compatibility fallback.
 - `role="alertdialog"` with `backdrop="default"` forces effective static-backdrop semantics; do not loosen that contract casually.
 
 ## STORYBOOK PATTERNS

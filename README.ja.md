@@ -318,10 +318,11 @@ app.mount('#app');
 | -------------------- | ------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | `backdrop`           | `String`                  | `"default"`      | `"default"` = 最上位ダイアログの背景クリックで閉じる, `"static"` = 背景ありだがクリックで閉じない                  |
 | `escape`             | `Boolean`                 | `true`            | Escapeキー押下でダイアログを閉じる                                                                                     |
-| `role`               | `String`                  | `"dialog"`        | ARIA role: `"dialog"` または `"alertdialog"`                                                                           |
+| `role`               | `String`                  | `"dialog"`        | ARIA role: `"dialog"` または `"alertdialog"`。alertdialog では `describedBy` が必須                                  |
+| `describedBy`        | `String`                  | `undefined`        | 説明要素のID（複数可）。`aria-describedby` として出力し、`role="alertdialog"` では必須                                 |
 | `closeLabel`         | `String`                  | `"Close"`         | 閉じるボタンのアクセシブルなラベル                                                                                       |
 | `initialFocus`       | `String` \| `HTMLElement` | `undefined`       | ダイアログが開いたときにフォーカスする要素のセレクタまたは要素                                                         |
-| `teleport`           | `Boolean` \| `String`     | `false`           | `true` = `body` にテレポート、または CSS セレクタでターゲットを指定                                                    |
+| `teleport`           | `Boolean` \| `String`     | `true`             | 既定で `body` にテレポート。インライン描画は `false`、任意ターゲットは CSS セレクタで指定                              |
 | `scrollLock`         | `Boolean`                 | `true`            | ダイアログ表示中にページのスクロールをロックする。open 中の変更は即時反映される                                         |
 | `draggable`          | `Boolean`                 | `false`           | ヘッダーによるドラッグ移動を有効にする                                                                                 |
 | `transition`         | `String`                  | `"fade"`          | ダイアログパネルのトランジション名                                                                                     |
@@ -336,6 +337,8 @@ app.mount('#app');
 ## 🛠 v1.0 移行
 
 v1.0 は modal 専用です。`modal` prop と boolean の `backdrop={true|false}` は廃止されました。
+ダイアログは既定で `body` にテレポートされます。インライン描画が必要な場合だけ `:teleport="false"` を指定してください。
+`role="alertdialog"` では、alert メッセージ要素を指す `describedBy` が必須です。
 背景クリックで最上位ダイアログを閉じる場合はデフォルトの `backdrop="default"` を、閉じない場合は
 `backdrop="static"` を使用してください。non-modal ダイアログには対応しません。
 
@@ -378,9 +381,9 @@ v1.0 は modal 専用です。`modal` prop と boolean の `backdrop={true|false
 
 ## 🔓 Expose
 
-| Method         | Description                                                                              |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| `requestClose` | プログラムからダイアログのクローズをリクエストします。`beforeClose` ガードを尊重します。 |
+| Method         | Description                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------- |
+| `requestClose` | `Promise<boolean>` を返します。close 開始時は `true`、guard拒否・guard実行中は `false` です。                 |
 
 ---
 
@@ -389,14 +392,15 @@ v1.0 は modal 専用です。`modal` prop と boolean の `backdrop={true|false
 - ダイアログは常に modal です。最上位ダイアログには `aria-modal="true"` を設定し、フォーカストラップを有効化します
 - 下層ダイアログには `aria-modal="false"` + `aria-hidden="true"`
 - `aria-labelledby` は header slot がある場合に表示タイトルを参照します。ない場合は `aria-label` を指定してください
-- `aria-describedby` は自動生成されません。短い説明がある場合は属性を直接指定してください
+- `role="alertdialog"` では `describedBy` prop が必須で、`aria-describedby` として出力されます
+- 通常の dialog では直接の `aria-describedby` 属性も互換フォールバックとして使えます。`describedBy` が優先されます
 - 閉じるボタンのアクセシブルなラベルは `closeLabel` prop で変更できます（デフォルトは `"Close"`）
-- `aria-label`、`aria-describedby`、`data-*`、`id` などの追加属性はダイアログに fallthrough します
+- `aria-label`、`data-*`、`id` などの追加属性はダイアログに fallthrough します
 - フォーカストラップは最上位ダイアログで有効化され、キーボード操作を一貫化
 - 最初のダイアログを開く前にフォーカスされていた要素に、最後のダイアログが閉じたときにフォーカスを復元
 - Escape でのクローズは有効時のみ（stack 時は最上位ダイアログのみ）
 
-背景ページのコンテンツに `inert` は設定されません。modal 性は `aria-modal` とフォーカストラップで示し、モーダルダイアログの背景操作を防ぎます。ダイアログはインラインにも描画されるため、祖先要素に `inert` を設定するとダイアログ自身も対象になります。
+背景ページのコンテンツに `inert` は設定されません。modal 性は `aria-modal` とフォーカストラップで示し、モーダルダイアログの背景操作を防ぎます。ダイアログは既定で `body` にテレポートされるため、変形された祖先要素や局所的な stacking context を避けられます。
 
 ---
 

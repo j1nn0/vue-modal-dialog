@@ -1,19 +1,29 @@
-import { createApp, defineComponent, h, ref, type App, type Ref, type VNodeChild } from 'vue';
+import {
+  createApp,
+  defineComponent,
+  h,
+  ref,
+  type App,
+  type Component,
+  type Ref,
+  type VNodeChild,
+} from 'vue';
 import VueModalDialog from '@/components/VueModalDialog.vue';
-import type { VueModalDialogExpose, VueModalDialogProps } from '@/types';
+import type { DialogRoleProps, VueModalDialogCommonProps, VueModalDialogExpose } from '@/types';
 
 /** Content rendered into an imperative dialog slot. */
 export type DialogContent = string | (() => VNodeChild);
 
 /** Options for an imperative dialog, including its slot content. */
-export type DialogOptions = Partial<VueModalDialogProps> & {
-  /** Content rendered in the dialog header. */
-  header?: DialogContent;
-  /** Content rendered in the dialog body. */
-  content?: DialogContent;
-  /** Content rendered in the dialog footer. */
-  footer?: DialogContent;
-};
+export type DialogOptions = Partial<VueModalDialogCommonProps> &
+  DialogRoleProps & {
+    /** Content rendered in the dialog header. */
+    header?: DialogContent;
+    /** Content rendered in the dialog body. */
+    content?: DialogContent;
+    /** Content rendered in the dialog footer. */
+    footer?: DialogContent;
+  };
 
 type DialogInstance = {
   app: App | null;
@@ -30,6 +40,8 @@ type DialogInstance = {
 function toSlot(content: DialogContent): () => VNodeChild {
   return typeof content === 'function' ? content : () => content;
 }
+
+const DialogComponent = VueModalDialog as unknown as Component;
 
 /**
  * Imperative dialog API for opening modal dialogs programmatically.
@@ -88,9 +100,9 @@ export function useDialog(): {
     instance.closeRequestPending = true;
     try {
       void Promise.resolve(instance.dialog.requestClose())
-        .then(() => {
+        .then((closed: boolean) => {
           instance.closeRequestPending = false;
-          if (!instance.closeStarted) instance.closeValue = undefined;
+          if (!closed && !instance.closeStarted) instance.closeValue = undefined;
         })
         .catch(() => {
           instance.closeRequestPending = false;
@@ -138,7 +150,7 @@ export function useDialog(): {
       setup() {
         return () =>
           h(
-            VueModalDialog,
+            DialogComponent,
             {
               ...props,
               ref: (value: unknown) => {

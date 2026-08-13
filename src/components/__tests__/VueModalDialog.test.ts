@@ -157,19 +157,23 @@ describe('VueModalDialog', () => {
       wrapper.unmount();
     });
 
-    it('teleports to body when teleport is true', async () => {
+    it('teleports to body by default', async () => {
       const container = document.createElement('div');
+      document.body.appendChild(container);
+      const wrapper = mount(VueModalDialog, {
+        attachTo: container,
+        props: { modelValue: false, 'onUpdate:modelValue': () => {} },
+      });
 
-      const wrapper = mountDialog({ teleport: true }, { attachTo: container });
       await openDialog(wrapper);
 
       const dialog = document.body.querySelector('[role="dialog"]');
-
-      expect(dialog).not.toBeNull();
+      expect((wrapper.props() as { teleport?: boolean }).teleport).toBe(true);
       expect(document.body.contains(dialog)).toBe(true);
       expect(container.contains(dialog)).toBe(false);
 
       wrapper.unmount();
+      container.remove();
     });
 
     it('teleports to a custom selector target', async () => {
@@ -374,24 +378,28 @@ describe('VueModalDialog', () => {
     it('generates unique non-empty title ids for mounted dialogs', async () => {
       const firstOpen = ref(false);
       const secondOpen = ref(false);
-      const wrapper = mount(
+      mount(
         defineComponent({
           setup() {
             return () =>
               h('div', [
                 h(
-                  VueModalDialog,
+                  VueModalDialog as unknown as object,
                   {
                     modelValue: firstOpen.value,
-                    'onUpdate:modelValue': (value: boolean) => (firstOpen.value = value),
+                    'onUpdate:modelValue': (value: boolean) => {
+                      firstOpen.value = value;
+                    },
                   },
                   { header: () => h('span', 'First') },
                 ),
                 h(
-                  VueModalDialog,
+                  VueModalDialog as unknown as object,
                   {
                     modelValue: secondOpen.value,
-                    'onUpdate:modelValue': (value: boolean) => (secondOpen.value = value),
+                    'onUpdate:modelValue': (value: boolean) => {
+                      secondOpen.value = value;
+                    },
                   },
                   { header: () => h('span', 'Second') },
                 ),
@@ -405,7 +413,9 @@ describe('VueModalDialog', () => {
       await nextTick();
       await nextTick();
 
-      const titleIds = wrapper.findAll('.dialog-title').map((title) => title.attributes('id'));
+      const titleIds = [...document.body.querySelectorAll('.dialog-title')]
+        .slice(-2)
+        .map((title) => title.getAttribute('id'));
 
       expect(titleIds).toHaveLength(2);
       const stackIds = useDialogStack._getStack().map((entry) => entry.id);
@@ -778,27 +788,55 @@ describe('VueModalDialog', () => {
       const wrapper = mountDialog();
       await openDialog(wrapper);
 
-      const dialog = wrapper.find('[role="dialog"]');
-      expect(dialog.exists()).toBe(true);
+      expect(wrapper.find('[role="dialog"]').exists()).toBe(true);
     });
 
-    it('sets role to alertdialog when specified', async () => {
-      const wrapper = mountDialog({ role: 'alertdialog' });
+    it('sets role and description for alertdialog', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const wrapper = mountDialog({ role: 'alertdialog', describedBy: 'delete-description' });
       await openDialog(wrapper);
 
       const dialog = wrapper.find('[role="alertdialog"]');
-      expect(dialog.exists()).toBe(true);
+      expect(dialog.attributes('aria-describedby')).toBe('delete-description');
+      expect(warnSpy).not.toHaveBeenCalledWith(
+        '[Vue warn]: [VueModalDialog] role="alertdialog" requires a describedBy prop.',
+      );
+      warnSpy.mockRestore();
     });
 
-    it('defaults backdrop to static when role is alertdialog', async () => {
-      const wrapper = mountDialog({ role: 'alertdialog' });
+    it('warns when an untyped alertdialog omits describedBy', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const wrapper = mountDialog({ role: 'alertdialog' } as never);
       await openDialog(wrapper);
 
-      const backdrop = wrapper.find('.backdrop');
-      await backdrop.trigger('click');
+      expect(
+        warnSpy.mock.calls.some(([message]) =>
+          String(message).includes('role="alertdialog" requires a describedBy prop.'),
+        ),
+      ).toBe(true);
+      warnSpy.mockRestore();
+    });
+
+    it('uses static backdrop behavior for alertdialog', async () => {
+      const wrapper = mountDialog({ role: 'alertdialog', describedBy: 'delete-description' });
+      await openDialog(wrapper);
+
+      await wrapper.find('.backdrop').trigger('click');
       await nextTick();
 
       expect(wrapper.emitted('update:modelValue')).toBeFalsy();
+    });
+
+    it('uses describedBy ahead of a legacy aria-describedby attribute', async () => {
+      const wrapper = mountDialog(
+        { describedBy: 'prop-description' },
+        { attrs: { 'aria-describedby': 'attr-description' } },
+      );
+      await openDialog(wrapper);
+
+      expect(wrapper.find('[role="dialog"]').attributes('aria-describedby')).toBe(
+        'prop-description',
+      );
     });
   });
 
@@ -855,16 +893,62 @@ describe('VueModalDialog', () => {
       expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
     });
 
-    it('requestClose() exposed method triggers close when no beforeClose', async () => {
+    it('requestClose() resolves true when it starts closing', async () => {
       const wrapper = mountDialog();
       await openDialog(wrapper);
 
-      await (wrapper.vm as unknown as { requestClose: () => Promise<void> }).requestClose();
+      await expect(
+        (wrapper.vm as unknown as { requestClose: () => Promise<boolean> }).requestClose(),
+      ).resolves.toBe(true);
       await nextTick();
       await nextTick();
       await nextTick();
 
       expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
+    });
+
+    it('runs an async beforeClose guard only once while pending', async () => {
+      let resolveGuard!: (value: boolean) => void;
+      const beforeClose = vi.fn(() => new Promise<boolean>((resolve) => (resolveGuard = resolve)));
+      const wrapper = mountDialog({ beforeClose });
+      await openDialog(wrapper);
+      const requestClose = (wrapper.vm as unknown as { requestClose: () => Promise<boolean> })
+        .requestClose;
+
+      const first = requestClose();
+      await expect(requestClose()).resolves.toBe(false);
+      expect(beforeClose).toHaveBeenCalledOnce();
+
+      resolveGuard(true);
+      await expect(first).resolves.toBe(true);
+      expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
+    });
+
+    it('allows another request after beforeClose rejects closing', async () => {
+      const beforeClose = vi
+        .fn<() => boolean>()
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(true);
+      const wrapper = mountDialog({ beforeClose });
+      await openDialog(wrapper);
+      const requestClose = (wrapper.vm as unknown as { requestClose: () => Promise<boolean> })
+        .requestClose;
+
+      await expect(requestClose()).resolves.toBe(false);
+      await expect(requestClose()).resolves.toBe(true);
+      expect(beforeClose).toHaveBeenCalledTimes(2);
+    });
+
+    it('returns false when beforeClose rejects', async () => {
+      const warning = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const wrapper = mountDialog({ beforeClose: () => Promise.reject(new Error('failed')) });
+      await openDialog(wrapper);
+
+      await expect(
+        (wrapper.vm as unknown as { requestClose: () => Promise<boolean> }).requestClose(),
+      ).resolves.toBe(false);
+      expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+      warning.mockRestore();
     });
   });
 });

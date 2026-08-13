@@ -7,7 +7,7 @@ import { nextTick } from 'vue';
 import { vi } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import VueModalDialog from '@/components/VueModalDialog.vue';
-import type { VueModalDialogProps } from '@/types';
+import type { DialogRoleProps, VueModalDialogCommonProps, VueModalDialogProps } from '@/types';
 import { useDialogStack } from '@/composables/useDialogStack';
 
 interface FocusTrapMock {
@@ -57,6 +57,7 @@ export const defaultMountProps: VueModalDialogProps = {
   position: 'center',
   width: 'md',
   mode: null,
+  // Explicitly keep integration mounts local; the public component default is true.
   teleport: false,
   scrollLock: true,
   // Transition names are deliberately omitted so tests exercise the component's
@@ -74,10 +75,8 @@ export const defaultMountProps: VueModalDialogProps = {
  * @param mountOptions - Additional Vue Test Utils mount options.
  */
 export function mountDialog(
-  overrides: Partial<VueModalDialogProps> & { modelValue?: boolean } & Record<
-      `on${string}`,
-      unknown
-    > = {},
+  overrides: Partial<VueModalDialogCommonProps> &
+    DialogRoleProps & { modelValue?: boolean } & Record<`on${string}`, unknown> = {},
   mountOptions: Record<string, unknown> = {},
 ): VueWrapper {
   return mount(VueModalDialog, {

@@ -4,6 +4,8 @@ import { action } from 'storybook/actions';
 
 import VueModalDialog from './VueModalDialog.vue';
 
+const component = VueModalDialog as unknown as Meta['component'];
+
 const openedAction = action('opened');
 const closedAction = action('closed');
 
@@ -20,7 +22,7 @@ const LONG_TEXT = Array.from({ length: 8 })
 
 const meta: Meta = {
   title: 'Components/VueModalDialog',
-  component: VueModalDialog,
+  component,
   tags: ['autodocs'],
   args: {
     backdrop: 'default',
@@ -78,12 +80,20 @@ const meta: Meta = {
       },
     },
     role: {
-      description: 'ARIA role applied to the dialog container.',
+      description: 'ARIA role applied to the dialog container. Alert dialogs require describedBy.',
       control: 'inline-radio',
       options: ['dialog', 'alertdialog'],
       table: {
         type: { summary: '"dialog" | "alertdialog"' },
         defaultValue: { summary: 'dialog' },
+      },
+    },
+    describedBy: {
+      description: 'Description element id; required when role is "alertdialog".',
+      control: 'text',
+      table: {
+        type: { summary: 'string | undefined' },
+        defaultValue: { summary: 'undefined' },
       },
     },
     initialFocus: {
@@ -99,7 +109,7 @@ const meta: Meta = {
       control: 'boolean',
       table: {
         type: { summary: 'boolean | string' },
-        defaultValue: { summary: 'false' },
+        defaultValue: { summary: 'true' },
       },
     },
     scrollLock: {
@@ -264,6 +274,9 @@ export const Playground: Story = {
           v-model="isOpen"
           :backdrop="args.backdrop"
           :escape="args.escape"
+          :role="args.role"
+          :described-by="args.describedBy"
+          :teleport="args.teleport"
           :position="args.position"
           :width="args.width"
           :mode="args.mode"
