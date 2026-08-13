@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.0-rc.7](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.6...v1.0.0-rc.7) (2026-08-13)
+
+### Bug Fixes
+
+* **dialog:** prevent duplicate close requests ([ede8d10](https://github.com/j1nn0/vue-modal-dialog/commit/ede8d10984e8f6ce6157b4a4ddc3f24ee8796093))
+
 ## [1.0.0-rc.6](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.5...v1.0.0-rc.6) (2026-08-13)
 
 ### ⚠ BREAKING CHANGES
