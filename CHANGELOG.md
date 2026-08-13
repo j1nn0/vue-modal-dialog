@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.0-rc.5](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.4...v1.0.0-rc.5) (2026-08-13)
+
+### ⚠ BREAKING CHANGES
+
+* make dialogs modal-only
+
+### Features
+
+* make dialogs modal-only ([a4577bf](https://github.com/j1nn0/vue-modal-dialog/commit/a4577bf0bb124000d377a515f45731de381970e0))
+
 ## [1.0.0-rc.4](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.3...v1.0.0-rc.4) (2026-08-13)
 
 ### Bug Fixes
