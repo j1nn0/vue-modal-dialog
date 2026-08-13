@@ -2,6 +2,8 @@
 import {
   useTemplateRef,
   useSlots,
+  useAttrs,
+  useId,
   ref,
   computed,
   watch,
@@ -18,6 +20,8 @@ import { useDialogMode } from '@/composables/useDialogMode';
 import { useDialogStack } from '@/composables/useDialogStack';
 import { useDialogDrag } from '@/composables/useDialogDrag';
 
+defineOptions({ inheritAttrs: false });
+
 // props / emit
 const props = withDefaults(defineProps<VueModalDialogProps>(), {
   backdrop: true,
@@ -31,17 +35,21 @@ const props = withDefaults(defineProps<VueModalDialogProps>(), {
   scrollLock: true,
   initialFocus: undefined,
   modal: true,
+  closeLabel: 'Close',
 });
 const emit = defineEmits<VueModalDialogEmits>();
 defineSlots<VueModalDialogSlots>();
 const dialogRef = useTemplateRef('dialogRef');
 const slots = useSlots();
+const attrs = useAttrs();
 const isOpen = defineModel<boolean>({ required: true });
 
 // Stack integration: shared single backdrop, dialogs stacked above it
-const dialogId = `dialog-${Math.random().toString(36).slice(2)}`;
+const dialogId = useDialogStack.nextId();
 const stackIndex = ref(-1);
 const currentTopId = ref<string | null>(null);
+const titleId = useId();
+const hasHeader = computed(() => Boolean(slots.header));
 const teleportTarget = computed(() =>
   props.teleport === true ? 'body' : typeof props.teleport === 'string' ? props.teleport : 'body',
 );
@@ -106,6 +114,9 @@ watchEffect(() => {
       '[VueModalDialog] backdrop="static" with escape=false means the user has no way to dismiss the dialog.',
     );
   }
+  if (!hasHeader.value && !attrs['aria-label']) {
+    vueWarn('[VueModalDialog] dialog has no accessible name: provide a header slot or aria-label.');
+  }
 });
 
 function updateStackIndex() {
@@ -160,10 +171,6 @@ onKeyStroke('Escape', (e) => {
   }
 });
 
-// Random ID（for ARIA）
-const headerId = `dialog-header-${Math.random().toString(36).slice(2)}`;
-const bodyId = `dialog-body-${Math.random().toString(36).slice(2)}`;
-
 defineExpose({ requestClose });
 </script>
 
@@ -189,30 +196,35 @@ defineExpose({ requestClose });
       <div
         ref="dialogRef"
         v-if="isOpen"
-        :open="isOpen"
+        v-bind="$attrs"
         :style="[{ maxWidth: dialogWidthStyle, zIndex: zIndexValue }, dragStyle]"
         class="dialog"
         :class="[dialogPositionClass, dialogWidthClass, modeClass, { 'is-dragging': isDragging }]"
         :role="props.role ?? 'dialog'"
         :aria-modal="isTop && props.modal !== false"
         :aria-hidden="!isTop"
-        :aria-labelledby="headerId"
-        :aria-describedby="bodyId"
+        :aria-labelledby="hasHeader ? titleId : undefined"
       >
         <div class="dialog-content">
           <header
             class="dialog-header"
             :class="{ 'is-draggable': isDraggable }"
-            :id="headerId"
             @pointerdown="onPointerDown"
           >
-            <div class="dialog-title">
+            <div class="dialog-title" :id="hasHeader ? titleId : undefined">
               <slot name="header"></slot>
             </div>
-            <button class="dialog-close" @click="requestClose" aria-label="Close">×</button>
+            <button
+              type="button"
+              class="dialog-close"
+              @click="requestClose"
+              :aria-label="props.closeLabel"
+            >
+              ×
+            </button>
           </header>
 
-          <div class="dialog-body" :id="bodyId">
+          <div class="dialog-body">
             <slot></slot>
           </div>
 

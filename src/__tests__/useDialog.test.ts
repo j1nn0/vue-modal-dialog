@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { h, nextTick } from 'vue';
 import { useDialog } from '@/composables/useDialog';
+import { useDialogStack } from '@/composables/useDialogStack';
 
 const useFocusTrapMock = vi.hoisted(() => ({
   useFocusTrap: vi.fn(() => ({ activate: vi.fn(), deactivate: vi.fn() })),
@@ -132,6 +133,24 @@ describe('useDialog', () => {
     dialog.close();
     finishTransition();
     await promise;
+  });
+
+  it('does not report two dialogs as topmost across separate apps', async () => {
+    // Each useDialog() dialog mounts its own Vue app; ids must not collide.
+    const a = useDialog();
+    const b = useDialog();
+    a.open({ header: 'A' });
+    await nextTick();
+    b.open({ header: 'B' });
+    await nextTick();
+
+    const stackIds = useDialogStack._getStack().map((entry) => entry.id);
+    expect(new Set(stackIds).size).toBe(stackIds.length);
+    // With colliding ids both dialogs consider themselves topmost.
+    expect(document.body.querySelectorAll('[aria-modal="true"]').length).toBe(1);
+
+    a.close();
+    b.close();
   });
 
   it('does nothing during SSR', async () => {

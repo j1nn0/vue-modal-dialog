@@ -15,6 +15,8 @@ export interface VueModalDialogProps {
    * @example 'alertdialog'
    */
   role?: 'dialog' | 'alertdialog';
+  /** Accessible label for the dialog close button. @default 'Close' */
+  closeLabel?: string;
   /**
    * Element selector or element to focus when the dialog opens.
    * @param Uses the first matching element or the provided element as the initial focus target.

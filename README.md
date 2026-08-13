@@ -321,6 +321,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 | `backdrop`           | `Boolean` \| `String`     | `true`            | `true` = backdrop click closes dialog, `false` = no backdrop, `"static"` = backdrop shown but click does not close         |
 | `escape`             | `Boolean`                 | `true`            | Pressing Escape key closes the dialog                                                                                      |
 | `role`               | `String`                  | `"dialog"`        | ARIA role: `"dialog"` or `"alertdialog"`                                                                                   |
+| `closeLabel`         | `String`                  | `"Close"`         | Accessible label for the close button                                                                                    |
 | `initialFocus`       | `String` \| `HTMLElement` | `undefined`       | Element selector or element to focus when the dialog opens                                                                 |
 | `modal`              | `Boolean`                 | `true`            | `true` = blocks background interaction and traps focus                                                                     |
 | `teleport`           | `Boolean` \| `String`     | `false`           | `true` = teleports to `body`, or specify a CSS selector target                                                             |
@@ -370,12 +371,19 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 - `role="dialog"` + `aria-modal="true"` on the topmost dialog
 - `aria-modal="false"` + `aria-hidden="true"` on lower-layered dialogs
-- `aria-labelledby` points to header slot
-- `aria-describedby` points to body slot
-- Close button has `aria-label="Close"`
+- `aria-labelledby` points to the visible title when a header slot is supplied; otherwise provide `aria-label`
+- `aria-describedby` is not generated; pass it directly when a short description is available
+- Close button uses the `closeLabel` prop for its accessible label (`"Close"` by default)
+- Additional attributes such as `aria-label`, `aria-describedby`, `data-*`, and `id` fall through to the dialog
 - Focus trap is active on the topmost dialog to keep keyboard navigation predictable
 - Focus is restored to the element that was focused before the first dialog opened when the last dialog closes
 - Escape key closes the dialog if enabled (topmost dialog only when stacked)
+
+Background page content is **not** marked `inert`. Modality is conveyed with `aria-modal` and enforced
+with a focus trap, which is what the Vue and React dialog ecosystems generally ship. Making the
+background truly inert is not possible in the default configuration: the dialog renders inline, so
+anything marked inert would also cover the dialog's own ancestors, and nothing except a top-layer
+native `<dialog>` can escape inertness.
 
 ---
 

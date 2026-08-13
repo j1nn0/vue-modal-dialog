@@ -18,6 +18,13 @@ export interface StackEntry {
 const stack: StackEntry[] = [];
 const subscribers = new Set<(stack: StackEntry[]) => void>();
 
+// Identity counter for stack entries. Deliberately not Vue's `useId()`: that is
+// unique only within a single app, and `useDialog()` mounts each dialog in its
+// own app, so two dialogs would share an id and both consider themselves topmost.
+// This counter shares the module scope of the stack it keys, which is exactly
+// the scope that must be collision-free.
+let idCounter = 0;
+
 // Focus restoration: save the element that was focused before the first dialog opened.
 let previouslyFocusedElement: Element | null = null;
 
@@ -78,6 +85,15 @@ function restoreFocus(): void {
  * ```
  */
 export const useDialogStack = {
+  /**
+   * Generate an id that is unique across every dialog sharing this stack,
+   * including dialogs mounted in separate Vue apps. The id is bookkeeping only
+   * and is never rendered, so it needs no server/client stability.
+   */
+  nextId(): string {
+    idCounter += 1;
+    return `dialog-${idCounter}`;
+  },
   /** Push a dialog onto the stack. Saves focus if this is the first entry. */
   push(entry: StackEntry): number {
     if (stack.length === 0) saveFocus();

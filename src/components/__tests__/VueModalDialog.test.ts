@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { nextTick } from 'vue';
-import type { VueWrapper } from '@vue/test-utils';
+import { defineComponent, h, nextTick, ref } from 'vue';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import VueModalDialog from '@/components/VueModalDialog.vue';
 import { mountDialog, clearDialogStack } from '@/test-utils';
 import { useDialogStack } from '@/composables/useDialogStack';
 
@@ -153,8 +154,9 @@ describe('VueModalDialog', () => {
     it('uses the default transition names', () => {
       const wrapper = mountDialog();
 
-      expect(wrapper.props('transition')).toBe('fade');
-      expect(wrapper.props('backdropTransition')).toBe('fade-backdrop');
+      const props = wrapper.props() as Record<string, unknown>;
+      expect(props.transition).toBe('fade');
+      expect(props.backdropTransition).toBe('fade-backdrop');
     });
 
     it('passes a custom transition name to the dialog transition', async () => {
@@ -223,36 +225,136 @@ describe('VueModalDialog', () => {
   });
 
   describe('ARIA attributes', () => {
-    it('sets role, aria-modal, aria-hidden and aria-label', async () => {
-      const wrapper = mountDialog();
+    it('labels the dialog with the title element, excluding the close button', async () => {
+      const wrapper = mountDialog(
+        {},
+        {
+          slots: { header: '<span class="test-header">Title</span>' },
+        },
+      );
       await openDialog(wrapper);
 
       const dialog = wrapper.find('[role="dialog"]');
-      expect(dialog.attributes('aria-modal')).toBe('true');
-      expect(dialog.attributes('aria-hidden')).toBe('false');
-      expect(dialog.attributes('aria-labelledby')).toBeTruthy();
-      expect(dialog.attributes('aria-describedby')).toBeTruthy();
+      const title = wrapper.find('.dialog-title');
+      const labelledby = dialog.attributes('aria-labelledby');
 
-      const closeBtn = wrapper.find('.dialog-close');
-      expect(closeBtn.attributes('aria-label')).toBe('Close');
+      expect(labelledby).toBeTruthy();
+      expect(title.attributes('id')).toBe(labelledby);
+      expect(title.text()).toBe('Title');
+      expect(title.find('.dialog-close').exists()).toBe(false);
     });
 
-    it('aria-labelledby points to header element', async () => {
+    it('does not emit aria-labelledby without a header slot', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const wrapper = mountDialog({}, { attrs: { 'aria-label': 'Unnamed dialog' } });
+      await openDialog(wrapper);
+
+      expect(wrapper.find('[role="dialog"]').attributes('aria-labelledby')).toBeUndefined();
+      expect(warnSpy).not.toHaveBeenCalledWith(
+        '[Vue warn]: [VueModalDialog] dialog has no accessible name: provide a header slot or aria-label.',
+      );
+      warnSpy.mockRestore();
+    });
+
+    it('warns when the dialog has no accessible name', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const wrapper = mountDialog();
       await openDialog(wrapper);
 
-      const labelledby = wrapper.find('[role="dialog"]').attributes('aria-labelledby');
-      const header = wrapper.find('.dialog-header');
-      expect(header.attributes('id')).toBe(labelledby);
+      expect(warnSpy.mock.calls[0]?.[0]).toBe(
+        '[Vue warn]: [VueModalDialog] dialog has no accessible name: provide a header slot or aria-label.',
+      );
+      warnSpy.mockRestore();
     });
 
-    it('aria-describedby points to body element', async () => {
-      const wrapper = mountDialog();
+    it('does not emit aria-describedby by default', async () => {
+      const wrapper = mountDialog({}, { attrs: { 'aria-label': 'Dialog' } });
       await openDialog(wrapper);
 
-      const describedby = wrapper.find('[role="dialog"]').attributes('aria-describedby');
-      const body = wrapper.find('.dialog-body');
-      expect(body.attributes('id')).toBe(describedby);
+      expect(wrapper.find('[role="dialog"]').attributes('aria-describedby')).toBeUndefined();
+    });
+
+    it('passes consumer ARIA attributes through to the dialog', async () => {
+      const wrapper = mountDialog(
+        {},
+        {
+          attrs: {
+            'aria-label': 'Settings',
+            'aria-describedby': 'settings-description',
+          },
+        },
+      );
+      await openDialog(wrapper);
+
+      const dialog = wrapper.find('[role="dialog"]');
+      expect(dialog.attributes('aria-label')).toBe('Settings');
+      expect(dialog.attributes('aria-describedby')).toBe('settings-description');
+    });
+
+    it('uses the configured close button label', async () => {
+      const defaultWrapper = mountDialog({}, { attrs: { 'aria-label': 'Dialog' } });
+      await openDialog(defaultWrapper);
+      expect(defaultWrapper.find('.dialog-close').attributes('aria-label')).toBe('Close');
+      expect(defaultWrapper.find('.dialog-close').attributes('type')).toBe('button');
+
+      const wrapper = mountDialog({ closeLabel: 'Dismiss' }, { attrs: { 'aria-label': 'Dialog' } });
+      await openDialog(wrapper);
+      expect(wrapper.find('.dialog-close').attributes('aria-label')).toBe('Dismiss');
+    });
+
+    it('does not render the non-semantic open attribute', async () => {
+      const wrapper = mountDialog({}, { attrs: { 'aria-label': 'Dialog' } });
+      await openDialog(wrapper);
+
+      expect(wrapper.find('[role="dialog"]').attributes('open')).toBeUndefined();
+    });
+
+    it('generates unique non-empty title ids for mounted dialogs', async () => {
+      const firstOpen = ref(false);
+      const secondOpen = ref(false);
+      const wrapper = mount(
+        defineComponent({
+          setup() {
+            return () =>
+              h('div', [
+                h(
+                  VueModalDialog,
+                  {
+                    modelValue: firstOpen.value,
+                    'onUpdate:modelValue': (value: boolean) => (firstOpen.value = value),
+                  },
+                  { header: () => h('span', 'First') },
+                ),
+                h(
+                  VueModalDialog,
+                  {
+                    modelValue: secondOpen.value,
+                    'onUpdate:modelValue': (value: boolean) => (secondOpen.value = value),
+                  },
+                  { header: () => h('span', 'Second') },
+                ),
+              ]);
+          },
+        }),
+      );
+      firstOpen.value = true;
+      secondOpen.value = true;
+      await nextTick();
+      await nextTick();
+      await nextTick();
+
+      const titleIds = wrapper.findAll('.dialog-title').map((title) => title.attributes('id'));
+
+      expect(titleIds).toHaveLength(2);
+      const stackIds = useDialogStack._getStack().map((entry) => entry.id);
+
+      expect(titleIds[0]).toBeTruthy();
+      expect(titleIds[1]).toBeTruthy();
+      expect(titleIds[0]).not.toBe(titleIds[1]);
+      expect(stackIds).toHaveLength(2);
+      expect(stackIds[0]).toBeTruthy();
+      expect(stackIds[1]).toBeTruthy();
+      expect(stackIds[0]).not.toBe(stackIds[1]);
     });
   });
 
@@ -630,10 +732,15 @@ describe('VueModalDialog', () => {
     it('emits console.warn if role="alertdialog" and modal=false', async () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      const wrapper = mountDialog({ role: 'alertdialog', modal: false });
+      const wrapper = mountDialog(
+        { role: 'alertdialog', modal: false },
+        { attrs: { 'aria-label': 'Alert' } },
+      );
       await openDialog(wrapper);
 
-      const [warnMessage] = consoleWarnSpy.mock.calls[0];
+      const warnMessage = consoleWarnSpy.mock.calls.find(([message]) =>
+        String(message).includes('role="alertdialog" with modal=false'),
+      )?.[0];
       expect(warnMessage).toBe(
         '[Vue warn]: [VueModalDialog] role="alertdialog" with modal=false is contradictory: alertdialogs require focus to stay inside.',
       );
@@ -699,7 +806,7 @@ describe('VueModalDialog', () => {
       const wrapper = mountDialog();
       await openDialog(wrapper);
 
-      await wrapper.vm.requestClose();
+      await (wrapper.vm as unknown as { requestClose: () => Promise<void> }).requestClose();
       await nextTick();
       await nextTick();
       await nextTick();

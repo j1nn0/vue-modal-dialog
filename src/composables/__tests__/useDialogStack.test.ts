@@ -9,6 +9,16 @@ describe('useDialogStack', () => {
     document.body.classList.remove('vue-modal-open');
   });
 
+  it('nextId is unique across dialogs mounted in separate Vue apps', () => {
+    // Vue's useId() restarts at v-0 per app, so dialogs opened through
+    // useDialog() (each its own app) would collide and both look topmost.
+    const ids = new Set<string>();
+    for (let i = 0; i < 50; i++) ids.add(useDialogStack.nextId());
+
+    expect(ids.size).toBe(50);
+    expect([...ids].every((id) => id.length > 0)).toBe(true);
+  });
+
   it('push/pop updates count, topId and body class', () => {
     expect(useDialogStack.count()).toBe(0);
 
