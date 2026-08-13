@@ -65,7 +65,7 @@ Vue 3 向けの再利用可能なモーダルダイアログコンポーネン�
 - **v0.12.0 の新機能**:
   - Teleport 対応: DOM 内の任意の場所（`body` など）にレンダリング可能
   - ドラッグ移動: ヘッダー部分をドラッグしてダイアログを移動可能
-  - プログラマティック API: `useDialog()` コンポーザブルによるダイアログ制御
+  - プログラマティック API: `useDialog()` コンポーザブルでコンテンツ付きダイアログを開き、結果を await
   - Before-close ガード: 閉じる前のロジック（保存確認など）を追加可能
   - カスタムトランジション: ダイアログと背景のアニメーションをカスタマイズ可能
   - 初期フォーカス: 開いたときにフォーカスする要素を明示的に指定可能
@@ -400,7 +400,7 @@ v1.0 は modal 専用です。`modal` prop と boolean の `backdrop={true|false
 - 最初のダイアログを開く前にフォーカスされていた要素に、最後のダイアログが閉じたときにフォーカスを復元
 - Escape でのクローズは有効時のみ（stack 時は最上位ダイアログのみ）
 
-背景ページのコンテンツに `inert` は設定されません。modal 性は `aria-modal` とフォーカストラップで示し、モーダルダイアログの背景操作を防ぎます。ダイアログは既定で `body` にテレポートされるため、変形された祖先要素や局所的な stacking context を避けられます。
+背景ページのコンテンツに `inert` は設定されません。modal 性は `aria-modal` とフォーカストラップで示し、モーダルダイアログの背景操作を防ぎます。バックドロップは interaction shield として機能し、必要に応じて上記の移行用 CSS で見た目を透明にできます。ダイアログは既定で `body` にテレポートされるため、変形された祖先要素や局所的な stacking context を避けられます。
 
 ---
 
@@ -443,6 +443,16 @@ v1.0 は modal 専用です。`modal` prop と boolean の `backdrop={true|false
   --j1nn0-vue-modal-dialog-footer-background: #f5f5f5;
   --j1nn0-vue-modal-dialog-footer-padding: 1rem;
 
+  /* Close button */
+  --j1nn0-vue-modal-dialog-close-size: 24px;
+  --j1nn0-vue-modal-dialog-close-border-radius: 4px;
+  --j1nn0-vue-modal-dialog-close-hover-background: rgba(0, 0, 0, 0.08);
+
+  /* Focus ring */
+  --j1nn0-vue-modal-dialog-focus-ring-color: #1d4ed8;
+  --j1nn0-vue-modal-dialog-focus-ring-width: 2px;
+  --j1nn0-vue-modal-dialog-focus-ring-offset: 2px;
+
   /* Dark mode */
   --j1nn0-vue-modal-dialog-backdrop-background-dark: rgba(255, 255, 255, 0.2);
   --j1nn0-vue-modal-dialog-border-dark: none;
@@ -450,8 +460,12 @@ v1.0 は modal 専用です。`modal` prop と boolean の `backdrop={true|false
   --j1nn0-vue-modal-dialog-footer-background-dark: #1f2937;
   --j1nn0-vue-modal-dialog-body-background-dark: #111827;
   --j1nn0-vue-modal-dialog-text-color-dark: #f9fafb;
+  --j1nn0-vue-modal-dialog-close-hover-background-dark: rgba(255, 255, 255, 0.12);
+  --j1nn0-vue-modal-dialog-focus-ring-color-dark: #93c5fd;
 }
 ```
+
+`--j1nn0-vue-modal-dialog-close-size` を 24px 以上に保つと、WCAG 2.2 SC 2.5.8（Target Size, Minimum）を満たします。ユーザーが reduced motion を指定している場合、トランジションは自動的に短縮されます。
 
 ---
 
@@ -476,24 +490,37 @@ v1.0 は modal 専用です。`modal` prop と boolean の `backdrop={true|false
 
 ## 🎯 Programmatic API
 
-`useDialog` コンポーザブルを使用して、子コンポーネントやロジックからダイアログの状態を制御できます。
+`useDialog` を使用して、ダイアログを命令的に開き、`close` に渡した値を await できます。
 
 ```vue
-<script setup>
-import { VueModalDialog, useDialog } from '@j1nn0/vue-modal-dialog';
+<script setup lang="ts">
+import { h } from 'vue';
+import { useDialog } from '@j1nn0/vue-modal-dialog';
 
-const { isOpen, open, close } = useDialog();
+const dialog = useDialog();
+
+async function confirmDelete() {
+  const confirmed = await dialog.open<boolean>({
+    header: 'Delete file?',
+    content: () => h('p', 'This cannot be undone.'),
+    footer: () =>
+      h('button', { type: 'button', onClick: () => dialog.close(true) }, 'OK'),
+  });
+
+  if (confirmed) {
+    // Delete the file.
+  }
+}
 </script>
 
 <template>
-  <button @click="open">API経由で開く</button>
-
-  <VueModalDialog v-model="isOpen">
-    <p>useDialog() で制御されています</p>
-    <button @click="close">閉じる</button>
-  </VueModalDialog>
+  <button type="button" @click="confirmDelete">Delete file</button>
 </template>
 ```
+
+この方法で開いたダイアログは独自の Vue アプリにマウントされるため、ホストアプリの
+プラグイン、グローバルコンポーネント、`provide()` の値を継承しません。これらの値が必要な
+場合は、テンプレート内で `<VueModalDialog v-model="isOpen">` を使用してください。
 
 ---
 
