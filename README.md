@@ -452,24 +452,37 @@ No additional configuration is required to use stack behavior.
 
 ## 🎯 Programmatic API
 
-You can use the `useDialog` composable to control the dialog state from any child component or logic.
+Use `useDialog` to open a dialog imperatively and await the value passed to `close`.
 
 ```vue
-<script setup>
-import { VueModalDialog, useDialog } from '@j1nn0/vue-modal-dialog';
+<script setup lang="ts">
+import { h } from 'vue';
+import { useDialog } from '@j1nn0/vue-modal-dialog';
 
-const { isOpen, open, close } = useDialog();
+const dialog = useDialog();
+
+async function confirmDelete() {
+  const confirmed = await dialog.open<boolean>({
+    header: 'Delete file?',
+    content: () => h('p', 'This cannot be undone.'),
+    footer: () =>
+      h('button', { type: 'button', onClick: () => dialog.close(true) }, 'OK'),
+  });
+
+  if (confirmed) {
+    // Delete the file.
+  }
+}
 </script>
 
 <template>
-  <button @click="open">Open via API</button>
-
-  <VueModalDialog v-model="isOpen">
-    <p>Controlled via useDialog()</p>
-    <button @click="close">Close</button>
-  </VueModalDialog>
+  <button type="button" @click="confirmDelete">Delete file</button>
 </template>
 ```
+
+Dialogs opened this way are mounted in their own Vue app, so they do not inherit the host app's
+plugins, global components, or `provide()` values. Use `<VueModalDialog v-model="isOpen">` in a
+template when those values are required.
 
 ---
 
