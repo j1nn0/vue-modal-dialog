@@ -24,7 +24,7 @@ export default defineConfig({
     vue(),
     dts({
       tsconfigPath: './tsconfig.build.json',
-      rollupTypes: true,
+      bundleTypes: true,
     }),
     banner(bannerText),
     vueDevTools(),

@@ -336,7 +336,7 @@ export const StackedModals: Story = {
       };
 
       watch(
-        () => args.mode,
+        () => (args as { mode?: 'light' | 'dark' | null }).mode,
         (nextMode, prevMode) => {
           if (typeof document === 'undefined') return;
           if (prevMode) document.body.classList.remove(`mode-${prevMode}`);
