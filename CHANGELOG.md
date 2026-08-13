@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.0-rc.4](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.3...v1.0.0-rc.4) (2026-08-13)
+
+### Bug Fixes
+
+* **publish:** preserve tagged sources and stable dist-tags ([493649e](https://github.com/j1nn0/vue-modal-dialog/commit/493649e412011e229e411df405b6b160547d64b6))
+
 ## [1.0.0-rc.3](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2026-08-13)
 
 ### Bug Fixes
