@@ -49,7 +49,7 @@ export default defineConfig({
         /^@vueuse\/core(?:\/|$)/,
         /^@vueuse\/integrations(?:\/|$)/,
         /^focus-trap(?:\/|$)/,
-      ], // 外部依存
+      ], // External dependencies
       output: {
         globals: {
           vue: 'Vue',

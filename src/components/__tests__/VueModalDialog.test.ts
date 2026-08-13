@@ -81,7 +81,7 @@ describe('VueModalDialog', () => {
       expect(document.body.classList.contains('vue-modal-open')).toBe(true);
       expect(wrapper.find('.backdrop').exists()).toBe(true);
       expect(dialog.attributes('aria-modal')).toBe('true');
-      expect(dialog.attributes('aria-hidden')).toBe('false');
+      expect(dialog.attributes('inert')).toBe('false');
       expect(dialogInDomWhenBeforeOpen).toBe(true);
       expect(wrapper.emitted('before-open')).toHaveLength(1);
       expect(wrapper.emitted('opening')).toHaveLength(1);
@@ -115,9 +115,9 @@ describe('VueModalDialog', () => {
       await nextTick();
 
       expect(useDialogStack.count()).toBe(2);
-      expect(first.find('[role="dialog"]').attributes('aria-hidden')).toBe('true');
+      expect(first.find('[role="dialog"]').attributes('inert')).toBe('true');
       expect(second.find('[role="dialog"]').attributes('aria-modal')).toBe('true');
-      expect(second.find('[role="dialog"]').attributes('aria-hidden')).toBe('false');
+      expect(second.find('[role="dialog"]').attributes('inert')).toBe('false');
       expect(first.find('.backdrop').exists()).toBe(false);
       expect(second.find('.backdrop').exists()).toBe(true);
 
@@ -908,7 +908,8 @@ describe('VueModalDialog', () => {
     });
 
     it('accepts only one close request while a controlled parent update is pending', async () => {
-      const wrapper = mountDialog({ 'onUpdate:modelValue': () => {} });
+      const beforeClose = vi.fn(() => Promise.resolve(true));
+      const wrapper = mountDialog({ beforeClose, 'onUpdate:modelValue': () => {} });
       await openDialog(wrapper);
       const requestClose = (wrapper.vm as unknown as { requestClose: () => Promise<boolean> })
         .requestClose;
@@ -920,6 +921,35 @@ describe('VueModalDialog', () => {
       await expect(second).resolves.toBe(false);
       expect(wrapper.emitted('before-close')).toHaveLength(1);
       expect(wrapper.emitted('update:modelValue')).toHaveLength(1);
+    });
+
+    it('can close again when a controlled parent refuses the first close update', async () => {
+      let refuseClose = true;
+      const wrapper = mountDialog(
+        {
+          'onUpdate:modelValue': (value: boolean) => {
+            if (refuseClose) {
+              refuseClose = false;
+              return;
+            }
+            void wrapper.setProps({ modelValue: value });
+          },
+        },
+        { attrs: { 'aria-label': 'Dialog' } },
+      );
+      await openDialog(wrapper);
+
+      const requestClose = (wrapper.vm as unknown as { requestClose: () => Promise<boolean> })
+        .requestClose;
+      await expect(requestClose()).resolves.toBe(true);
+      await nextTick();
+      expect(wrapper.find('[role="dialog"]').exists()).toBe(true);
+
+      await expect(requestClose()).resolves.toBe(true);
+      await nextTick();
+      await nextTick();
+      expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+      wrapper.unmount();
     });
 
     it('runs an async beforeClose guard only once while pending', async () => {

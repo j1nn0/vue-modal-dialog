@@ -1,22 +1,18 @@
 import type { ComputedRef, Ref } from 'vue';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
-/** Props shape expected by `useDialogMode`. */
-export interface DialogModeProps {
-  mode?: 'light' | 'dark' | null;
-}
-
 /**
  * Composable that resolves the dialog color mode.
  *
- * When `props.mode` is `'light'` or `'dark'` it is used directly.
- * When it is `null` (default) the composable follows the OS-level
+ * When the mode getter returns `'light'` or `'dark'` it is used directly.
+ * When it returns `null` (default) the composable follows the OS-level
  * `prefers-color-scheme` media query and updates reactively.
  *
+ * @param getMode - Getter for the current mode prop.
  * @returns `effectiveMode` — the resolved mode, and `modeClass` —
  *          a CSS class string (`'mode-light'` or `'mode-dark'`).
  */
-export function useDialogMode(props: DialogModeProps): {
+export function useDialogMode(getMode: () => 'light' | 'dark' | null | undefined): {
   effectiveMode: Ref<'light' | 'dark' | undefined>;
   modeClass: ComputedRef<string>;
 } {
@@ -30,18 +26,19 @@ export function useDialogMode(props: DialogModeProps): {
   };
 
   const updateMode = (): void => {
-    effectiveMode.value = props.mode != null ? props.mode : getSystemMode();
+    const mode = getMode();
+    effectiveMode.value = mode ?? getSystemMode();
   };
 
   const modeClass = computed(() => `mode-${effectiveMode.value}`);
 
-  // props.mode が変わるたび即時に反映
-  watch(() => props.mode, updateMode, { immediate: true });
+  // Reflect mode prop changes immediately.
+  watch(getMode, updateMode, { immediate: true });
 
-  // prefers-color-scheme の変更
+  // Listen for prefers-color-scheme changes.
   let mediaQuery: MediaQueryList | null = null;
   const mediaListener = (e: MediaQueryListEvent): void => {
-    if (props.mode == null) {
+    if (getMode() == null) {
       effectiveMode.value = e.matches ? 'dark' : 'light';
     }
   };

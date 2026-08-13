@@ -23,9 +23,9 @@
       "require": "./dist/vue-modal-dialog.umd.cjs"
     },
     "./style.css": "./dist/vue-modal-dialog.css",
-    "./dist/*": "./dist/*",
     "./package.json": "./package.json"
   },
+  "sideEffects": ["**/*.css"],
   "type": "module",
   "files": [
     "dist"

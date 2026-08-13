@@ -58,4 +58,89 @@ jobs:
 
       - run: pnpm build
 
+      - name: Typecheck packed package from a consumer
+        run: |
+          set -euo pipefail
+          tmp_dir="$(mktemp -d)"
+          trap 'rm -rf "$tmp_dir"' EXIT
+          pnpm pack --pack-destination "$tmp_dir" >/dev/null
+          archive="$(find "$tmp_dir" -maxdepth 1 -type f -name '*.tgz' -print -quit)"
+          package_dir="$tmp_dir/package"
+          mkdir "$package_dir"
+          tar -xzf "$archive" -C "$package_dir" --strip-components=1
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$package_dir/node_modules"
+
+          consumer_dir="$tmp_dir/consumer"
+          mkdir -p "$consumer_dir/node_modules/@j1nn0"
+          ln -s "$package_dir" "$consumer_dir/node_modules/@j1nn0/vue-modal-dialog"
+          ln -s "$GITHUB_WORKSPACE/node_modules/vue" "$consumer_dir/node_modules/vue"
+          cat > "$consumer_dir/tsconfig.json" <<'EOF'
+          {
+            "compilerOptions": {
+              "strict": true,
+              "target": "ESNext",
+              "module": "ESNext",
+              "moduleResolution": "Bundler",
+              "jsx": "preserve",
+              "lib": ["ESNext", "DOM"],
+              "skipLibCheck": true
+            },
+            "include": ["Consumer.vue"],
+            "vueCompilerOptions": {
+              "strictTemplates": true
+            }
+          }
+          EOF
+          cat > "$consumer_dir/Consumer.vue" <<'EOF'
+          <script setup lang="ts">
+          import { ref } from 'vue'
+          import { VueModalDialog } from '@j1nn0/vue-modal-dialog'
+          import type { VueModalDialogSlots } from '@j1nn0/vue-modal-dialog'
+
+          const open = ref(false)
+          const slots: VueModalDialogSlots = {
+            header: () => null,
+            default: () => null,
+            footer: () => null
+          }
+          slots.header()
+          </script>
+
+          <template>
+            <VueModalDialog v-model="open">
+              <template #header>Example</template>
+              <p>Body</p>
+              <template #footer>Footer</template>
+            </VueModalDialog>
+          </template>
+          EOF
+          "$GITHUB_WORKSPACE/node_modules/.bin/vue-tsc" --noEmit -p "$consumer_dir/tsconfig.json"
+
+          cat > "$consumer_dir/Consumer.vue" <<'EOF'
+          <script setup lang="ts">
+          import { ref } from 'vue'
+          import { VueModalDialog } from '@j1nn0/vue-modal-dialog'
+          import type { VueModalDialogSlots } from '@j1nn0/vue-modal-dialog'
+
+          const open = ref(false)
+          const invalidSlots: VueModalDialogSlots = {
+            nonexistent: () => null
+          }
+          void invalidSlots
+          </script>
+
+          <template>
+            <VueModalDialog v-model="open" :widthh="123">
+              <template #nonexistent>Bad</template>
+            </VueModalDialog>
+          </template>
+          EOF
+          if bad_output="$("$GITHUB_WORKSPACE/node_modules/.bin/vue-tsc" --noEmit -p "$consumer_dir/tsconfig.json" 2>&1)"; then
+            echo 'Expected invalid packed-package usage to fail type-checking.' >&2
+            exit 1
+          fi
+          printf '%s\n' "$bad_output"
+          grep -q 'widthh' <<<"$bad_output"
+          grep -q 'nonexistent' <<<"$bad_output"
+
       - run: pnpm size

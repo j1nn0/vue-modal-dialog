@@ -6,7 +6,7 @@ import { useDialogMode } from '../useDialogMode';
 
 test('useDialogMode respects props.mode and updates', async () => {
   const props = ref<{ mode: 'light' | 'dark' | null }>({ mode: 'dark' });
-  const { effectiveMode, modeClass } = useDialogMode(props.value);
+  const { effectiveMode, modeClass } = useDialogMode(() => props.value.mode);
 
   expect(effectiveMode.value).toBe('dark');
   expect(modeClass.value).toBe('mode-dark');
@@ -30,7 +30,7 @@ const TestComponent = defineComponent({
     },
   },
   setup(props) {
-    return useDialogMode(props);
+    return useDialogMode(() => props.mode);
   },
   template: '<div :class="modeClass">{{ effectiveMode }}</div>',
 });

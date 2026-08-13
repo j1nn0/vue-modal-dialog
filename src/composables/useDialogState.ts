@@ -1,10 +1,8 @@
 import type { Ref } from 'vue';
-import { nextTick, onBeforeUnmount, onMounted, warn as vueWarn, watch } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, watch } from 'vue';
 
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 import { useDialogStack } from '@/composables/useDialogStack';
-import type { VueModalDialogProps } from '@/types';
-
 type DialogEmit = (event: 'opened') => void;
 
 export type { DialogEmit };
@@ -17,7 +15,7 @@ export type { DialogEmit };
  * @param isOpen         - Model ref for v-model binding.
  * @param dialogRef      - Template ref pointing to the dialog root element.
  * @param emit           - Emits the `'opened'` event.
- * @param _props         - Dialog props used for initial focus configuration.
+ * @param getInitialFocus - Getter for the initial focus configuration.
  * @param dialogId       - Unique dialog identifier.
  * @param closeCallback  - Callback invoked when `close` is called.
  * @returns `close` — a function that invokes the close callback.
@@ -26,13 +24,13 @@ export function useDialogState(
   isOpen: Ref<boolean>,
   dialogRef: Ref<HTMLElement | null>,
   emit: DialogEmit,
-  _props: Pick<VueModalDialogProps, 'initialFocus'>,
+  getInitialFocus: () => string | HTMLElement | undefined,
   dialogId: string,
   closeCallback: () => Promise<boolean> | void,
 ): { close: () => void } {
   const { activate: activateFocusTrap, deactivate: deactivateFocusTrap } = useFocusTrap(dialogRef, {
     initialFocus: () => {
-      const target = _props.initialFocus;
+      const target = getInitialFocus();
       if (target === undefined) return false;
       if (typeof target === 'string') {
         if (typeof document === 'undefined') return false;
@@ -59,7 +57,7 @@ export function useDialogState(
         deactivateFocusTrap();
       }
     } catch (err) {
-      vueWarn('useDialogState updateFocus error', err);
+      console.warn('[VueModalDialog] useDialogState updateFocus error', err);
     }
   }
 

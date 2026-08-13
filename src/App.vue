@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import VueModalDialog from '@/components/VueModalDialog.vue';
 import { useDialogMode } from './composables/useDialogMode';
 import type { VueModalDialogProps } from '@/types';
@@ -43,11 +43,7 @@ const logEvent = (name: string) => eventLog.value.push(name);
 const clearLog = () => (eventLog.value = []);
 
 // Mode class for body styling
-const modeProps = reactive({ mode });
-watch(mode, (newVal) => {
-  modeProps.mode = newVal;
-});
-const { modeClass } = useDialogMode(modeProps);
+const { modeClass } = useDialogMode(() => mode.value);
 watch(
   modeClass,
   (newVal, oldVal) => {

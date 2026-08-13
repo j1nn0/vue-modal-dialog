@@ -24,19 +24,23 @@ import { useDialogDrag } from '@/composables/useDialogDrag';
 defineOptions({ inheritAttrs: false });
 
 // props / emit
-const props = withDefaults(defineProps<VueModalDialogProps>(), {
-  backdrop: 'default',
-  escape: true,
-  transition: 'fade',
-  backdropTransition: 'fade-backdrop',
-  position: 'center',
-  width: 'md',
-  mode: null,
-  teleport: true,
-  scrollLock: true,
-  initialFocus: undefined,
-  closeLabel: 'Close',
-});
+const {
+  backdrop = 'default',
+  escape = true,
+  transition = 'fade',
+  backdropTransition = 'fade-backdrop',
+  position = 'center',
+  width = 'md',
+  mode = null,
+  teleport = true,
+  scrollLock = true,
+  initialFocus = undefined,
+  closeLabel = 'Close',
+  draggable,
+  beforeClose,
+  role,
+  describedBy,
+} = defineProps<VueModalDialogProps>();
 const emit = defineEmits<VueModalDialogEmits>();
 defineSlots<VueModalDialogSlots>();
 const dialogRef = useTemplateRef('dialogRef');
@@ -51,10 +55,10 @@ const currentTopId = ref<string | null>(null);
 const titleId = useId();
 const hasHeader = computed(() => Boolean(slots.header));
 const teleportTarget = computed(() =>
-  props.teleport === true ? 'body' : typeof props.teleport === 'string' ? props.teleport : 'body',
+  teleport === true ? 'body' : typeof teleport === 'string' ? teleport : 'body',
 );
-const describedBy = computed(() => {
-  const value = props.describedBy ?? attrs['aria-describedby'];
+const ariaDescribedBy = computed(() => {
+  const value = describedBy ?? attrs['aria-describedby'];
   return typeof value === 'string' ? value : undefined;
 });
 let closePending = false;
@@ -62,16 +66,16 @@ let closePending = false;
 async function requestClose(): Promise<boolean> {
   if (!isOpen.value || closePending) return false;
 
-  closePending = true;
-  if (!props.beforeClose) {
+  if (!beforeClose) {
     emit('before-close');
     isOpen.value = false;
     return true;
   }
 
+  closePending = true;
   try {
     emit('before-close');
-    const allow = await props.beforeClose();
+    const allow = await beforeClose();
     if (!allow) {
       closePending = false;
       return false;
@@ -80,17 +84,27 @@ async function requestClose(): Promise<boolean> {
     isOpen.value = false;
     return true;
   } catch (err) {
-    vueWarn('[VueModalDialog] beforeClose rejected.', err);
+    console.warn('[VueModalDialog] beforeClose rejected.', err);
     closePending = false;
     return false;
   }
 }
 
 // composables (pass dialogId to useDialogState so focus-trap can react to stack)
-const { close } = useDialogState(isOpen, dialogRef, emit, props, dialogId, requestClose);
-const { dialogWidthClass, dialogWidthStyle, dialogPositionClass } = useDialogSize(props);
-const { modeClass } = useDialogMode(props);
-const isDraggable = computed(() => props.draggable === true && props.width !== 'fullscreen');
+const { close } = useDialogState(
+  isOpen,
+  dialogRef,
+  emit,
+  () => initialFocus,
+  dialogId,
+  requestClose,
+);
+const { dialogWidthClass, dialogWidthStyle, dialogPositionClass } = useDialogSize({
+  width: computed(() => width),
+  position: computed(() => position),
+});
+const { modeClass } = useDialogMode(() => mode);
+const isDraggable = computed(() => draggable === true && width !== 'fullscreen');
 const { onPointerDown, dragStyle, isDragging } = useDialogDrag(isOpen, isDraggable, dialogRef);
 
 // read base z-index safely
@@ -117,20 +131,20 @@ const zIndexValue = computed(() => {
 
 const isTop = computed(() => currentTopId.value === dialogId);
 const effectiveBackdrop = computed(() =>
-  props.role === 'alertdialog' && props.backdrop === 'default' ? 'static' : props.backdrop,
+  role === 'alertdialog' && backdrop === 'default' ? 'static' : backdrop,
 );
 const canCloseByBackdrop = computed(() => effectiveBackdrop.value === 'default');
 
 watchEffect(() => {
-  if (props.draggable && props.width === 'fullscreen') {
+  if (draggable && width === 'fullscreen') {
     vueWarn('[VueModalDialog] draggable=true has no effect when width="fullscreen".');
   }
-  if (props.backdrop === 'static' && props.escape === false) {
+  if (backdrop === 'static' && escape === false) {
     vueWarn(
       '[VueModalDialog] backdrop="static" with escape=false leaves the close button as the only built-in dismissal mechanism.',
     );
   }
-  if (props.role === 'alertdialog' && !props.describedBy) {
+  if (role === 'alertdialog' && !describedBy) {
     vueWarn('[VueModalDialog] role="alertdialog" requires a describedBy prop.');
   }
   if (!hasHeader.value && !attrs['aria-label']) {
@@ -154,7 +168,7 @@ function registerInStack(): void {
     id: dialogId,
     el: dialogRef,
     onClose: close,
-    scrollLock: props.scrollLock,
+    scrollLock,
   });
   stackIndex.value = idx;
   updateStackIndex();
@@ -175,7 +189,7 @@ watch(isOpen, (val) => {
 });
 
 watch(
-  () => props.scrollLock,
+  () => scrollLock,
   (enabled) => {
     if (isOpen.value) useDialogStack.setScrollLock(dialogId, enabled);
   },
@@ -201,7 +215,7 @@ function handleBackdropClick() {
 // Escape key only handled by top modal
 onKeyStroke('Escape', (e) => {
   if (!isOpen.value) return;
-  if (props.escape && isTop.value) {
+  if (escape && isTop.value) {
     e.preventDefault();
     requestClose();
   }
@@ -211,7 +225,7 @@ defineExpose({ requestClose });
 </script>
 
 <template>
-  <Teleport :to="teleportTarget" :disabled="!props.teleport">
+  <Teleport :to="teleportTarget" :disabled="!teleport">
     <transition :name="backdropTransition" appear>
       <div
         v-if="isOpen && isTop && width !== 'fullscreen'"
@@ -230,11 +244,11 @@ defineExpose({ requestClose });
         :style="[{ maxWidth: dialogWidthStyle, zIndex: zIndexValue }, dragStyle]"
         class="dialog"
         :class="[dialogPositionClass, dialogWidthClass, modeClass, { 'is-dragging': isDragging }]"
-        :role="props.role ?? 'dialog'"
+        :role="role ?? 'dialog'"
         :aria-modal="isTop"
-        :aria-hidden="!isTop"
+        :inert="!isTop"
         :aria-labelledby="hasHeader ? titleId : undefined"
-        :aria-describedby="describedBy"
+        :aria-describedby="ariaDescribedBy"
       >
         <div class="dialog-content">
           <header
@@ -249,7 +263,7 @@ defineExpose({ requestClose });
               type="button"
               class="dialog-close"
               @click="requestClose"
-              :aria-label="props.closeLabel"
+              :aria-label="closeLabel"
             >
               ×
             </button>

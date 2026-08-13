@@ -1,3 +1,5 @@
+import type { VNodeChild } from 'vue';
+
 /**
  * Dialog width: one of the built-in presets, or any CSS length.
  *
@@ -121,11 +123,11 @@ export interface VueModalDialogEmits {
 /** Slots provided by the VueModalDialog component. */
 export interface VueModalDialogSlots {
   /** Header area of the dialog. Contains the title and close button. */
-  header: [];
+  header(): VNodeChild;
   /** Default body content of the dialog. */
-  default: [];
+  default(): VNodeChild;
   /** Footer area of the dialog. Only rendered when the slot is provided. */
-  footer: [];
+  footer(): VNodeChild;
 }
 
 /** Public API exposed via template ref on the VueModalDialog component. */

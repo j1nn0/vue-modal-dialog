@@ -33,9 +33,16 @@ describe('useDialogState', () => {
     deactivateSpy.mockClear();
     vi.mocked(useFocusTrap).mockClear();
     clearDialogStack();
-    dialogState = useDialogState(isOpen, dialogRef, emit, {}, 'dialog-test', () => {
-      isOpen.value = false;
-    });
+    dialogState = useDialogState(
+      isOpen,
+      dialogRef,
+      emit,
+      () => undefined,
+      'dialog-test',
+      () => {
+        isOpen.value = false;
+      },
+    );
   });
 
   afterEach(() => {
@@ -80,7 +87,7 @@ describe('useDialogState', () => {
   describe('initialFocus', () => {
     it('returns false when props.initialFocus is undefined', () => {
       const props = { initialFocus: undefined };
-      useDialogState(isOpen, dialogRef, emit, props, 'dialog-test', vi.fn());
+      useDialogState(isOpen, dialogRef, emit, () => props.initialFocus, 'dialog-test', vi.fn());
 
       const trapCalls = vi.mocked(useFocusTrap).mock.calls;
       const lastCall = trapCalls[trapCalls.length - 1];
@@ -97,7 +104,7 @@ describe('useDialogState', () => {
       dialogRef.value = rootElement;
 
       const props = { initialFocus: '.my-input' };
-      useDialogState(isOpen, dialogRef, emit, props, 'dialog-test', vi.fn());
+      useDialogState(isOpen, dialogRef, emit, () => props.initialFocus, 'dialog-test', vi.fn());
 
       const trapCalls = vi.mocked(useFocusTrap).mock.calls;
       const lastCall = trapCalls[trapCalls.length - 1];
@@ -114,7 +121,7 @@ describe('useDialogState', () => {
       dialogRef.value = rootElement;
 
       const props = { initialFocus: '.non-existent' };
-      useDialogState(isOpen, dialogRef, emit, props, 'dialog-test', vi.fn());
+      useDialogState(isOpen, dialogRef, emit, () => props.initialFocus, 'dialog-test', vi.fn());
 
       const trapCalls = vi.mocked(useFocusTrap).mock.calls;
       const lastCall = trapCalls[trapCalls.length - 1];
@@ -128,7 +135,7 @@ describe('useDialogState', () => {
     it('returns HTMLElement directly', () => {
       const dummyElement = document.createElement('button');
       const props = { initialFocus: dummyElement };
-      useDialogState(isOpen, dialogRef, emit, props, 'dialog-test', vi.fn());
+      useDialogState(isOpen, dialogRef, emit, () => props.initialFocus, 'dialog-test', vi.fn());
 
       const trapCalls = vi.mocked(useFocusTrap).mock.calls;
       const lastCall = trapCalls[trapCalls.length - 1];

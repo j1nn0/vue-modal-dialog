@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { nextTick, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import type { Ref } from 'vue';
 
 import { useDialogSize } from '../useDialogSize';
@@ -79,7 +79,7 @@ describe('useDialogSize composable', () => {
 
     it('reacts to width changes', async () => {
       const width = ref('sm');
-      const { dialogWidthClass, dialogWidthStyle } = mountComposable(width);
+      const { dialogWidthClass, dialogWidthStyle } = mountComposable(computed(() => width.value));
 
       // 初期値
       expect(dialogWidthClass.value).toEqual({

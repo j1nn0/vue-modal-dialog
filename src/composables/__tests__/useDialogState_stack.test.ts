@@ -45,7 +45,14 @@ describe('useDialogState (stack-aware)', () => {
     const wrapper = mount(
       defineComponent({
         setup() {
-          useDialogState(initialIsOpen, initialRef, initialEmit, {}, 'initial', vi.fn());
+          useDialogState(
+            initialIsOpen,
+            initialRef,
+            initialEmit,
+            () => undefined,
+            'initial',
+            vi.fn(),
+          );
           onMounted(() => {
             useDialogStack.push({ id: 'initial', scrollLock: true });
           });
@@ -75,7 +82,7 @@ describe('useDialogState (stack-aware)', () => {
   });
 
   it('activates focus trap only when top of stack', async () => {
-    useDialogState(isOpen, dialogRef, emit, {}, 'd1', vi.fn());
+    useDialogState(isOpen, dialogRef, emit, () => undefined, 'd1', vi.fn());
 
     // open and register
     isOpen.value = true;

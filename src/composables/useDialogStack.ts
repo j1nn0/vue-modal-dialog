@@ -97,7 +97,7 @@ function restoreFocus(): void {
     try {
       previouslyFocusedElement.focus();
     } catch (err) {
-      vueWarn('useDialogStack focus restore error', err);
+      console.warn('[VueModalDialog] useDialogStack focus restore error', err);
     } finally {
       previouslyFocusedElement = null;
     }
