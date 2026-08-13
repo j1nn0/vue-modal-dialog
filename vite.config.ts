@@ -4,7 +4,7 @@ import banner from 'vite-plugin-banner';
 import dts from 'vite-plugin-dts';
 import { defineConfig } from 'vite';
 import eslint from 'vite-plugin-eslint';
-import pkg from './package.json';
+import pkg from './package.json' with { type: 'json' };
 import vue from '@vitejs/plugin-vue';
 import vueDevTools from 'vite-plugin-vue-devtools';
 
