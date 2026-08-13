@@ -25,8 +25,6 @@ type DialogInstance = {
   closeStarted: boolean;
   closeRequestPending: boolean;
   cleaned: boolean;
-  transitionEndHandler: (() => void) | null;
-  cleanupTimer: ReturnType<typeof setTimeout> | undefined;
 };
 
 function toSlot(content: DialogContent): () => VNodeChild {
@@ -54,15 +52,6 @@ export function useDialog(): {
     if (instance.cleaned) return;
     instance.cleaned = true;
 
-    if (instance.transitionEndHandler) {
-      instance.container.removeEventListener('transitionend', instance.transitionEndHandler);
-      instance.transitionEndHandler = null;
-    }
-    if (instance.cleanupTimer !== undefined) {
-      clearTimeout(instance.cleanupTimer);
-      instance.cleanupTimer = undefined;
-    }
-
     instance.app?.unmount();
     instance.app = null;
     if (instance.container.parentNode) {
@@ -83,10 +72,6 @@ export function useDialog(): {
     instance.closeValue = value;
     if (current === instance) isOpen.value = false;
 
-    const onTransitionEnd = () => finishClose(instance);
-    instance.transitionEndHandler = onTransitionEnd;
-    instance.container.addEventListener('transitionend', onTransitionEnd);
-    instance.cleanupTimer = setTimeout(onTransitionEnd, 500);
     instance.model.value = false;
   }
 
@@ -122,11 +107,9 @@ export function useDialog(): {
 
     if (current) {
       const previous = current;
-      // Mark closed first so the component's model update cannot restart the
-      // close sequence while we tear the previous instance down.
-      previous.closeStarted = true;
+      // Resolve replacement through the panel's leave transition as well.
       previous.closeValue = undefined;
-      finishClose(previous);
+      startClose(previous, undefined);
     }
 
     let resolvePromise!: (value: T | undefined) => void;
@@ -149,8 +132,6 @@ export function useDialog(): {
       closeStarted: false,
       closeRequestPending: false,
       cleaned: false,
-      transitionEndHandler: null,
-      cleanupTimer: undefined,
     };
 
     const Root = defineComponent({
@@ -163,6 +144,7 @@ export function useDialog(): {
               ref: (value: unknown) => {
                 instance.dialog = value as VueModalDialogExpose | null;
               },
+              onAfterLeave: () => finishClose(instance),
               modelValue: instance.model.value,
               'onUpdate:modelValue': (value: boolean) => {
                 if (value) {

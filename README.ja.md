@@ -354,7 +354,8 @@ app.mount('#app');
 | `opened`       | `void`  | オープニングトランジションが完了したときに発火します   |
 | `before-close` | `void`  | ダイアログが閉じる処理を開始する前に発火します         |
 | `closing`      | `void`  | クロージングトランジションが開始されたときに発火します |
-| `closed`       | `void`  | クロージングトランジションが完了したときに発火します   |
+| `closed`       | `void`  | Vue が close を適用したときに発火します。leave transition は継続中の場合があります |
+| `after-leave`  | `void`  | ダイアログパネルの leave transition 完了後に発火します   |
 
 ---
 

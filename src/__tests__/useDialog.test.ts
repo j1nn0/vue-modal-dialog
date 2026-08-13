@@ -8,15 +8,14 @@ const useFocusTrapMock = vi.hoisted(() => ({
 }));
 vi.mock('@vueuse/integrations/useFocusTrap', () => useFocusTrapMock);
 
-function finishTransition(): void {
-  document
-    .querySelector('[role="dialog"]')
-    ?.parentElement?.dispatchEvent(new Event('transitionend'));
+async function finishTransition(): Promise<void> {
+  await nextTick();
+  await nextTick();
 }
 
 describe('useDialog', () => {
   beforeEach(() => {
-    document.body.innerHTML = '';
+    while (document.body.firstChild) document.body.firstChild.remove();
   });
 
   afterEach(() => {
@@ -35,7 +34,7 @@ describe('useDialog', () => {
     expect(dialog.isOpen.value).toBe(true);
 
     dialog.close();
-    finishTransition();
+    await finishTransition();
     await promise;
   });
 
@@ -49,7 +48,7 @@ describe('useDialog', () => {
     expect(document.querySelector('.dialog-body')?.textContent).toContain('Plain content');
 
     dialog.close();
-    finishTransition();
+    await finishTransition();
     await stringContent;
 
     const renderContent = dialog.open({
@@ -60,7 +59,7 @@ describe('useDialog', () => {
     expect(document.querySelector('.dialog-body')?.textContent).toContain('Rendered content');
 
     dialog.close();
-    finishTransition();
+    await finishTransition();
     await renderContent;
   });
 
@@ -71,7 +70,7 @@ describe('useDialog', () => {
 
     expect(document.querySelector('.dialog-footer')).not.toBeNull();
     dialog.close();
-    finishTransition();
+    await finishTransition();
     await withFooter;
 
     const withoutFooter = dialog.open();
@@ -79,7 +78,7 @@ describe('useDialog', () => {
 
     expect(document.querySelector('.dialog-footer')).toBeNull();
     dialog.close();
-    finishTransition();
+    await finishTransition();
     await withoutFooter;
   });
 
@@ -89,7 +88,7 @@ describe('useDialog', () => {
     await nextTick();
 
     dialog.close(42);
-    finishTransition();
+    await finishTransition();
 
     await expect(promise).resolves.toBe(42);
   });
@@ -101,7 +100,7 @@ describe('useDialog', () => {
 
     document.querySelector<HTMLButtonElement>('.dialog-close')?.click();
     await nextTick();
-    finishTransition();
+    await finishTransition();
 
     await expect(promise).resolves.toBeUndefined();
   });
@@ -109,17 +108,31 @@ describe('useDialog', () => {
   it('resolves the first promise when open() replaces the instance', async () => {
     const dialog = useDialog();
     const first = dialog.open({ width: 'sm' });
+    let firstResolved = false;
+    void first.then(() => {
+      firstResolved = true;
+    });
     await nextTick();
 
     const second = dialog.open({ width: 'lg' });
     await nextTick();
 
-    expect(document.body.querySelector('.dialog-sm')).toBeNull();
+    expect(document.body.querySelector('.dialog-sm')).not.toBeNull();
     expect(document.body.querySelector('.dialog-lg')).not.toBeNull();
+
+    const firstContainer = document.body.querySelector('.dialog-sm')?.parentElement;
+    firstContainer
+      ?.querySelector('.dialog-content')
+      ?.dispatchEvent(new Event('transitionend', { bubbles: true }));
+    await nextTick();
+    expect(firstResolved).toBe(false);
+
+    await finishTransition();
     await expect(first).resolves.toBeUndefined();
+    expect(document.body.querySelector('.dialog-sm')).toBeNull();
 
     dialog.close();
-    finishTransition();
+    await finishTransition();
     await second;
   });
 
@@ -128,10 +141,10 @@ describe('useDialog', () => {
     const promise = dialog.open({ width: 'lg' });
     await nextTick();
 
-    expect(document.body.innerHTML).toContain('dialog-lg');
+    expect(document.body.querySelector('.dialog-lg')).not.toBeNull();
 
     dialog.close();
-    finishTransition();
+    await finishTransition();
     await promise;
   });
 
@@ -151,6 +164,7 @@ describe('useDialog', () => {
 
     a.close();
     b.close();
+    await finishTransition();
   });
 
   it('does nothing during SSR', async () => {
@@ -162,8 +176,7 @@ describe('useDialog', () => {
     dialog.close(true);
   });
 
-  it('removes the container after close cleanup', async () => {
-    vi.useFakeTimers();
+  it('keeps the container until the leave transition completes', async () => {
     const dialog = useDialog();
     const promise = dialog.open();
     await nextTick();
@@ -173,11 +186,11 @@ describe('useDialog', () => {
 
     dialog.close();
     expect(container?.isConnected).toBe(true);
+    expect(dialog.isOpen.value).toBe(false);
 
-    vi.advanceTimersByTime(500);
+    await finishTransition();
     await promise;
 
     expect(container?.isConnected).toBe(false);
-    expect(dialog.isOpen.value).toBe(false);
   });
 });

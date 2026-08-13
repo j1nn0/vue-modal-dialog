@@ -205,7 +205,7 @@ defineExpose({ requestClose });
       ></div>
     </transition>
 
-    <transition :name="transition" appear>
+    <transition :name="transition" appear @after-leave="emit('after-leave')">
       <div
         ref="dialogRef"
         v-if="isOpen"
@@ -553,9 +553,7 @@ defineExpose({ requestClose });
   }
 }
 
-// Respect a user's reduced-motion preference. A near-zero duration is used
-// rather than `none` so `transitionend` still fires for listeners that wait
-// on it (see useDialog's deferred unmount).
+// Respect a user's reduced-motion preference while keeping Vue transition hooks active.
 @media (prefers-reduced-motion: reduce) {
   .backdrop,
   .fade-enter-active,

@@ -356,6 +356,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 | `before-close` | `void`  | Fired before closing begins and before the `beforeClose` guard runs; a cancelled guard may prevent any close.                                     |
 | `closing`      | `void`  | Fired when the dialog starts closing.                                                                                                             |
 | `closed`       | `void`  | Fired once Vue has applied the close; the leave transition may still be playing.                                                                  |
+| `after-leave`  | `void`  | Fired after the dialog panel's leave transition completes.                                                                                         |
 
 ---
 

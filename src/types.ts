@@ -114,6 +114,8 @@ export interface VueModalDialogEmits {
   closing: [];
   /** Fired once Vue has applied the close; the leave transition may still be playing. */
   closed: [];
+  /** Fired after the dialog panel's leave transition completes. */
+  'after-leave': [];
 }
 
 /** Slots provided by the VueModalDialog component. */
