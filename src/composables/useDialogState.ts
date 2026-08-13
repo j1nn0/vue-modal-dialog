@@ -1,5 +1,5 @@
 import type { Ref } from 'vue';
-import { nextTick, warn as vueWarn, watch } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, warn as vueWarn, watch } from 'vue';
 
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 import { useDialogStack } from '@/composables/useDialogStack';
@@ -48,6 +48,7 @@ export function useDialogState(
   };
 
   let subscribed = false;
+  let unmounted = false;
 
   function updateFocus(): void {
     try {
@@ -62,23 +63,46 @@ export function useDialogState(
     }
   }
 
-  watch(isOpen, async (val) => {
-    if (val) {
-      await nextTick();
-      if (!subscribed) {
-        useDialogStack.subscribe(updateFocus);
-        subscribed = true;
-      }
-      updateFocus();
-      emit('opened');
-    } else {
-      // Deactivate focus trap; the component emits 'closed' after Vue applies the DOM change.
-      deactivateFocusTrap();
-      if (subscribed) {
-        useDialogStack.unsubscribe(updateFocus);
-        subscribed = false;
-      }
+  async function handleOpen(): Promise<void> {
+    if (subscribed) return;
+
+    await nextTick();
+    if (unmounted || !isOpen.value || subscribed) return;
+
+    if (!subscribed) {
+      useDialogStack.subscribe(updateFocus);
+      subscribed = true;
     }
+    updateFocus();
+    emit('opened');
+  }
+
+  function handleClose(): void {
+    // Deactivate focus trap; the component emits 'closed' after Vue applies the DOM change.
+    deactivateFocusTrap();
+    if (subscribed) {
+      useDialogStack.unsubscribe(updateFocus);
+      subscribed = false;
+    }
+  }
+
+  watch(isOpen, (val) => {
+    if (val) {
+      void handleOpen();
+    } else {
+      handleClose();
+    }
+  });
+
+  onMounted(() => {
+    if (isOpen.value) {
+      void handleOpen();
+    }
+  });
+
+  onBeforeUnmount(() => {
+    unmounted = true;
+    handleClose();
   });
 
   return { close };

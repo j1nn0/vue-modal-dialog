@@ -75,7 +75,10 @@ export const defaultMountProps: VueModalDialogProps = {
  * @param mountOptions - Additional Vue Test Utils mount options.
  */
 export function mountDialog(
-  overrides: Partial<VueModalDialogProps> & Record<`on${string}`, unknown> = {},
+  overrides: Partial<VueModalDialogProps> & { modelValue?: boolean } & Record<
+      `on${string}`,
+      unknown
+    > = {},
   mountOptions: Record<string, unknown> = {},
 ): VueWrapper {
   return mount(VueModalDialog, {

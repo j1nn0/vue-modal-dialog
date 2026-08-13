@@ -9,6 +9,7 @@ import {
   watch,
   watchEffect,
   onBeforeUnmount,
+  onMounted,
   nextTick,
   warn as vueWarn,
 } from 'vue';
@@ -127,27 +128,39 @@ function updateStackIndex() {
 // subscribe once to stack updates so we update stackIndex reactively
 useDialogStack.subscribe(updateStackIndex);
 
+function registerInStack(): void {
+  if (useDialogStack.indexOf(dialogId) !== -1) return;
+
+  emit('before-open');
+  const idx = useDialogStack.push({
+    id: dialogId,
+    el: dialogRef,
+    onClose: close,
+    propsSnapshot: {
+      ...props,
+      scrollLock: props.modal === false ? false : props.scrollLock,
+    },
+  });
+  stackIndex.value = idx;
+  updateStackIndex();
+  emit('opening');
+}
+
 // Watch open state to register/unregister in stack
 watch(isOpen, (val) => {
   if (val) {
-    emit('before-open');
-    const idx = useDialogStack.push({
-      id: dialogId,
-      el: dialogRef,
-      onClose: close,
-      propsSnapshot: {
-        ...props,
-        scrollLock: props.modal === false ? false : props.scrollLock,
-      },
-    });
-    stackIndex.value = idx;
-    updateStackIndex();
-    emit('opening');
+    registerInStack();
   } else {
     emit('closing');
     useDialogStack.pop(dialogId);
     // Defer closed emit until Vue has applied the DOM change.
     nextTick().then(() => emit('closed'));
+  }
+});
+
+onMounted(() => {
+  if (isOpen.value && useDialogStack.indexOf(dialogId) === -1) {
+    registerInStack();
   }
 });
 

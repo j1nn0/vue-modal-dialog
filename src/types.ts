@@ -100,7 +100,9 @@ export interface VueModalDialogProps {
 
 /** Events emitted by the VueModalDialog component. */
 export interface VueModalDialogEmits {
-  /** Fired when opening is requested, before the dialog is added to the DOM. */
+  /**
+   * Fired when opening is requested. For an initially open dialog, this fires after its initial DOM mount.
+   */
   'before-open': [];
   /** Fired when the dialog starts opening. */
   opening: [];

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { nextTick, ref } from 'vue';
+import { defineComponent, h, nextTick, onMounted, ref } from 'vue';
+import { mount } from '@vue/test-utils';
 import type { Ref } from 'vue';
 import { clearDialogStack } from '@/test-utils';
 
@@ -34,6 +35,43 @@ describe('useDialogState (stack-aware)', () => {
 
   afterEach(() => {
     clearDialogStack();
+  });
+
+  it('handles an initially open dialog after mount and cleans up on unmount', async () => {
+    const initialIsOpen = ref(true);
+    const initialEmit = vi.fn() as unknown as DialogEmit;
+    const initialRef = ref<HTMLElement | null>(null);
+
+    const wrapper = mount(
+      defineComponent({
+        setup() {
+          useDialogState(initialIsOpen, initialRef, initialEmit, {}, 'initial', vi.fn());
+          onMounted(() => {
+            useDialogStack.push({ id: 'initial', propsSnapshot: { scrollLock: true } });
+          });
+          return () => h('div', { ref: initialRef });
+        },
+      }),
+    );
+    await nextTick();
+    await nextTick();
+
+    expect(useDialogStack.count()).toBe(1);
+    expect(activateSpy).toHaveBeenCalled();
+    expect(initialEmit).toHaveBeenCalledWith('opened');
+    expect(document.body.classList.contains('vue-modal-open')).toBe(true);
+
+    deactivateSpy.mockClear();
+    wrapper.unmount();
+
+    expect(deactivateSpy).toHaveBeenCalledOnce();
+    expect(useDialogStack.count()).toBe(1);
+
+    useDialogStack.push({ id: 'other' });
+    expect(deactivateSpy).toHaveBeenCalledOnce();
+
+    useDialogStack.pop('other');
+    useDialogStack.pop('initial');
   });
 
   it('activates focus trap only when top of stack', async () => {

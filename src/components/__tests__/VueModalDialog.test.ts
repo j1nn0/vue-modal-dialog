@@ -62,6 +62,69 @@ describe('VueModalDialog', () => {
       expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
     });
 
+    it('supports an initially open dialog through stack and lifecycle setup', async () => {
+      let dialogInDomWhenBeforeOpen = false;
+      const wrapper = mountDialog(
+        {
+          modelValue: true,
+          onBeforeOpen: () => {
+            dialogInDomWhenBeforeOpen = document.querySelector('[role="dialog"]') !== null;
+          },
+        },
+        { attachTo: document.body },
+      );
+      await nextTick();
+      await nextTick();
+
+      const dialog = wrapper.find('[role="dialog"]');
+      expect(useDialogStack.count()).toBe(1);
+      expect(document.body.classList.contains('vue-modal-open')).toBe(true);
+      expect(wrapper.find('.backdrop').exists()).toBe(true);
+      expect(dialog.attributes('aria-modal')).toBe('true');
+      expect(dialog.attributes('aria-hidden')).toBe('false');
+      expect(dialogInDomWhenBeforeOpen).toBe(true);
+      expect(wrapper.emitted('before-open')).toHaveLength(1);
+      expect(wrapper.emitted('opening')).toHaveLength(1);
+      expect(wrapper.emitted('opened')).toHaveLength(1);
+
+      wrapper.unmount();
+      expect(useDialogStack.count()).toBe(0);
+      expect(document.body.classList.contains('vue-modal-open')).toBe(false);
+    });
+
+    it('cleans up focus trap when an initially open dialog is unmounted', async () => {
+      const wrapper = mountDialog({ modelValue: true });
+      await nextTick();
+      await nextTick();
+
+      const focusTrap = useFocusTrapMock.useFocusTrap.mock.results.at(-1)?.value as {
+        deactivate: ReturnType<typeof vi.fn>;
+      };
+      expect(focusTrap.deactivate).not.toHaveBeenCalled();
+
+      wrapper.unmount();
+
+      expect(focusTrap.deactivate).toHaveBeenCalled();
+      expect(useDialogStack.count()).toBe(0);
+    });
+
+    it('stacks multiple initially open dialogs with one active modal', async () => {
+      const first = mountDialog({ modelValue: true });
+      const second = mountDialog({ modelValue: true });
+      await nextTick();
+      await nextTick();
+
+      expect(useDialogStack.count()).toBe(2);
+      expect(first.find('[role="dialog"]').attributes('aria-hidden')).toBe('true');
+      expect(second.find('[role="dialog"]').attributes('aria-modal')).toBe('true');
+      expect(second.find('[role="dialog"]').attributes('aria-hidden')).toBe('false');
+      expect(first.find('.backdrop').exists()).toBe(false);
+      expect(second.find('.backdrop').exists()).toBe(true);
+
+      first.unmount();
+      second.unmount();
+    });
+
     it('renders in-place when teleport is false', async () => {
       const container = document.createElement('div');
 
@@ -397,6 +460,18 @@ describe('VueModalDialog', () => {
 
       expect(wrapper.find('.backdrop').exists()).toBe(false);
     });
+
+    it('closes an initially open dialog from its backdrop', async () => {
+      const wrapper = mountDialog({ modelValue: true });
+      await nextTick();
+      await nextTick();
+
+      await wrapper.find('.backdrop').trigger('click');
+      await nextTick();
+      await nextTick();
+
+      expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
+    });
   });
 
   describe('escape key', () => {
@@ -420,6 +495,18 @@ describe('VueModalDialog', () => {
       await nextTick();
 
       expect(wrapper.emitted('update:modelValue')).toBeFalsy();
+    });
+
+    it('closes an initially open dialog from Escape', async () => {
+      const wrapper = mountDialog({ modelValue: true });
+      await nextTick();
+      await nextTick();
+
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+      await nextTick();
+      await nextTick();
+
+      expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
     });
   });
 
