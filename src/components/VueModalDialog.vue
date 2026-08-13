@@ -60,7 +60,7 @@ const { close } = useDialogState(isOpen, dialogRef, emit, props, dialogId, reque
 const { dialogWidthClass, dialogWidthStyle, dialogPositionClass } = useDialogSize(props);
 const { modeClass } = useDialogMode(props);
 const isDraggable = computed(() => props.draggable === true && props.width !== 'fullscreen');
-const { onPointerDown, dragStyle } = useDialogDrag(isOpen, isDraggable);
+const { onPointerDown, dragStyle, isDragging } = useDialogDrag(isOpen, isDraggable, dialogRef);
 
 // read base z-index safely
 const BASE_Z =
@@ -208,7 +208,7 @@ defineExpose({ requestClose });
         :open="isOpen"
         :style="[{ maxWidth: dialogWidthStyle, zIndex: zIndexValue }, dragStyle]"
         class="dialog"
-        :class="[dialogPositionClass, dialogWidthClass, modeClass]"
+        :class="[dialogPositionClass, dialogWidthClass, modeClass, { 'is-dragging': isDragging }]"
         :role="props.role ?? 'dialog'"
         :aria-modal="isTop && props.modal !== false"
         :aria-hidden="!isTop"
@@ -218,8 +218,8 @@ defineExpose({ requestClose });
         <div class="dialog-content">
           <header
             class="dialog-header"
+            :class="{ 'is-draggable': isDraggable }"
             :id="headerId"
-            :style="isDraggable ? { cursor: 'grab' } : {}"
             @pointerdown="onPointerDown"
           >
             <div class="dialog-title">
@@ -464,6 +464,21 @@ defineExpose({ requestClose });
   padding: var(--j1nn0-vue-modal-dialog-header-padding);
   border-top-left-radius: var(--j1nn0-vue-modal-dialog-border-radius);
   border-top-right-radius: var(--j1nn0-vue-modal-dialog-border-radius);
+
+  &.is-draggable {
+    cursor: grab;
+    // Claim touch gestures so dragging does not scroll the page instead.
+    touch-action: none;
+  }
+}
+
+// Suppress text selection only while a drag is in progress.
+.dialog.is-dragging {
+  user-select: none;
+
+  .dialog-header.is-draggable {
+    cursor: grabbing;
+  }
 }
 
 .dialog-footer {
