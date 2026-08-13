@@ -66,6 +66,16 @@ export default defineConfig([
     files: ['src/**/__tests__/*'],
   },
 
+  // Repo tooling under scripts/ runs in Node, not the browser.
+  {
+    files: ['scripts/**/*.{js,mjs}'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 
   skipFormatting,

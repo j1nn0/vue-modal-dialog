@@ -73,6 +73,7 @@ Library-mode Vite build, colocated Vitest coverage, and a small source tree with
 - Do not treat `useDialogStack` as per-instance state.
 - Do not mount component tests initially open when watcher behavior matters.
 - Do not reference the removed `.github/instructions/*` or prompt docs; they are not in this repo.
+- Do not put the development Node/pnpm requirement back into `engines`; that field is published and constrains consumers. Do not replace `scripts/check-dev-env.mjs` with `devEngines` either: pnpm 10.34 ignores it outright — an impossible `>=99` requirement with `onFail: "error"` still installs and runs scripts without a warning.
 
 ## UNIQUE STYLES
 
@@ -99,5 +100,7 @@ make release-patch|release-minor|release-major
 - Validation order: `format:check -> lint -> test -> build`.
 - CI splits into `lint` and `test-and-build`; publish runs only on `v*.*.*` tags.
 - Pre-commit runs `pnpm test`; format is still manual.
-- Node >= 24 and pnpm >= 10 are enforced; `.npmrc` points installs at `https://npm.flatt.tech/`.
+- Published `engines` state the consumer floor only (Node >= 20.19). The development requirement — Node 24, pnpm 10 — is enforced separately by `scripts/check-dev-env.mjs`, run from `prepare`. `prepare` runs for this repo and for git/directory installs, never for a registry tarball, and `scripts/` is outside `files`, so consumers never see it.
+- The technical floor for developing here is Node >= 22 (`vite.config.ts` uses import attributes, `with { type: 'json' }`); the guard requires 24 to match CI.
+- `.npmrc` points installs at `https://npm.flatt.tech/` and sets `engine-strict=true`, which now only checks the published consumer floor.
 - Read the child AGENTS before changing `src/components/` or `src/composables/` internals.

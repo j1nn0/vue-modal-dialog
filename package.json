@@ -33,8 +33,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=24",
-    "pnpm": ">=10"
+    "node": ">=20.19.0"
   },
   "packageManager": "pnpm@10.34.4",
   "browserslist": [
@@ -62,7 +61,7 @@
     "size": "size-limit",
     "release": "release-it",
     "upgrade-interactive": "pnpm update --interactive",
-    "prepare": "husky"
+    "prepare": "node scripts/check-dev-env.mjs && husky"
   },
   "repository": {
     "type": "git",
