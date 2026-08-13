@@ -5,8 +5,14 @@ import VueModalDialog from '@/components/VueModalDialog.vue';
 import { mountDialog, clearDialogStack } from '@/test-utils';
 import { useDialogStack } from '@/composables/useDialogStack';
 
+type FocusTrapTarget = { value: HTMLElement | null };
+type FocusTrapOptions = { initialFocus?: () => HTMLElement | undefined };
+
 const useFocusTrapMock = vi.hoisted(() => ({
-  useFocusTrap: vi.fn(() => ({ activate: vi.fn(), deactivate: vi.fn() })),
+  useFocusTrap: vi.fn((_target: FocusTrapTarget, _options: FocusTrapOptions) => ({
+    activate: vi.fn(),
+    deactivate: vi.fn(),
+  })),
 }));
 vi.mock('@vueuse/integrations/useFocusTrap', () => useFocusTrapMock);
 
@@ -701,6 +707,29 @@ describe('VueModalDialog', () => {
 
       wrapper1.unmount();
       wrapper2.unmount();
+    });
+
+    it('focuses the first tabbable element by default when opened', async () => {
+      useFocusTrapMock.useFocusTrap.mockImplementationOnce(
+        (target: FocusTrapTarget, options: FocusTrapOptions) => ({
+          activate: vi.fn(() => {
+            const initialFocus = options.initialFocus?.();
+            const element =
+              initialFocus === undefined
+                ? target.value?.querySelector<HTMLElement>('.dialog-close')
+                : initialFocus;
+            element?.focus();
+          }),
+          deactivate: vi.fn(),
+        }),
+      );
+
+      const wrapper = mountDialog({}, { attachTo: document.body });
+      await openDialog(wrapper);
+
+      expect(document.activeElement).toBe(wrapper.find('.dialog-close').element);
+
+      wrapper.unmount();
     });
 
     it('restores focus to previously active element on close', async () => {

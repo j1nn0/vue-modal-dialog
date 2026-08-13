@@ -85,7 +85,7 @@ describe('useDialogState', () => {
   });
 
   describe('initialFocus', () => {
-    it('returns false when props.initialFocus is undefined', () => {
+    it('returns undefined when props.initialFocus is undefined', () => {
       const props = { initialFocus: undefined };
       useDialogState(isOpen, dialogRef, emit, () => props.initialFocus, 'dialog-test', vi.fn());
 
@@ -93,8 +93,8 @@ describe('useDialogState', () => {
       const lastCall = trapCalls[trapCalls.length - 1];
       const options = lastCall[1] as Record<string, unknown>;
 
-      const initialFocusFn = options.initialFocus as () => string | HTMLElement | false;
-      expect(initialFocusFn()).toBe(false);
+      const initialFocusFn = options.initialFocus as () => HTMLElement | undefined;
+      expect(initialFocusFn()).toBeUndefined();
     });
 
     it('returns matching HTMLElement for valid string selector', () => {
@@ -110,12 +110,12 @@ describe('useDialogState', () => {
       const lastCall = trapCalls[trapCalls.length - 1];
       const options = lastCall[1] as Record<string, unknown>;
 
-      const initialFocusFn = options.initialFocus as () => string | HTMLElement | false;
+      const initialFocusFn = options.initialFocus as () => HTMLElement | undefined;
       expect(initialFocusFn()).toBe(dummyElement);
       expect(rootElement.querySelector).toHaveBeenCalledWith('.my-input');
     });
 
-    it('returns false for invalid string selector', () => {
+    it('returns undefined for invalid string selector', () => {
       const rootElement = document.createElement('div');
       rootElement.querySelector = vi.fn().mockReturnValue(null);
       dialogRef.value = rootElement;
@@ -127,9 +127,38 @@ describe('useDialogState', () => {
       const lastCall = trapCalls[trapCalls.length - 1];
       const options = lastCall[1] as Record<string, unknown>;
 
-      const initialFocusFn = options.initialFocus as () => string | HTMLElement | false;
-      expect(initialFocusFn()).toBe(false);
+      const initialFocusFn = options.initialFocus as () => HTMLElement | undefined;
+      expect(initialFocusFn()).toBeUndefined();
       expect(rootElement.querySelector).toHaveBeenCalledWith('.non-existent');
+    });
+
+    it('returns undefined when a string selector is used before the dialog is mounted', () => {
+      const props = { initialFocus: '.my-input' };
+      useDialogState(isOpen, dialogRef, emit, () => props.initialFocus, 'dialog-test', vi.fn());
+
+      const trapCalls = vi.mocked(useFocusTrap).mock.calls;
+      const lastCall = trapCalls[trapCalls.length - 1];
+      const options = lastCall[1] as Record<string, unknown>;
+
+      const initialFocusFn = options.initialFocus as () => HTMLElement | undefined;
+      expect(initialFocusFn()).toBeUndefined();
+    });
+
+    it('returns undefined for a string selector during SSR', () => {
+      const props = { initialFocus: '.my-input' };
+      useDialogState(isOpen, dialogRef, emit, () => props.initialFocus, 'dialog-test', vi.fn());
+
+      const trapCalls = vi.mocked(useFocusTrap).mock.calls;
+      const lastCall = trapCalls[trapCalls.length - 1];
+      const options = lastCall[1] as Record<string, unknown>;
+      const initialFocusFn = options.initialFocus as () => HTMLElement | undefined;
+
+      vi.stubGlobal('document', undefined);
+      try {
+        expect(initialFocusFn()).toBeUndefined();
+      } finally {
+        vi.unstubAllGlobals();
+      }
     });
 
     it('returns HTMLElement directly', () => {
@@ -141,7 +170,7 @@ describe('useDialogState', () => {
       const lastCall = trapCalls[trapCalls.length - 1];
       const options = lastCall[1] as Record<string, unknown>;
 
-      const initialFocusFn = options.initialFocus as () => string | HTMLElement | false;
+      const initialFocusFn = options.initialFocus as () => HTMLElement | undefined;
       expect(initialFocusFn()).toBe(dummyElement);
     });
   });

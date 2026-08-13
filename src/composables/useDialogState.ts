@@ -31,10 +31,10 @@ export function useDialogState(
   const { activate: activateFocusTrap, deactivate: deactivateFocusTrap } = useFocusTrap(dialogRef, {
     initialFocus: () => {
       const target = getInitialFocus();
-      if (target === undefined) return false;
+      if (target === undefined) return undefined;
       if (typeof target === 'string') {
-        if (typeof document === 'undefined') return false;
-        return dialogRef.value?.querySelector<HTMLElement>(target) || false;
+        if (typeof document === 'undefined') return undefined;
+        return dialogRef.value?.querySelector<HTMLElement>(target) ?? undefined;
       }
       return target;
     },
