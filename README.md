@@ -437,7 +437,8 @@ This library supports **multiple modals opened simultaneously**.
 When dialogs are stacked:
 
 - Only the topmost dialog responds to Escape and backdrop click
-- Only the topmost dialog renders a backdrop (`fullscreen` dialogs do not render a backdrop)
+- Only the topmost dialog renders a backdrop (`fullscreen`, non-modal and `backdrop="false"` dialogs
+  do not render a backdrop)
 - Focus trap is active only for the topmost dialog
 - ARIA attributes are updated by stack position:
   - topmost dialog: `aria-modal="true"`, `aria-hidden="false"`
@@ -489,8 +490,11 @@ Enable header-based dragging by adding the `draggable` prop.
 
 Set `modal` to `false` to allow interaction with the background while the dialog is open.
 
+Non-modal dialogs render no backdrop, so they are never dismissed by clicking outside. Escape still
+closes them unless `escape` is `false`.
+
 ```vue
-<VueModalDialog v-model="isOpen" :modal="false" backdrop="static">
+<VueModalDialog v-model="isOpen" :modal="false">
   <p>The background remains interactive.</p>
 </VueModalDialog>
 ```

@@ -10,7 +10,7 @@ import {
   nextTick,
   warn as vueWarn,
 } from 'vue';
-import { onKeyStroke, useEventListener } from '@vueuse/core';
+import { onKeyStroke } from '@vueuse/core';
 import type { VueModalDialogProps, VueModalDialogEmits, VueModalDialogSlots } from '@/types';
 import { useDialogState } from '@/composables/useDialogState';
 import { useDialogSize } from '@/composables/useDialogSize';
@@ -152,27 +152,6 @@ function handleBackdropClick() {
   if (canCloseByBackdrop.value && isTop.value) requestClose();
 }
 
-// Fallback for environments where backdrop click can be swallowed by overlays/tooling.
-useEventListener(
-  () => (typeof document !== 'undefined' ? document : null),
-  'pointerdown',
-  (e: PointerEvent) => {
-    if (!isOpen.value) return;
-    if (!isTop.value) return;
-    if (!canCloseByBackdrop.value) return;
-    if (props.width === 'fullscreen') return;
-
-    const root = dialogRef.value;
-    const target = e.target as Node | null;
-    if (!root || !target) return;
-
-    if (!root.contains(target)) {
-      requestClose();
-    }
-  },
-  { capture: true },
-);
-
 // Escape key only handled by top modal
 onKeyStroke('Escape', (e) => {
   if (!isOpen.value) return;
@@ -193,7 +172,13 @@ defineExpose({ requestClose });
   <Teleport :to="teleportTarget" :disabled="!props.teleport">
     <transition :name="backdropTransition" appear>
       <div
-        v-if="isOpen && isTop && width !== 'fullscreen' && props.modal !== false"
+        v-if="
+          isOpen &&
+          isTop &&
+          width !== 'fullscreen' &&
+          props.modal !== false &&
+          effectiveBackdrop !== false
+        "
         class="backdrop"
         :class="modeClass"
         :style="{ zIndex: BASE_Z + (stackIndex >= 0 ? stackIndex * 2 : 0) }"

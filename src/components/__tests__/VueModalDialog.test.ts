@@ -110,11 +110,17 @@ describe('VueModalDialog', () => {
   });
 
   describe('modal prop', () => {
-    it('does not render backdrop when modal is false', async () => {
+    it('does not render backdrop or close on outside pointerdown when modal is false', async () => {
       const wrapper = mountDialog({ modal: false });
       await openDialog(wrapper);
 
       expect(wrapper.find('.backdrop').exists()).toBe(false);
+
+      document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      await nextTick();
+
+      expect(wrapper.find('[role="dialog"]').exists()).toBe(true);
+      expect(wrapper.emitted('update:modelValue')).toBeFalsy();
     });
 
     it('sets aria-modal to false when modal is false', async () => {
@@ -283,18 +289,11 @@ describe('VueModalDialog', () => {
       expect(wrapper.emitted('update:modelValue')).toBeFalsy();
     });
 
-    it('backdrop=false still renders backdrop but does not close on click', async () => {
+    it('backdrop=false does not render a backdrop', async () => {
       const wrapper = mountDialog({ backdrop: false });
       await openDialog(wrapper);
 
-      // backdrop still renders with backdrop=false
-      expect(wrapper.find('.backdrop').exists()).toBe(true);
-
-      await wrapper.find('.backdrop').trigger('click');
-      await nextTick();
-
-      // clicking backdrop should NOT close when backdrop=false
-      expect(wrapper.emitted('update:modelValue')).toBeFalsy();
+      expect(wrapper.find('.backdrop').exists()).toBe(false);
     });
   });
 
@@ -438,37 +437,37 @@ describe('VueModalDialog', () => {
     });
   });
 
-  describe('pointerdown fallback', () => {
-    it('closes dialog on pointerdown outside dialog', async () => {
+  describe('outside click behavior', () => {
+    it('does not close when pointerdown starts on backdrop and release occurs inside dialog', async () => {
       const wrapper = mountDialog();
       await openDialog(wrapper);
 
-      document.dispatchEvent(new PointerEvent('pointerdown'));
-      await nextTick();
-      await nextTick();
-      await nextTick();
-
-      expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
-    });
-
-    it('does not close on pointerdown when backdrop=static', async () => {
-      const wrapper = mountDialog({ backdrop: 'static' });
-      await openDialog(wrapper);
-
-      document.dispatchEvent(new PointerEvent('pointerdown'));
+      wrapper
+        .find('.backdrop')
+        .element.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      wrapper
+        .find('.dialog')
+        .element.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
       await nextTick();
 
       expect(wrapper.emitted('update:modelValue')).toBeFalsy();
     });
 
-    it('does not close on pointerdown when fullscreen', async () => {
-      const wrapper = mountDialog({ width: 'fullscreen' });
+    it('does not close when clicking an outside element that is not the backdrop', async () => {
+      const wrapper = mountDialog();
       await openDialog(wrapper);
 
-      document.dispatchEvent(new PointerEvent('pointerdown'));
+      const outside = document.createElement('div');
+      document.body.appendChild(outside);
+
+      outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      outside.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       await nextTick();
 
+      expect(wrapper.find('[role="dialog"]').exists()).toBe(true);
       expect(wrapper.emitted('update:modelValue')).toBeFalsy();
+
+      outside.remove();
     });
   });
 
@@ -615,11 +614,7 @@ describe('VueModalDialog', () => {
       const wrapper = mountDialog({ role: 'alertdialog', backdrop: false });
       await openDialog(wrapper);
 
-      const backdrop = wrapper.find('.backdrop');
-      await backdrop.trigger('click');
-      await nextTick();
-
-      expect(wrapper.emitted('update:modelValue')).toBeFalsy();
+      expect(wrapper.find('.backdrop').exists()).toBe(false);
     });
 
     it('emits console.warn if role="alertdialog" and modal=false', async () => {
