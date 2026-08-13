@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.0.0-rc.2](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2026-08-13)
+
+### ⚠ BREAKING CHANGES
+
+* **package:** CommonJS output is now `dist/vue-modal-dialog.umd.cjs`. Import styles from `@j1nn0/vue-modal-dialog/style.css`; legacy `dist/*` paths remain exported for compatibility.
+
+### Features
+
+* **events:** add `after-leave`, fired when the dialog panel's leave transition completes.
+
+### Bug Fixes
+
+* **dialog:** support dialogs initially mounted with `v-model` set to `true`.
+* **useDialog:** wait for Vue's leave lifecycle before unmounting imperative dialogs.
+* **package:** support native Node ESM and CommonJS resolution through an explicit exports map.
+
+### Chore
+
+* **deps:** update the development toolchain and resolve known dependency advisories.
+* **types:** type-check Vite and Storybook configuration.
+
 ## [1.0.0-rc.1](https://github.com/j1nn0/vue-modal-dialog/compare/v0.13.5...v1.0.0-rc.1) (2026-08-13)
 
 ### ⚠ BREAKING CHANGES
@@ -9,17 +30,20 @@
 reference the title element rather than the header.
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
 * **useDialog:** `useDialog().open()` returns a promise instead of
 undefined, and accepts content options alongside the dialog props. It is
 an imperative mount API, not the state holder the README previously
 described.
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
 * **events:** `opened` now fires after the DOM update rather than
 synchronously when the open state changes, and after `before-open` and
 `opening` rather than before them.
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
 * **backdrop:** `backdrop: false` no longer renders a backdrop element.
 Outside-click dismissal now requires a completed click on the backdrop,
 so it no longer occurs for non-modal dialogs or for clicks on elements
