@@ -62,25 +62,27 @@ let closePending = false;
 async function requestClose(): Promise<boolean> {
   if (!isOpen.value || closePending) return false;
 
+  closePending = true;
   if (!props.beforeClose) {
     emit('before-close');
     isOpen.value = false;
     return true;
   }
 
-  closePending = true;
   try {
     emit('before-close');
     const allow = await props.beforeClose();
-    if (!allow) return false;
+    if (!allow) {
+      closePending = false;
+      return false;
+    }
 
     isOpen.value = false;
     return true;
   } catch (err) {
     vueWarn('[VueModalDialog] beforeClose rejected.', err);
-    return false;
-  } finally {
     closePending = false;
+    return false;
   }
 }
 
@@ -161,6 +163,7 @@ function registerInStack(): void {
 
 // Watch open state to register/unregister in stack
 watch(isOpen, (val) => {
+  closePending = false;
   if (val) {
     registerInStack();
   } else {

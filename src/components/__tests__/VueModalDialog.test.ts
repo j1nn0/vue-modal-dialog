@@ -907,6 +907,21 @@ describe('VueModalDialog', () => {
       expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
     });
 
+    it('accepts only one close request while a controlled parent update is pending', async () => {
+      const wrapper = mountDialog({ 'onUpdate:modelValue': () => {} });
+      await openDialog(wrapper);
+      const requestClose = (wrapper.vm as unknown as { requestClose: () => Promise<boolean> })
+        .requestClose;
+
+      const first = requestClose();
+      const second = requestClose();
+
+      await expect(first).resolves.toBe(true);
+      await expect(second).resolves.toBe(false);
+      expect(wrapper.emitted('before-close')).toHaveLength(1);
+      expect(wrapper.emitted('update:modelValue')).toHaveLength(1);
+    });
+
     it('runs an async beforeClose guard only once while pending', async () => {
       let resolveGuard!: (value: boolean) => void;
       const beforeClose = vi.fn(() => new Promise<boolean>((resolve) => (resolveGuard = resolve)));
