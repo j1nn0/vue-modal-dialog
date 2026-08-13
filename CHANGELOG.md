@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.0-rc.6](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.5...v1.0.0-rc.6) (2026-08-13)
+
+### ⚠ BREAKING CHANGES
+
+* harden dialog accessibility and closing
+
+### Features
+
+* harden dialog accessibility and closing ([f74a465](https://github.com/j1nn0/vue-modal-dialog/commit/f74a465289b5b2d8d665fecc8093242426165d8c))
+
 ## [1.0.0-rc.5](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.4...v1.0.0-rc.5) (2026-08-13)
 
 ### ⚠ BREAKING CHANGES
