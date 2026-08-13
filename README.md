@@ -325,7 +325,7 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 | `initialFocus`       | `String` \| `HTMLElement` | `undefined`       | Element selector or element to focus when the dialog opens                                                                 |
 | `modal`              | `Boolean`                 | `true`            | `true` = blocks background interaction and traps focus                                                                     |
 | `teleport`           | `Boolean` \| `String`     | `false`           | `true` = teleports to `body`, or specify a CSS selector target                                                             |
-| `scrollLock`         | `Boolean`                 | `true`            | Locks page scrolling while the dialog is open                                                                              |
+| `scrollLock`         | `Boolean`                 | `true`            | Locks page scrolling and compensates for the removed scrollbar width                                                       |
 | `draggable`          | `Boolean`                 | `false`           | Enables dragging the dialog by its header                                                                                  |
 | `transition`         | `String`                  | `"fade"`          | Transition name for the dialog panel                                                                                       |
 | `backdropTransition` | `String`                  | `"fade-backdrop"` | Transition name for the backdrop layer                                                                                     |

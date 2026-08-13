@@ -7,6 +7,8 @@ describe('useDialogStack', () => {
   afterEach(() => {
     clearDialogStack();
     document.body.classList.remove('vue-modal-open');
+    document.body.style.paddingRight = '';
+    vi.restoreAllMocks();
   });
 
   it('nextId is unique across dialogs mounted in separate Vue apps', () => {
@@ -42,12 +44,40 @@ describe('useDialogStack', () => {
   });
 
   describe('scrollLock behavior', () => {
-    it('adds body class for default scrollLock', () => {
+    it('adds body class without padding in a non-scrollable document', () => {
       useDialogStack.push({ id: 'default-lock' });
 
       expect(document.body.classList.contains('vue-modal-open')).toBeTruthy();
+      expect(document.body.style.paddingRight).toBe('');
 
       useDialogStack.pop('default-lock');
+    });
+
+    it('compensates for the scrollbar once and restores inline padding', () => {
+      const documentElement = document.documentElement;
+      vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(1200);
+      vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(800);
+      vi.spyOn(documentElement, 'clientWidth', 'get').mockReturnValue(1185);
+      vi.spyOn(documentElement, 'scrollHeight', 'get').mockReturnValue(1200);
+      document.body.style.paddingRight = '12px';
+
+      useDialogStack.push({ id: 'first-lock' });
+      expect(document.body.style.paddingRight).toBe('27px');
+
+      useDialogStack.push({ id: 'second-lock' });
+      expect(document.body.style.paddingRight).toBe('27px');
+
+      useDialogStack.pop('second-lock');
+      expect(document.body.style.paddingRight).toBe('27px');
+
+      useDialogStack.pop('first-lock');
+      expect(document.body.style.paddingRight).toBe('12px');
+
+      document.body.style.paddingRight = '';
+      useDialogStack.push({ id: 'empty-padding-lock' });
+      expect(document.body.style.paddingRight).toBe('15px');
+      useDialogStack.pop('empty-padding-lock');
+      expect(document.body.style.paddingRight).toBe('');
     });
 
     it('does not add body class when all dialogs disable scrollLock', () => {

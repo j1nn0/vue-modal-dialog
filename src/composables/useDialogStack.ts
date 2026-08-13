@@ -25,6 +25,11 @@ const subscribers = new Set<(stack: StackEntry[]) => void>();
 // the scope that must be collision-free.
 let idCounter = 0;
 
+// Native scrollbars are typically much narrower than this; this rejects layout-less metrics.
+const MAX_SCROLLBAR_WIDTH = 100;
+let bodyPaddingRightBeforeLock: string | null = null;
+let bodyPaddingRightCompensated = false;
+
 // Focus restoration: save the element that was focused before the first dialog opened.
 let previouslyFocusedElement: Element | null = null;
 
@@ -43,8 +48,41 @@ function applyBodyClass(): void {
   if (typeof document === 'undefined') return;
   const shouldLockScroll = stack.some((entry) => entry.propsSnapshot?.scrollLock !== false);
 
-  if (shouldLockScroll) document.body.classList.add('vue-modal-open');
-  else document.body.classList.remove('vue-modal-open');
+  if (shouldLockScroll) {
+    document.body.classList.add('vue-modal-open');
+    if (bodyPaddingRightBeforeLock !== null) return;
+
+    bodyPaddingRightBeforeLock = document.body.style.paddingRight;
+    if (typeof window === 'undefined') return;
+
+    try {
+      const { documentElement } = document;
+      const scrollbarWidth = window.innerWidth - documentElement.clientWidth;
+      if (
+        documentElement.scrollHeight <= window.innerHeight ||
+        scrollbarWidth <= 0 ||
+        scrollbarWidth > MAX_SCROLLBAR_WIDTH
+      ) {
+        return;
+      }
+
+      const computedPadding =
+        Number.parseFloat(window.getComputedStyle(document.body).paddingRight) || 0;
+      document.body.style.paddingRight = `${computedPadding + scrollbarWidth}px`;
+      bodyPaddingRightCompensated = true;
+    } catch {
+      // Scroll locking still works when layout metrics are unavailable.
+    }
+  } else {
+    document.body.classList.remove('vue-modal-open');
+    if (bodyPaddingRightBeforeLock === null) return;
+
+    if (bodyPaddingRightCompensated) {
+      document.body.style.paddingRight = bodyPaddingRightBeforeLock;
+    }
+    bodyPaddingRightBeforeLock = null;
+    bodyPaddingRightCompensated = false;
+  }
 }
 
 function saveFocus(): void {
