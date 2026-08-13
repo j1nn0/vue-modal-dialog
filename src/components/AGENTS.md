@@ -27,15 +27,15 @@ Component-layer guidance for the dialog UI. Use this with the root `AGENTS.md`; 
 ## RENDERING AND ACCESSIBILITY
 
 - Teleport target is computed from `teleport`: `true -> body`, `string -> selector`, otherwise in-place rendering.
-- Only the top modal renders the backdrop and handles Escape/backdrop-close behavior.
+- Dialogs are always modal: only the top dialog renders the backdrop and handles Escape/backdrop-close behavior.
 - `aria-modal` and `aria-hidden` depend on stack position; preserve that top-vs-lower dialog distinction.
 - Header/body IDs are generated for `aria-labelledby` and `aria-describedby`; keep those bindings intact when changing structure.
-- `role="alertdialog"` forces effective static-backdrop semantics; do not loosen that contract casually.
+- `role="alertdialog"` with `backdrop="default"` forces effective static-backdrop semantics; do not loosen that contract casually.
 
 ## STORYBOOK PATTERNS
 
 - Prefer the existing helper pattern: `usePlayground()` for counters/body mode class handling and `renderSimpleStory()` for low-ceremony examples.
-- Keep stories behavior-focused: stacked dialogs, lifecycle events, custom widths, modes, static/no backdrop, and form content already define the coverage baseline.
+- Keep stories behavior-focused: stacked dialogs, lifecycle events, custom widths, modes, static/transparent backdrop, and form content already define the coverage baseline.
 - Story code that touches `document` must keep SSR guards, even though Storybook is browser-first.
 
 ## TESTING PATTERNS

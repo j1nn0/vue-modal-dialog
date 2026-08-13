@@ -1,7 +1,5 @@
 import { warn as vueWarn } from 'vue';
 import type { Ref } from 'vue';
-import type { VueModalDialogProps } from '@/types';
-
 /** Entry stored in the dialog stack for each open dialog. */
 export interface StackEntry {
   /** Unique dialog identifier. */
@@ -10,8 +8,8 @@ export interface StackEntry {
   el?: Ref<HTMLElement | null>;
   /** Close callback registered by the dialog. */
   onClose?: () => void;
-  /** Snapshot of dialog props at the time of opening. */
-  propsSnapshot?: Partial<VueModalDialogProps>;
+  /** Whether this dialog keeps page scrolling locked. */
+  scrollLock?: boolean;
 }
 
 // Singleton stack manager for modal dialogs
@@ -46,7 +44,7 @@ function notify(): void {
 
 function applyBodyClass(): void {
   if (typeof document === 'undefined') return;
-  const shouldLockScroll = stack.some((entry) => entry.propsSnapshot?.scrollLock !== false);
+  const shouldLockScroll = stack.some((entry) => entry.scrollLock !== false);
 
   if (shouldLockScroll) {
     document.body.classList.add('vue-modal-open');
@@ -139,6 +137,15 @@ export const useDialogStack = {
     applyBodyClass();
     notify();
     return stack.length - 1;
+  },
+  /** Update a registered dialog's scroll lock and notify stack subscribers. */
+  setScrollLock(id: string, enabled: boolean): void {
+    const entry = stack.find((item) => item.id === id);
+    if (!entry) return;
+
+    entry.scrollLock = enabled;
+    applyBodyClass();
+    notify();
   },
   /** Remove a dialog by id. Restores focus when the stack becomes empty. */
   pop(id: string): StackEntry | null {

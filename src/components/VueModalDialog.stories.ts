@@ -23,7 +23,7 @@ const meta: Meta = {
   component: VueModalDialog,
   tags: ['autodocs'],
   args: {
-    backdrop: true,
+    backdrop: 'default',
     escape: true,
     position: 'center',
     width: 'md',
@@ -32,12 +32,12 @@ const meta: Meta = {
   argTypes: {
     backdrop: {
       description:
-        'Backdrop behavior: `true` (closes on click), `false` (no backdrop), `"static"` (visible but click does not close).',
+        'Backdrop behavior: `"default"` (closes on click) or `"static"` (visible but click does not close).',
       control: 'select',
-      options: [true, false, 'static'],
+      options: ['default', 'static'],
       table: {
-        type: { summary: 'boolean | "static"' },
-        defaultValue: { summary: 'true' },
+        type: { summary: '"default" | "static"' },
+        defaultValue: { summary: 'default' },
       },
     },
     escape: {
@@ -92,14 +92,6 @@ const meta: Meta = {
       table: {
         type: { summary: 'string | HTMLElement | undefined' },
         defaultValue: { summary: 'undefined' },
-      },
-    },
-    modal: {
-      description: 'Enables modal behavior (blocks background interaction, traps focus).',
-      control: 'boolean',
-      table: {
-        type: { summary: 'boolean' },
-        defaultValue: { summary: 'true' },
       },
     },
     teleport: {
@@ -315,7 +307,7 @@ export const Fullscreen: Story = {
 /** Opens two dialogs in a stacked configuration. Only the topmost responds to Escape / backdrop click. */
 export const StackedModals: Story = {
   args: {
-    backdrop: true,
+    backdrop: 'default',
     escape: true,
     position: 'center',
     width: 'md',
@@ -418,17 +410,40 @@ export const StaticBackdrop: Story = {
   render: renderSimpleStory(defaultHeader(), defaultBody(), defaultFooter()),
 };
 
-// ── NoBackdrop ─────────────────────────────────────────────────────────────
+// ── TransparentBackdrop ─────────────────────────────────────────────────────
 
-/** Dialog without any backdrop. */
-export const NoBackdrop: Story = {
+/** A transparent backdrop still shields background interaction while remaining visually clear. */
+export const TransparentBackdrop: Story = {
   args: {
-    backdrop: false,
-    titleText: 'No Backdrop',
-    bodyText: 'There is no backdrop behind this dialog. Use the × button or Close to dismiss.',
-    footerText: 'No backdrop',
+    backdrop: 'default',
+    titleText: 'Transparent Backdrop',
+    bodyText: 'The backdrop remains an interaction shield but is visually transparent.',
+    footerText: 'Backdrop click still closes',
   },
-  render: renderSimpleStory(defaultHeader(), defaultBody(), defaultFooter()),
+  render: (args) => ({
+    components: { VueModalDialog },
+    setup() {
+      const isOpen = ref(false);
+      return { args, isOpen };
+    },
+    template: `
+      <div style="--j1nn0-vue-modal-dialog-backdrop-background: transparent; min-width: 320px;">
+        <button type="button" @click="isOpen = true">Open Dialog</button>
+        <VueModalDialog
+          v-model="isOpen"
+          :backdrop="args.backdrop"
+          :escape="args.escape"
+          :position="args.position"
+          :width="args.width"
+          :mode="args.mode"
+        >
+          ${defaultHeader()}
+          ${defaultBody()}
+          ${defaultFooter()}
+        </VueModalDialog>
+      </div>
+    `,
+  }),
 };
 
 // ── NoEscape ───────────────────────────────────────────────────────────────
@@ -615,7 +630,7 @@ export const FormInDialog: Story = {
 /** Demonstrates all six lifecycle events emitted by the dialog. */
 export const LifecycleEvents: Story = {
   args: {
-    backdrop: true,
+    backdrop: 'default',
     escape: true,
     position: 'center',
     width: 'md',

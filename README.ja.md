@@ -40,7 +40,6 @@ Vue 3 向けの再利用可能なモーダルダイアログコンポーネン�
 - [🔓 Expose](#-expose)
 - [🎯 Programmatic API](#-programmatic-api)
 - [🖱 Draggable Dialogs](#-draggable-dialogs)
-- [🚪 Non-modal Dialogs](#-non-modal-dialogs)
 - [🔒 Prevent Close](#-prevent-close)
 - [♿ Accessibility](#-accessibility)
 - [🎨 Styles](#-styles)
@@ -65,7 +64,6 @@ Vue 3 向けの再利用可能なモーダルダイアログコンポーネン�
 - `mode` prop によるライト/ダークモード対応（`"light"`, `"dark"`, `null` は OS/ブラウザ設定に追従）
 - **v0.12.0 の新機能**:
   - Teleport 対応: DOM 内の任意の場所（`body` など）にレンダリング可能
-  - 非モーダル対応: ダイアログ表示中も背景の操作を許可
   - ドラッグ移動: ヘッダー部分をドラッグしてダイアログを移動可能
   - プログラマティック API: `useDialog()` コンポーザブルによるダイアログ制御
   - Before-close ガード: 閉じる前のロジック（保存確認など）を追加可能
@@ -318,14 +316,13 @@ app.mount('#app');
 
 | Prop                 | Type                      | Default           | Description                                                                                                            |
 | -------------------- | ------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `backdrop`           | `Boolean` \| `String`     | `true`            | `true` = 背景クリックで閉じる, `false` = 背景なし, `"static"` = 背景ありだがクリックで閉じない                         |
+| `backdrop`           | `String`                  | `"default"`      | `"default"` = 最上位ダイアログの背景クリックで閉じる, `"static"` = 背景ありだがクリックで閉じない                  |
 | `escape`             | `Boolean`                 | `true`            | Escapeキー押下でダイアログを閉じる                                                                                     |
 | `role`               | `String`                  | `"dialog"`        | ARIA role: `"dialog"` または `"alertdialog"`                                                                           |
 | `closeLabel`         | `String`                  | `"Close"`         | 閉じるボタンのアクセシブルなラベル                                                                                       |
 | `initialFocus`       | `String` \| `HTMLElement` | `undefined`       | ダイアログが開いたときにフォーカスする要素のセレクタまたは要素                                                         |
-| `modal`              | `Boolean`                 | `true`            | `true` = 背景の操作をブロックし、フォーカスをダイアログ内に閉じ込める                                                  |
 | `teleport`           | `Boolean` \| `String`     | `false`           | `true` = `body` にテレポート、または CSS セレクタでターゲットを指定                                                    |
-| `scrollLock`         | `Boolean`                 | `true`            | ダイアログ表示中にページのスクロールをロックする                                                                       |
+| `scrollLock`         | `Boolean`                 | `true`            | ダイアログ表示中にページのスクロールをロックする。open 中の変更は即時反映される                                         |
 | `draggable`          | `Boolean`                 | `false`           | ヘッダーによるドラッグ移動を有効にする                                                                                 |
 | `transition`         | `String`                  | `"fade"`          | ダイアログパネルのトランジション名                                                                                     |
 | `backdropTransition` | `String`                  | `"fade-backdrop"` | バックドロップレイヤーのトランジション名                                                                               |
@@ -333,6 +330,25 @@ app.mount('#app');
 | `position`           | `String`                  | `"center"`        | 配置: `"center"`, `"top"`, `"bottom"`, `"left"`, `"right"`, `"topleft"`, `"topright"`, `"bottomleft"`, `"bottomright"` |
 | `width`              | `String`                  | `"md"`            | ダイアログ幅。プリセット: `sm`, `md`, `lg`, `fullscreen`。`"400px"`, `"50%"`, `"80vw"` のようなカスタム幅にも対応      |
 | `mode`               | `String` \| `null`        | `null`            | カラーモード: `"light"` はライト、`"dark"` はダーク、`null` はOS/ブラウザ設定に追従                                    |
+
+---
+
+## 🛠 v1.0 移行
+
+v1.0 は modal 専用です。`modal` prop と boolean の `backdrop={true|false}` は廃止されました。
+背景クリックで最上位ダイアログを閉じる場合はデフォルトの `backdrop="default"` を、閉じない場合は
+`backdrop="static"` を使用してください。non-modal ダイアログには対応しません。
+
+背景を視覚的に透明にしつつ interaction shield を維持する場合は、既存の CSS custom property を
+名前変更せずに上書きします。
+
+```css
+:root {
+  --j1nn0-vue-modal-dialog-backdrop-background: transparent;
+  --j1nn0-vue-modal-dialog-backdrop-background-dark: transparent;
+  --j1nn0-vue-modal-dialog-backdrop-blur: 0;
+}
+```
 
 ---
 
@@ -370,7 +386,7 @@ app.mount('#app');
 
 ## ♿ Accessibility
 
-- `role="dialog"` をダイアログコンテナに設定し、モーダルな最上位ダイアログには `aria-modal="true"` を設定
+- ダイアログは常に modal です。最上位ダイアログには `aria-modal="true"` を設定し、フォーカストラップを有効化します
 - 下層ダイアログには `aria-modal="false"` + `aria-hidden="true"`
 - `aria-labelledby` は header slot がある場合に表示タイトルを参照します。ない場合は `aria-label` を指定してください
 - `aria-describedby` は自動生成されません。短い説明がある場合は属性を直接指定してください
@@ -380,7 +396,7 @@ app.mount('#app');
 - 最初のダイアログを開く前にフォーカスされていた要素に、最後のダイアログが閉じたときにフォーカスを復元
 - Escape でのクローズは有効時のみ（stack 時は最上位ダイアログのみ）
 
-デフォルト設定では、背景ページのコンテンツに `inert` は設定されません。モーダル性は `aria-modal` とフォーカストラップで示し、モーダルダイアログの背景操作を防ぎます。ダイアログはインラインにも描画されるため、祖先要素に `inert` を設定するとダイアログ自身も対象になります。
+背景ページのコンテンツに `inert` は設定されません。modal 性は `aria-modal` とフォーカストラップで示し、モーダルダイアログの背景操作を防ぎます。ダイアログはインラインにも描画されるため、祖先要素に `inert` を設定するとダイアログ自身も対象になります。
 
 ---
 
@@ -442,7 +458,7 @@ app.mount('#app');
 ダイアログがスタックされた場合:
 
 - Escapeキーと backdrop click に反応するのは最上位ダイアログのみ
-- backdrop を描画するのは最上位ダイアログのみ（`fullscreen` は backdrop を描画しません）
+- backdrop を描画するのは最上位ダイアログのみ（`fullscreen` はダイアログ自身が viewport を覆うため別 backdrop を描画しません）
 - フォーカストラップは最上位ダイアログのみ有効
 - ARIA属性はスタック位置に応じて更新
   - 最上位ダイアログ: `aria-modal="true"`, `aria-hidden="false"`
@@ -485,18 +501,6 @@ const { isOpen, open, close } = useDialog();
 <VueModalDialog v-model="isOpen" draggable>
   <template #header>ドラッグして移動</template>
   <p>このダイアログは画面内の好きな場所に移動できます。</p>
-</VueModalDialog>
-```
-
----
-
-## 🚪 Non-modal Dialogs
-
-`modal` を `false` に設定すると、ダイアログが表示されている間も背景の要素を操作できるようになります。
-
-```vue
-<VueModalDialog v-model="isOpen" :modal="false" backdrop="static">
-  <p>背景の要素をそのまま操作できます。</p>
 </VueModalDialog>
 ```
 

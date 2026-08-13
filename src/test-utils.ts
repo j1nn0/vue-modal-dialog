@@ -52,14 +52,13 @@ export function createUseFocusTrapMock(): UseFocusTrapMock {
  * Merge with overrides: `{ ...defaultMountProps, width: 'lg' }`
  */
 export const defaultMountProps: VueModalDialogProps = {
-  backdrop: true,
+  backdrop: 'default',
   escape: true,
   position: 'center',
   width: 'md',
   mode: null,
   teleport: false,
   scrollLock: true,
-  modal: true,
   // Transition names are deliberately omitted so tests exercise the component's
   // own defaults rather than re-asserting values supplied here.
 };

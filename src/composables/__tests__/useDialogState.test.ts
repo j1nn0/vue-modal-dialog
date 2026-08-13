@@ -44,7 +44,7 @@ describe('useDialogState', () => {
   });
 
   it('activates focus trap while the stack owns body class state', async () => {
-    useDialogStack.push({ id: 'dialog-test', propsSnapshot: { scrollLock: true } });
+    useDialogStack.push({ id: 'dialog-test', scrollLock: true });
     isOpen.value = true;
     await nextTick();
     await nextTick();
@@ -63,7 +63,7 @@ describe('useDialogState', () => {
   });
 
   it('close() invokes the callback and triggers focus cleanup', async () => {
-    useDialogStack.push({ id: 'dialog-test', propsSnapshot: { scrollLock: true } });
+    useDialogStack.push({ id: 'dialog-test', scrollLock: true });
     isOpen.value = true;
     await nextTick();
     await nextTick();
@@ -75,25 +75,6 @@ describe('useDialogState', () => {
 
     expect(deactivateSpy).toHaveBeenCalled();
     useDialogStack.pop('dialog-test');
-  });
-
-  describe('modal prop', () => {
-    it('does not activate focus trap when modal=false', async () => {
-      const localIsOpen = ref(false);
-      const props = { modal: false };
-      useDialogState(localIsOpen, dialogRef, emit, props, 'dialog-test-1', vi.fn());
-
-      useDialogStack.push({ id: 'dialog-test-1' });
-
-      localIsOpen.value = true;
-      await nextTick();
-      await nextTick();
-
-      expect(activateSpy).not.toHaveBeenCalled();
-      expect(emit).toBeCalledWith('opened');
-
-      useDialogStack.pop('dialog-test-1');
-    });
   });
 
   describe('initialFocus', () => {

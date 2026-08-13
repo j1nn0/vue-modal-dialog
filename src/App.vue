@@ -10,11 +10,10 @@ const openDialog = () => (isOpened.value = true);
 const closeDialog = () => (isOpened.value = false);
 
 // All 14 props controls
-const backdrop = ref<boolean | 'static'>(true);
+const backdrop = ref<'default' | 'static'>('default');
 const escape = ref(true);
 const role = ref<'dialog' | 'alertdialog'>('dialog');
 const initialFocus = ref('');
-const modal = ref(true);
 const teleport = ref(false);
 const scrollLock = ref(true);
 const draggable = ref(false);
@@ -77,8 +76,7 @@ massa arcu lacinia leo, at finibus libero nulla nec lectus.
       <label>
         Backdrop:
         <select v-model="backdrop">
-          <option :value="true">true (closes on click)</option>
-          <option :value="false">false (no backdrop)</option>
+          <option value="default">default (closes on click)</option>
           <option value="static">static (visible, no close)</option>
         </select>
       </label>
@@ -92,10 +90,6 @@ massa arcu lacinia leo, at finibus libero nulla nec lectus.
           <option value="dialog">dialog</option>
           <option value="alertdialog">alertdialog</option>
         </select>
-      </label>
-      <label>
-        Modal:
-        <input type="checkbox" v-model="modal" />
       </label>
       <label>
         Scroll Lock:
@@ -185,7 +179,6 @@ massa arcu lacinia leo, at finibus libero nulla nec lectus.
       :escape="escape"
       :role="role"
       :initial-focus="initialFocus || undefined"
-      :modal="modal"
       :teleport="teleport"
       :scroll-lock="scrollLock"
       :draggable="draggable"

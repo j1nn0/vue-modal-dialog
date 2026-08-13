@@ -25,7 +25,7 @@ defineOptions({ inheritAttrs: false });
 
 // props / emit
 const props = withDefaults(defineProps<VueModalDialogProps>(), {
-  backdrop: true,
+  backdrop: 'default',
   escape: true,
   transition: 'fade',
   backdropTransition: 'fade-backdrop',
@@ -35,7 +35,6 @@ const props = withDefaults(defineProps<VueModalDialogProps>(), {
   teleport: false,
   scrollLock: true,
   initialFocus: undefined,
-  modal: true,
   closeLabel: 'Close',
 });
 const emit = defineEmits<VueModalDialogEmits>();
@@ -95,18 +94,11 @@ const zIndexValue = computed(() => {
 
 const isTop = computed(() => currentTopId.value === dialogId);
 const effectiveBackdrop = computed(() =>
-  props.role === 'alertdialog' && props.backdrop === true ? 'static' : props.backdrop,
+  props.role === 'alertdialog' && props.backdrop === 'default' ? 'static' : props.backdrop,
 );
-const canCloseByBackdrop = computed(
-  () => effectiveBackdrop.value !== false && effectiveBackdrop.value !== 'static',
-);
+const canCloseByBackdrop = computed(() => effectiveBackdrop.value === 'default');
 
 watchEffect(() => {
-  if (props.role === 'alertdialog' && props.modal === false) {
-    vueWarn(
-      '[VueModalDialog] role="alertdialog" with modal=false is contradictory: alertdialogs require focus to stay inside.',
-    );
-  }
   if (props.draggable && props.width === 'fullscreen') {
     vueWarn('[VueModalDialog] draggable=true has no effect when width="fullscreen".');
   }
@@ -136,10 +128,7 @@ function registerInStack(): void {
     id: dialogId,
     el: dialogRef,
     onClose: close,
-    propsSnapshot: {
-      ...props,
-      scrollLock: props.modal === false ? false : props.scrollLock,
-    },
+    scrollLock: props.scrollLock,
   });
   stackIndex.value = idx;
   updateStackIndex();
@@ -157,6 +146,13 @@ watch(isOpen, (val) => {
     nextTick().then(() => emit('closed'));
   }
 });
+
+watch(
+  () => props.scrollLock,
+  (enabled) => {
+    if (isOpen.value) useDialogStack.setScrollLock(dialogId, enabled);
+  },
+);
 
 onMounted(() => {
   if (isOpen.value && useDialogStack.indexOf(dialogId) === -1) {
@@ -191,13 +187,7 @@ defineExpose({ requestClose });
   <Teleport :to="teleportTarget" :disabled="!props.teleport">
     <transition :name="backdropTransition" appear>
       <div
-        v-if="
-          isOpen &&
-          isTop &&
-          width !== 'fullscreen' &&
-          props.modal !== false &&
-          effectiveBackdrop !== false
-        "
+        v-if="isOpen && isTop && width !== 'fullscreen'"
         class="backdrop"
         :class="modeClass"
         :style="{ zIndex: BASE_Z + (stackIndex >= 0 ? stackIndex * 2 : 0) }"
@@ -214,7 +204,7 @@ defineExpose({ requestClose });
         class="dialog"
         :class="[dialogPositionClass, dialogWidthClass, modeClass, { 'is-dragging': isDragging }]"
         :role="props.role ?? 'dialog'"
-        :aria-modal="isTop && props.modal !== false"
+        :aria-modal="isTop"
         :aria-hidden="!isTop"
         :aria-labelledby="hasHeader ? titleId : undefined"
       >

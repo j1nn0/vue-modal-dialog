@@ -121,6 +121,23 @@ describe('VueModalDialog', () => {
       expect(first.find('.backdrop').exists()).toBe(false);
       expect(second.find('.backdrop').exists()).toBe(true);
 
+      const [firstTrap, secondTrap] = useFocusTrapMock.useFocusTrap.mock.results.slice(-2).map(
+        (result) =>
+          result.value as {
+            activate: ReturnType<typeof vi.fn>;
+            deactivate: ReturnType<typeof vi.fn>;
+          },
+      );
+      expect(firstTrap.deactivate).toHaveBeenCalled();
+      expect(secondTrap.activate).toHaveBeenCalled();
+
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+      await nextTick();
+      await nextTick();
+
+      expect(first.emitted('update:modelValue')).toBeFalsy();
+      expect(second.emitted('update:modelValue')?.[0]).toEqual([false]);
+
       first.unmount();
       second.unmount();
     });
@@ -173,43 +190,25 @@ describe('VueModalDialog', () => {
     });
   });
 
-  describe('modal prop', () => {
-    it('does not render backdrop or close on outside pointerdown when modal is false', async () => {
-      const wrapper = mountDialog({ modal: false });
+  describe('scrollLock prop', () => {
+    it('updates the stack entry and body class while open', async () => {
+      const wrapper = mountDialog({ scrollLock: true });
       await openDialog(wrapper);
 
-      expect(wrapper.find('.backdrop').exists()).toBe(false);
+      expect(useDialogStack._getStack()[0]?.scrollLock).toBe(true);
+      expect(document.body.classList.contains('vue-modal-open')).toBe(true);
 
-      document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      await wrapper.setProps({ scrollLock: false });
       await nextTick();
 
-      expect(wrapper.find('[role="dialog"]').exists()).toBe(true);
-      expect(wrapper.emitted('update:modelValue')).toBeFalsy();
-    });
-
-    it('sets aria-modal to false when modal is false', async () => {
-      const wrapper = mountDialog({ modal: false });
-      await openDialog(wrapper);
-
-      const dialog = wrapper.find('[role="dialog"]');
-      expect(dialog.attributes('aria-modal')).toBe('false');
-    });
-
-    it('derives scrollLock as false when modal is false', async () => {
-      const wrapper = mountDialog({ modal: false });
-      await openDialog(wrapper);
-
-      const stack = useDialogStack._getStack();
-      expect(stack.length).toBe(1);
-      expect(stack[0].propsSnapshot?.scrollLock).toBe(false);
+      expect(useDialogStack._getStack()[0]?.scrollLock).toBe(false);
       expect(document.body.classList.contains('vue-modal-open')).toBe(false);
-    });
 
-    it('retains stack participation even if non-modal', async () => {
-      const wrapper = mountDialog({ modal: false });
-      await openDialog(wrapper);
+      await wrapper.setProps({ scrollLock: true });
+      await nextTick();
 
-      expect(useDialogStack.count()).toBe(1);
+      expect(useDialogStack._getStack()[0]?.scrollLock).toBe(true);
+      expect(document.body.classList.contains('vue-modal-open')).toBe(true);
     });
   });
 
@@ -452,13 +451,6 @@ describe('VueModalDialog', () => {
       await nextTick();
 
       expect(wrapper.emitted('update:modelValue')).toBeFalsy();
-    });
-
-    it('backdrop=false does not render a backdrop', async () => {
-      const wrapper = mountDialog({ backdrop: false });
-      await openDialog(wrapper);
-
-      expect(wrapper.find('.backdrop').exists()).toBe(false);
     });
 
     it('closes an initially open dialog from its backdrop', async () => {
@@ -807,32 +799,6 @@ describe('VueModalDialog', () => {
       await nextTick();
 
       expect(wrapper.emitted('update:modelValue')).toBeFalsy();
-    });
-
-    it('respects explicit backdrop=false when role is alertdialog', async () => {
-      const wrapper = mountDialog({ role: 'alertdialog', backdrop: false });
-      await openDialog(wrapper);
-
-      expect(wrapper.find('.backdrop').exists()).toBe(false);
-    });
-
-    it('emits console.warn if role="alertdialog" and modal=false', async () => {
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-      const wrapper = mountDialog(
-        { role: 'alertdialog', modal: false },
-        { attrs: { 'aria-label': 'Alert' } },
-      );
-      await openDialog(wrapper);
-
-      const warnMessage = consoleWarnSpy.mock.calls.find(([message]) =>
-        String(message).includes('role="alertdialog" with modal=false'),
-      )?.[0];
-      expect(warnMessage).toBe(
-        '[Vue warn]: [VueModalDialog] role="alertdialog" with modal=false is contradictory: alertdialogs require focus to stay inside.',
-      );
-
-      consoleWarnSpy.mockRestore();
     });
   });
 

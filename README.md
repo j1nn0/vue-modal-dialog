@@ -40,7 +40,6 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 - [🔓 Expose](#-expose)
 - [🎯 Programmatic API](#-programmatic-api)
 - [🖱 Draggable Dialogs](#-draggable-dialogs)
-- [🚪 Non-modal Dialogs](#-non-modal-dialogs)
 - [🔒 Prevent Close](#-prevent-close)
 - [♿ Accessibility](#-accessibility)
 - [🎨 Styles](#-styles)
@@ -65,7 +64,6 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
 - Supports dark mode and light mode via the `mode` prop (`"light"`, `"dark"`, or `null` to follow OS/browser preference)
 - **New v0.12.0 Features**:
   - Teleport support: render dialog anywhere in the DOM (e.g., to `body`)
-  - Non-modal support: allow background interaction
   - Draggable dialogs: reposition dialog by dragging the header
   - Programmatic API: open a dialog with content and await its result via the `useDialog()` composable
   - Before-close guard: prevent closing based on logic (e.g., unsaved changes)
@@ -318,14 +316,13 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 | Prop                 | Type                      | Default           | Description                                                                                                                |
 | -------------------- | ------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `backdrop`           | `Boolean` \| `String`     | `true`            | `true` = backdrop click closes dialog, `false` = no backdrop, `"static"` = backdrop shown but click does not close         |
+| `backdrop`           | `String`                  | `"default"`      | `"default"` = topmost backdrop click closes the dialog, `"static"` = backdrop shown but click does not close                  |
 | `escape`             | `Boolean`                 | `true`            | Pressing Escape key closes the dialog                                                                                      |
 | `role`               | `String`                  | `"dialog"`        | ARIA role: `"dialog"` or `"alertdialog"`                                                                                   |
 | `closeLabel`         | `String`                  | `"Close"`         | Accessible label for the close button                                                                                    |
 | `initialFocus`       | `String` \| `HTMLElement` | `undefined`       | Element selector or element to focus when the dialog opens                                                                 |
-| `modal`              | `Boolean`                 | `true`            | `true` = blocks background interaction and traps focus                                                                     |
 | `teleport`           | `Boolean` \| `String`     | `false`           | `true` = teleports to `body`, or specify a CSS selector target                                                             |
-| `scrollLock`         | `Boolean`                 | `true`            | Locks page scrolling and compensates for the removed scrollbar width                                                       |
+| `scrollLock`         | `Boolean`                 | `true`            | Locks page scrolling and compensates for the removed scrollbar width; changes apply immediately while open                 |
 | `draggable`          | `Boolean`                 | `false`           | Enables dragging the dialog by its header                                                                                  |
 | `transition`         | `String`                  | `"fade"`          | Transition name for the dialog panel                                                                                       |
 | `backdropTransition` | `String`                  | `"fade-backdrop"` | Transition name for the backdrop layer                                                                                     |
@@ -333,6 +330,25 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 | `position`           | `String`                  | `"center"`        | Position: `"center"`, `"top"`, `"bottom"`, `"left"`, `"right"`, `"topleft"`, `"topright"`, `"bottomleft"`, `"bottomright"` |
 | `width`              | `String`                  | `"md"`            | Dialog width. Presets: `sm`, `md`, `lg`, `fullscreen`. Also supports custom CSS width, e.g. `"400px"`, `"50%"`, `"80vw"`   |
 | `mode`               | `String` \| `null`        | `null`            | Dialog color mode: `"light"` for light mode, `"dark"` for dark mode, null to follow the OS/browser preference              |
+
+---
+
+## 🛠 v1.0 Migration
+
+v1.0 is modal-only. The `modal` prop and boolean `backdrop={true|false}` values are removed.
+Use `backdrop="default"` (the default) to close on a topmost backdrop click, or
+`backdrop="static"` to keep the dialog open on backdrop clicks. Non-modal dialogs are not supported.
+
+To make the backdrop visually transparent while keeping its interaction shield, override the existing
+CSS custom property without renaming it:
+
+```css
+:root {
+  --j1nn0-vue-modal-dialog-backdrop-background: transparent;
+  --j1nn0-vue-modal-dialog-backdrop-background-dark: transparent;
+  --j1nn0-vue-modal-dialog-backdrop-blur: 0;
+}
+```
 
 ---
 
@@ -370,8 +386,8 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 
 ## ♿ Accessibility
 
-- `role="dialog"` + `aria-modal="true"` on the topmost dialog
-- `aria-modal="false"` + `aria-hidden="true"` on lower-layered dialogs
+- Dialogs are always modal: the topmost dialog has `aria-modal="true"` and an active focus trap
+- Lower-layered dialogs have `aria-modal="false"` + `aria-hidden="true"`
 - `aria-labelledby` points to the visible title when a header slot is supplied; otherwise provide `aria-label`
 - `aria-describedby` is not generated; pass it directly when a short description is available
 - Close button uses the customizable `closeLabel` prop for its accessible label (`"Close"` by default)
@@ -381,10 +397,9 @@ You can use `@j1nn0/vue-modal-dialog` via CDN without any bundler. Both **indivi
 - Escape key closes the dialog if enabled (topmost dialog only when stacked)
 
 Background page content is **not** marked `inert`. Modality is conveyed with `aria-modal` and enforced
-with a focus trap, which is what the Vue and React dialog ecosystems generally ship. Making the
-background truly inert is not possible in the default configuration: the dialog renders inline, so
-anything marked inert would also cover the dialog's own ancestors, and nothing except a top-layer
-native `<dialog>` can escape inertness.
+with a focus trap. The backdrop is the interaction shield; make it visually transparent with the
+migration CSS above when needed. The dialog renders inline by default, so applying `inert` to an
+ancestor would also cover the dialog itself.
 
 ---
 
@@ -461,8 +476,7 @@ This library supports **multiple modals opened simultaneously**.
 When dialogs are stacked:
 
 - Only the topmost dialog responds to Escape and backdrop click
-- Only the topmost dialog renders a backdrop (`fullscreen`, non-modal and `backdrop="false"` dialogs
-  do not render a backdrop)
+- Only the topmost dialog renders a backdrop; fullscreen dialogs do not render a separate backdrop because the dialog covers the viewport
 - Focus trap is active only for the topmost dialog
 - ARIA attributes are updated by stack position:
   - topmost dialog: `aria-modal="true"`, `aria-hidden="false"`
@@ -518,21 +532,6 @@ Enable header-based dragging by adding the `draggable` prop.
 <VueModalDialog v-model="isOpen" draggable>
   <template #header>Drag Me</template>
   <p>You can move this dialog anywhere on the screen.</p>
-</VueModalDialog>
-```
-
----
-
-## 🚪 Non-modal Dialogs
-
-Set `modal` to `false` to allow interaction with the background while the dialog is open.
-
-Non-modal dialogs render no backdrop, so they are never dismissed by clicking outside. Escape still
-closes them unless `escape` is `false`.
-
-```vue
-<VueModalDialog v-model="isOpen" :modal="false">
-  <p>The background remains interactive.</p>
 </VueModalDialog>
 ```
 

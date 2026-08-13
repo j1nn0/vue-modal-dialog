@@ -12,8 +12,8 @@ export type DialogWidth = 'sm' | 'md' | 'lg' | 'fullscreen' | (string & {});
  * All properties are optional with sensible defaults.
  */
 export interface VueModalDialogProps {
-  /** `true`: backdrop click closes the dialog. `false`: no backdrop. `'static'`: backdrop shown but click does not close. @default true */
-  backdrop?: boolean | 'static';
+  /** Interaction shield behavior for non-fullscreen dialogs: `'default'` closes the top dialog on click; `'static'` does not. @default 'default' */
+  backdrop?: 'default' | 'static';
   /** Whether pressing Escape closes the dialog (topmost only). @default true */
   escape?: boolean;
   /**
@@ -33,13 +33,6 @@ export interface VueModalDialogProps {
    */
   initialFocus?: string | HTMLElement;
   /**
-   * Enables modal behavior when true.
-   * @param Keeps background interaction blocked and focus trapped inside the dialog.
-   * @default true
-   * @example false
-   */
-  modal?: boolean;
-  /**
    * Controls whether the dialog is teleported or rendered in place.
    * @param Pass a boolean to enable/disable teleporting, or a string CSS selector for the target.
    * @default false
@@ -48,7 +41,7 @@ export interface VueModalDialogProps {
   teleport?: boolean | string;
   /**
    * Locks page scrolling while the dialog is open.
-   * @param Prevents background content from scrolling behind the dialog.
+   * @param Prevents background content from scrolling behind the dialog; changes take effect immediately while open.
    * @default true
    * @example false
    */

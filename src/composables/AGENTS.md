@@ -31,7 +31,7 @@ Composable-specific guidance for dialog internals. Use this with the root `AGENT
 ## SINGLETON PATTERN
 
 - `useDialogStack` is a singleton object, not a factory composable.
-- Import it and call methods directly (`push`, `pop`, `top`, `topId`, `count`, `indexOf`, `subscribe`, `unsubscribe`).
+- Import it and call methods directly (`push`, `pop`, `setScrollLock`, `top`, `topId`, `count`, `indexOf`, `subscribe`, `unsubscribe`).
 - Preserve first-open / last-close focus restoration when changing stack logic.
 - `_getStack()` is test introspection only, not production API.
 
@@ -39,7 +39,8 @@ Composable-specific guidance for dialog internals. Use this with the root `AGENT
 
 - `VueModalDialog.vue` coordinates these files; keep orchestration in the component layer.
 - `useDialogState()` requires `dialogId` and a close callback; it is stack-aware only and must stay aligned with `useDialogStack` on modal semantics, focus trap activation, and close timing.
-- `useDialogStack` is the single owner of the `vue-modal-open` body class and of scroll-lock padding.
+- `useDialogStack` is the single owner of the `vue-modal-open` body class and of scroll-lock padding; each entry stores only its `scrollLock` flag.
+- `setScrollLock(id, enabled)` updates registered entries immediately and notifies subscribers; unknown ids are no-ops.
 - Dialog ids come from `useDialogStack.nextId()`, never Vue's `useId()`: ids must not collide across the separate apps that `useDialog()` mounts.
 - `useDialogDrag` must no-op when the dialog is closed or fullscreen.
 

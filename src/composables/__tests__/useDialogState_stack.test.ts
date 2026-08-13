@@ -47,7 +47,7 @@ describe('useDialogState (stack-aware)', () => {
         setup() {
           useDialogState(initialIsOpen, initialRef, initialEmit, {}, 'initial', vi.fn());
           onMounted(() => {
-            useDialogStack.push({ id: 'initial', propsSnapshot: { scrollLock: true } });
+            useDialogStack.push({ id: 'initial', scrollLock: true });
           });
           return () => h('div', { ref: initialRef });
         },

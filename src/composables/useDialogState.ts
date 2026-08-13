@@ -17,7 +17,7 @@ export type { DialogEmit };
  * @param isOpen         - Model ref for v-model binding.
  * @param dialogRef      - Template ref pointing to the dialog root element.
  * @param emit           - Emits the `'opened'` event.
- * @param _props         - Snapshot of dialog props for focus-trap and modal behavior.
+ * @param _props         - Dialog props used for initial focus configuration.
  * @param dialogId       - Unique dialog identifier.
  * @param closeCallback  - Callback invoked when `close` is called.
  * @returns `close` — a function that invokes the close callback.
@@ -26,7 +26,7 @@ export function useDialogState(
   isOpen: Ref<boolean>,
   dialogRef: Ref<HTMLElement | null>,
   emit: DialogEmit,
-  _props: Partial<VueModalDialogProps>,
+  _props: Pick<VueModalDialogProps, 'initialFocus'>,
   dialogId: string,
   closeCallback: () => void,
 ): { close: () => void } {
@@ -53,7 +53,7 @@ export function useDialogState(
   function updateFocus(): void {
     try {
       const topId = useDialogStack.topId();
-      if (isOpen.value && topId === dialogId && _props.modal !== false) {
+      if (isOpen.value && topId === dialogId) {
         activateFocusTrap();
       } else {
         deactivateFocusTrap();

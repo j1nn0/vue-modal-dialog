@@ -81,7 +81,7 @@ describe('useDialogStack', () => {
     });
 
     it('does not add body class when all dialogs disable scrollLock', () => {
-      useDialogStack.push({ id: 'no-lock', propsSnapshot: { scrollLock: false } });
+      useDialogStack.push({ id: 'no-lock', scrollLock: false });
 
       expect(document.body.classList.contains('vue-modal-open')).toBeFalsy();
 
@@ -89,8 +89,8 @@ describe('useDialogStack', () => {
     });
 
     it('keeps body class when any stacked dialog enables scrollLock', () => {
-      useDialogStack.push({ id: 'no-lock', propsSnapshot: { scrollLock: false } });
-      useDialogStack.push({ id: 'yes-lock', propsSnapshot: { scrollLock: true } });
+      useDialogStack.push({ id: 'no-lock', scrollLock: false });
+      useDialogStack.push({ id: 'yes-lock', scrollLock: true });
 
       expect(document.body.classList.contains('vue-modal-open')).toBeTruthy();
 
@@ -98,6 +98,50 @@ describe('useDialogStack', () => {
       expect(document.body.classList.contains('vue-modal-open')).toBeFalsy();
 
       useDialogStack.pop('no-lock');
+    });
+
+    it('updates scrollLock and notifies subscribers for a registered dialog', () => {
+      const events: boolean[] = [];
+      const subscriber = (stack: { scrollLock?: boolean }[]) =>
+        events.push(stack[0]?.scrollLock ?? true);
+      useDialogStack.subscribe(subscriber);
+      useDialogStack.push({ id: 'toggle', scrollLock: true });
+
+      useDialogStack.setScrollLock('toggle', false);
+      expect(useDialogStack._getStack()[0]?.scrollLock).toBe(false);
+      expect(document.body.classList.contains('vue-modal-open')).toBe(false);
+      expect(events.at(-1)).toBe(false);
+
+      useDialogStack.setScrollLock('toggle', true);
+      expect(useDialogStack._getStack()[0]?.scrollLock).toBe(true);
+      expect(document.body.classList.contains('vue-modal-open')).toBe(true);
+      expect(events.at(-1)).toBe(true);
+
+      useDialogStack.unsubscribe(subscriber);
+      useDialogStack.pop('toggle');
+    });
+
+    it('ignores scrollLock updates for unknown ids', () => {
+      const subscriber = vi.fn();
+      useDialogStack.subscribe(subscriber);
+
+      expect(() => useDialogStack.setScrollLock('unknown', false)).not.toThrow();
+      expect(subscriber).not.toHaveBeenCalled();
+      expect(document.body.classList.contains('vue-modal-open')).toBe(false);
+
+      useDialogStack.unsubscribe(subscriber);
+    });
+
+    it('keeps body class when a lower dialog remains locked', () => {
+      useDialogStack.push({ id: 'lower', scrollLock: true });
+      useDialogStack.push({ id: 'top', scrollLock: false });
+
+      expect(useDialogStack.topId()).toBe('top');
+      expect(document.body.classList.contains('vue-modal-open')).toBe(true);
+
+      useDialogStack.pop('top');
+      expect(document.body.classList.contains('vue-modal-open')).toBe(true);
+      useDialogStack.pop('lower');
     });
   });
 
