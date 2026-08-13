@@ -86,6 +86,7 @@ pnpm dev
 pnpm storybook
 pnpm format:check
 pnpm lint
+pnpm lint:fix
 pnpm test
 pnpm build
 pnpm coverage
@@ -96,6 +97,6 @@ make release-patch|release-minor|release-major
 
 - Validation order: `format:check -> lint -> test -> build`.
 - CI splits into `lint` and `test-and-build`; publish runs only on `v*.*.*` tags.
-- Pre-commit runs `pnpm lint-staged` and `pnpm test`; format is still manual.
+- Pre-commit runs `pnpm test`; format is still manual.
 - Node >= 24 and pnpm >= 10 are enforced; `.npmrc` points installs at `https://npm.flatt.tech/`.
 - Read the child AGENTS before changing `src/components/` or `src/composables/` internals.

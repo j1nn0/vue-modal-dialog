@@ -82,4 +82,12 @@ jobs:
 
       # npm に公開（Git チェックをスキップ）
       - name: Publish to npm
-        run: pnpm publish --access public --no-git-checks --provenance --tag rc --registry https://registry.npmjs.org/
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          version="${version%%+*}"
+          if [[ "$version" == *-* ]]; then
+            npm_tag=rc
+          else
+            npm_tag=latest
+          fi
+          pnpm publish --access public --no-git-checks --provenance --tag "$npm_tag" --registry https://registry.npmjs.org/
