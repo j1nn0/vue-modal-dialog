@@ -60,8 +60,8 @@ export const defaultMountProps: VueModalDialogProps = {
   teleport: false,
   scrollLock: true,
   modal: true,
-  transition: 'fade',
-  backdropTransition: 'fade-backdrop',
+  // Transition names are deliberately omitted so tests exercise the component's
+  // own defaults rather than re-asserting values supplied here.
 };
 
 /**

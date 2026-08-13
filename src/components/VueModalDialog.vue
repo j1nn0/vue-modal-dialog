@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<VueModalDialogProps>(), {
   backdrop: true,
   escape: true,
   transition: 'fade',
-  backdropTransition: 'fade',
+  backdropTransition: 'fade-backdrop',
   position: 'center',
   width: 'md',
   mode: null,
