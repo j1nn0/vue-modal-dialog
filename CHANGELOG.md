@@ -1,5 +1,7 @@
 # Changelog
 
+## [1.0.0-rc.10](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.9...v1.0.0-rc.10) (2026-08-13)
+
 ## [1.0.0-rc.9](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.8...v1.0.0-rc.9) (2026-08-13)
 
 ### Bug Fixes
