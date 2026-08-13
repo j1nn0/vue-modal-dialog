@@ -40,7 +40,7 @@ Library-mode Vite build, colocated Vitest coverage, and a small source tree with
 | Programmatic API                    | `src/composables/useDialog.ts`                                                   | Mounts standalone Vue app                    |
 | Test helpers / mocks                | `src/test-utils.ts`                                                              | Shared across component and composable tests |
 | Multi-dialog stack/focus restore    | `src/composables/useDialogStack.ts`                                              | Singleton state; clean up in tests           |
-| Open/close lifecycle and focus trap | `src/composables/useDialogState.ts`                                              | Legacy vs stack-aware paths                  |
+| Open/close lifecycle and focus trap | `src/composables/useDialogState.ts`                                              | Stack-aware only; `dialogId` required        |
 | Build/lint/test pipeline            | `package.json`, `vite.config.ts`, `vitest.config.js`, `.github/workflows/ci.yml` | Zero-tolerance validation                    |
 | Release flow                        | `Makefile`, `.github/workflows/publish.yml`                                      | Tag-driven npm publish                       |
 

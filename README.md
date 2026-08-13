@@ -67,7 +67,7 @@ A reusable Vue 3 modal dialog component with focus trap and ARIA accessibility s
   - Teleport support: render dialog anywhere in the DOM (e.g., to `body`)
   - Non-modal support: allow background interaction
   - Draggable dialogs: reposition dialog by dragging the header
-  - Programmatic API: control dialog state via `useDialog()` composable
+  - Programmatic API: open a dialog with content and await its result via the `useDialog()` composable
   - Before-close guard: prevent closing based on logic (e.g., unsaved changes)
   - Custom transitions: configurable entry/exit animations for dialog and backdrop
   - Initial focus: explicitly define which element to focus on open

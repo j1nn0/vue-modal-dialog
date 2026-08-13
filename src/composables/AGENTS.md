@@ -10,23 +10,23 @@ Composable-specific guidance for dialog internals. Use this with the root `AGENT
 
 ## COMPOSABLE CATALOG
 
-- `useDialog.ts` — imperative API that mounts a standalone Vue app into `document.body`.
-- `useDialogState.ts` — open/close lifecycle, focus trap, body class, legacy vs stack-aware behavior.
+- `useDialog.ts` — imperative API that mounts a standalone Vue app into `document.body`, renders slot content, and resolves a promise on close.
+- `useDialogState.ts` — focus trap for a stack-aware dialog; emits `opened` after the DOM update.
 - `useDialogSize.ts` — width preset/custom width and position → class/style mapping.
 - `useDialogMode.ts` — explicit mode or `prefers-color-scheme` reactive mode.
-- `useDialogStack.ts` — module-level stack manager for top dialog, scroll lock, and focus restore.
-- `useDialogDrag.ts` — pointer-driven drag offsets and inline transform style.
+- `useDialogStack.ts` — module-level stack manager for top dialog, dialog ids, scroll lock (incl. scrollbar-width compensation), and focus restore.
+- `useDialogDrag.ts` — pointer-driven drag offsets, clamped to the viewport, applied via the CSS `translate` property.
 
 ## WHERE TO LOOK
 
-| Task                         | Location            | Notes                                  |
-| ---------------------------- | ------------------- | -------------------------------------- |
-| Programmatic open/close      | `useDialog.ts`      | Creates and tears down standalone apps |
-| Focus trap / lifecycle emits | `useDialogState.ts` | Two execution paths                    |
-| Multi-dialog ordering        | `useDialogStack.ts` | Singleton object; global test state    |
-| Width / position mapping     | `useDialogSize.ts`  | Presets and custom widths              |
-| Theme behavior               | `useDialogMode.ts`  | Explicit mode vs media query           |
-| Drag behavior                | `useDialogDrag.ts`  | Must stay inert when closed/fullscreen |
+| Task                       | Location            | Notes                                    |
+| -------------------------- | ------------------- | ---------------------------------------- |
+| Programmatic open/close    | `useDialog.ts`      | Creates and tears down standalone apps   |
+| Focus trap / `opened` emit | `useDialogState.ts` | Requires `dialogId` and a close callback |
+| Multi-dialog ordering      | `useDialogStack.ts` | Singleton object; global test state      |
+| Width / position mapping   | `useDialogSize.ts`  | Presets and custom widths                |
+| Theme behavior             | `useDialogMode.ts`  | Explicit mode vs media query             |
+| Drag behavior              | `useDialogDrag.ts`  | Must stay inert when closed/fullscreen   |
 
 ## SINGLETON PATTERN
 
@@ -38,8 +38,9 @@ Composable-specific guidance for dialog internals. Use this with the root `AGENT
 ## INTER-COMPOSABLE CONTRACTS
 
 - `VueModalDialog.vue` coordinates these files; keep orchestration in the component layer.
-- `useDialogState()` without `dialogId` uses the legacy path and manages focus/body state directly.
-- `useDialogState()` with `dialogId` becomes stack-aware and must stay aligned with `useDialogStack` on modal semantics, focus trap activation, and close timing.
+- `useDialogState()` requires `dialogId` and a close callback; it is stack-aware only and must stay aligned with `useDialogStack` on modal semantics, focus trap activation, and close timing.
+- `useDialogStack` is the single owner of the `vue-modal-open` body class and of scroll-lock padding.
+- Dialog ids come from `useDialogStack.nextId()`, never Vue's `useId()`: ids must not collide across the separate apps that `useDialog()` mounts.
 - `useDialogDrag` must no-op when the dialog is closed or fullscreen.
 
 ## TESTING PATTERNS
@@ -53,6 +54,6 @@ Composable-specific guidance for dialog internals. Use this with the root `AGENT
 ## ANTI-PATTERNS
 
 - Do not move shared stack state into per-instance composables.
-- Do not change one `useDialogState` path without checking the other.
+- Do not reintroduce a non-stack-aware `useDialogState` path; the stack owns body-class and scroll-lock state.
 - Do not expose `_getStack()` semantics as consumer API.
 - Do not add browser API access without SSR guards.
