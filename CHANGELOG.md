@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.0-rc.11](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.10...v1.0.0-rc.11) (2026-08-13)
+
+### Bug Fixes
+
+* **a11y:** move focus into the dialog when initialFocus is unset ([ee42fee](https://github.com/j1nn0/vue-modal-dialog/commit/ee42fee87bebdff7e75a89c2df657c93f3d61a90))
+
+### Documentation
+
+* **ja:** correct the Programmatic API example ([76f47ae](https://github.com/j1nn0/vue-modal-dialog/commit/76f47ae47709a0266708d09e8d9aa243f35c67f0))
+
+### Chore
+
+* **release:** make non-fix commit types reach the changelog ([4d18841](https://github.com/j1nn0/vue-modal-dialog/commit/4d188419ab631b03c156548b43faa039350a6b43))
+* split the consumer engine floor from the development one ([be7e31d](https://github.com/j1nn0/vue-modal-dialog/commit/be7e31d4f70ed3db4477b2b076ea7facfc5ee4b0))
+
 ## [1.0.0-rc.10](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.9...v1.0.0-rc.10) (2026-08-13)
 
 ## [1.0.0-rc.9](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.8...v1.0.0-rc.9) (2026-08-13)
