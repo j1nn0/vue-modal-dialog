@@ -390,7 +390,7 @@ CSS custom property without renaming it:
 ## ♿ Accessibility
 
 - Dialogs are always modal: the topmost dialog has `aria-modal="true"` and an active focus trap
-- Lower-layered dialogs have `aria-modal="false"` + `aria-hidden="true"`
+- Lower-layered dialogs have `aria-modal="false"` + `inert`, so they leave the tab order as well as the accessibility tree
 - `aria-labelledby` points to the visible title when a header slot is supplied; otherwise provide `aria-label`
 - `role="alertdialog"` requires the `describedBy` prop, which is emitted as `aria-describedby`
 - For standard dialogs, a direct `aria-describedby` attribute remains a compatibility fallback; `describedBy` takes precedence
@@ -483,8 +483,8 @@ When dialogs are stacked:
 - Only the topmost dialog renders a backdrop; fullscreen dialogs do not render a separate backdrop because the dialog covers the viewport
 - Focus trap is active only for the topmost dialog
 - ARIA attributes are updated by stack position:
-  - topmost dialog: `aria-modal="true"`, `aria-hidden="false"`
-  - lower-layered dialogs: `aria-modal="false"`, `aria-hidden="true"`
+  - topmost dialog: `aria-modal="true"`, interactive
+  - lower-layered dialogs: `aria-modal="false"`, `inert`
 - Dialog z-index is automatically calculated from stack order
 - Focus is restored to the element that triggered the first dialog when all dialogs are closed
 

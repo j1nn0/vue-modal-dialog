@@ -67,6 +67,7 @@ Library-mode Vite build, colocated Vitest coverage, and a small source tree with
 ## ANTI-PATTERNS (THIS PROJECT)
 
 - Do not bypass `vue-tsc --noEmit -p tsconfig.build.json`; build depends on it.
+- Do not wrap `defineProps<VueModalDialogProps>()` in `withDefaults()`. Over an intersection containing a union (`DialogRoleProps`) it makes vue-tsc give up on declaration inference and emit `DefineSetupFnComponent<Record<string, any>, {}, ...>`, so consumers silently lose all prop/emit/slot/v-model type checking. Runtime props stay correct, so nothing local fails — only the published `dist/index.d.ts` is wrong. Use reactive props destructure with defaults instead; `scripts/check-packed-types.sh` guards this in CI.
 - Do not ignore lint warnings; `vite-plugin-eslint` runs with `failOnWarning: true`.
 - Do not leave unused imports; lint/build fail unless intentionally `_`-prefixed.
 - Do not treat `useDialogStack` as per-instance state.

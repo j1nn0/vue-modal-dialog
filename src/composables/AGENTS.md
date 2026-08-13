@@ -44,6 +44,7 @@ Composable-specific guidance for dialog internals. Use this with the root `AGENT
 - `useDialog()` keeps its own pending guard around the component's `requestClose()` result; preserve both guards when changing imperative close timing.
 - Dialog ids come from `useDialogStack.nextId()`, never Vue's `useId()`: ids must not collide across the separate apps that `useDialog()` mounts.
 - `useDialogDrag` must no-op when the dialog is closed or fullscreen.
+- Composables take prop values as getters or refs, never as a plain destructured value. The component destructures its props, so a bare value read at call time is frozen at that moment; `useDialogMode` and `useDialogState` take getters and `useDialogSize` takes `MaybeRef`.
 
 ## TESTING PATTERNS
 
@@ -59,3 +60,4 @@ Composable-specific guidance for dialog internals. Use this with the root `AGENT
 - Do not reintroduce a non-stack-aware `useDialogState` path; the stack owns body-class and scroll-lock state.
 - Do not expose `_getStack()` semantics as consumer API.
 - Do not add browser API access without SSR guards.
+- Do not report consumer-caused errors with Vue's `warn`; it compiles to a no-op in production, which is exactly where the diagnostic is needed. Use `console.warn` for those and keep `warn` for dev-time misuse hints.

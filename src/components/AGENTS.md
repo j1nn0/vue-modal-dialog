@@ -28,7 +28,7 @@ Component-layer guidance for the dialog UI. Use this with the root `AGENTS.md`; 
 
 - `teleport` defaults to `true` (`body`); use `false` only for explicit inline rendering, and a string selector for a custom target.
 - Dialogs are always modal: only the top dialog renders the backdrop and handles Escape/backdrop-close behavior.
-- `aria-modal` and `aria-hidden` depend on stack position; preserve that top-vs-lower dialog distinction.
+- `aria-modal` and `inert` depend on stack position; preserve that top-vs-lower dialog distinction. Lower dialogs are `inert`, not `aria-hidden`: they must leave the tab order too, not just the accessibility tree.
 - `describedBy` is the official `aria-describedby` API and is required for `role="alertdialog"`; direct `aria-describedby` is a standard-dialog compatibility fallback.
 - `role="alertdialog"` with `backdrop="default"` forces effective static-backdrop semantics; do not loosen that contract casually.
 
@@ -49,6 +49,8 @@ Component-layer guidance for the dialog UI. Use this with the root `AGENTS.md`; 
 ## ANTI-PATTERNS
 
 - Do not make fullscreen dialogs draggable.
+- Do not reintroduce `withDefaults()` around `defineProps`; it breaks the published component types. See the root `AGENTS.md` anti-patterns for why.
+- Do not latch `closePending` on the synchronous close path. It is only cleared by the `isOpen` watcher, so a controlled parent that refuses the update would wedge the dialog shut forever; the `!isOpen.value` guard already covers that path.
 - Do not remove the capture-phase pointerdown fallback without replacing the swallowed-backdrop-click coverage.
 - Do not emit `closed` synchronously from the component stack-aware path.
 - Do not duplicate composable unit-test assertions here; this file should stay integration-focused.

@@ -390,7 +390,7 @@ v1.0 は modal 専用です。`modal` prop と boolean の `backdrop={true|false
 ## ♿ Accessibility
 
 - ダイアログは常に modal です。最上位ダイアログには `aria-modal="true"` を設定し、フォーカストラップを有効化します
-- 下層ダイアログには `aria-modal="false"` + `aria-hidden="true"`
+- 下層ダイアログには `aria-modal="false"` + `inert`。アクセシビリティツリーだけでなくタブ順からも外れます
 - `aria-labelledby` は header slot がある場合に表示タイトルを参照します。ない場合は `aria-label` を指定してください
 - `role="alertdialog"` では `describedBy` prop が必須で、`aria-describedby` として出力されます
 - 通常の dialog では直接の `aria-describedby` 属性も互換フォールバックとして使えます。`describedBy` が優先されます
@@ -465,8 +465,8 @@ v1.0 は modal 専用です。`modal` prop と boolean の `backdrop={true|false
 - backdrop を描画するのは最上位ダイアログのみ（`fullscreen` はダイアログ自身が viewport を覆うため別 backdrop を描画しません）
 - フォーカストラップは最上位ダイアログのみ有効
 - ARIA属性はスタック位置に応じて更新
-  - 最上位ダイアログ: `aria-modal="true"`, `aria-hidden="false"`
-  - 下層ダイアログ: `aria-modal="false"`, `aria-hidden="true"`
+  - 最上位ダイアログ: `aria-modal="true"`、操作可能
+  - 下層ダイアログ: `aria-modal="false"`, `inert`
 - ダイアログの z-index はスタック順で自動計算
 - すべてのダイアログが閉じられたとき、最初のダイアログを起動した要素にフォーカスを復元
 
