@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.0-rc.9](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.8...v1.0.0-rc.9) (2026-08-13)
+
+### Bug Fixes
+
+* **types:** restore consumer-facing component types ([2bb5c19](https://github.com/j1nn0/vue-modal-dialog/commit/2bb5c196298bcdc77bf9e12e7ef6417c32a2aeb7))
+
 ## [1.0.0-rc.8](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.7...v1.0.0-rc.8) (2026-08-13)
 
 ## [1.0.0-rc.7](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.6...v1.0.0-rc.7) (2026-08-13)
