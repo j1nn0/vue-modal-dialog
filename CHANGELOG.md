@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.0-rc.3](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2026-08-13)
+
+### Bug Fixes
+
+* **release:** gate publishing and close immediate dialogs ([92fadba](https://github.com/j1nn0/vue-modal-dialog/commit/92fadba5dcbd414391c233b2c297a563d4658147))
+
 ## [1.0.0-rc.2](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2026-08-13)
 
 ### ⚠ BREAKING CHANGES
