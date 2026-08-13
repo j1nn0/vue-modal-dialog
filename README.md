@@ -426,6 +426,16 @@ native `<dialog>` can escape inertness.
   --j1nn0-vue-modal-dialog-footer-background: #f5f5f5;
   --j1nn0-vue-modal-dialog-footer-padding: 1rem;
 
+  /* Close button */
+  --j1nn0-vue-modal-dialog-close-size: 24px;
+  --j1nn0-vue-modal-dialog-close-border-radius: 4px;
+  --j1nn0-vue-modal-dialog-close-hover-background: rgba(0, 0, 0, 0.08);
+
+  /* Focus ring */
+  --j1nn0-vue-modal-dialog-focus-ring-color: #1d4ed8;
+  --j1nn0-vue-modal-dialog-focus-ring-width: 2px;
+  --j1nn0-vue-modal-dialog-focus-ring-offset: 2px;
+
   /* Dark mode */
   --j1nn0-vue-modal-dialog-backdrop-background-dark: rgba(255, 255, 255, 0.2);
   --j1nn0-vue-modal-dialog-border-dark: none;
@@ -433,8 +443,13 @@ native `<dialog>` can escape inertness.
   --j1nn0-vue-modal-dialog-footer-background-dark: #1f2937;
   --j1nn0-vue-modal-dialog-body-background-dark: #111827;
   --j1nn0-vue-modal-dialog-text-color-dark: #f9fafb;
+  --j1nn0-vue-modal-dialog-close-hover-background-dark: rgba(255, 255, 255, 0.12);
+  --j1nn0-vue-modal-dialog-focus-ring-color-dark: #93c5fd;
 }
 ```
+
+Keeping `--j1nn0-vue-modal-dialog-close-size` at 24px or above satisfies WCAG 2.2 SC 2.5.8
+(Target Size, Minimum). Transitions are shortened automatically when the user prefers reduced motion.
 
 ---
 

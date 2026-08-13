@@ -267,6 +267,16 @@ defineExpose({ requestClose });
   --j1nn0-vue-modal-dialog-footer-background: #f5f5f5;
   --j1nn0-vue-modal-dialog-footer-padding: 1rem;
 
+  /* Close button */
+  --j1nn0-vue-modal-dialog-close-size: 24px;
+  --j1nn0-vue-modal-dialog-close-border-radius: 4px;
+  --j1nn0-vue-modal-dialog-close-hover-background: rgba(0, 0, 0, 0.08);
+
+  /* Focus ring */
+  --j1nn0-vue-modal-dialog-focus-ring-color: #1d4ed8;
+  --j1nn0-vue-modal-dialog-focus-ring-width: 2px;
+  --j1nn0-vue-modal-dialog-focus-ring-offset: 2px;
+
   /* Dark mode */
   --j1nn0-vue-modal-dialog-backdrop-background-dark: rgba(255, 255, 255, 0.2);
   --j1nn0-vue-modal-dialog-border-dark: none;
@@ -274,6 +284,8 @@ defineExpose({ requestClose });
   --j1nn0-vue-modal-dialog-footer-background-dark: #1f2937;
   --j1nn0-vue-modal-dialog-body-background-dark: #111827;
   --j1nn0-vue-modal-dialog-text-color-dark: #f9fafb;
+  --j1nn0-vue-modal-dialog-close-hover-background-dark: rgba(255, 255, 255, 0.12);
+  --j1nn0-vue-modal-dialog-focus-ring-color-dark: #93c5fd;
 }
 .vue-modal-open {
   overflow: hidden;
@@ -401,6 +413,13 @@ defineExpose({ requestClose });
     }
     .dialog-close {
       color: var(--j1nn0-vue-modal-dialog-text-color);
+
+      &:hover {
+        background: var(--j1nn0-vue-modal-dialog-close-hover-background);
+      }
+      &:focus-visible {
+        outline-color: var(--j1nn0-vue-modal-dialog-focus-ring-color);
+      }
     }
   }
 
@@ -419,6 +438,13 @@ defineExpose({ requestClose });
     }
     .dialog-close {
       color: var(--j1nn0-vue-modal-dialog-text-color-dark);
+
+      &:hover {
+        background: var(--j1nn0-vue-modal-dialog-close-hover-background-dark);
+      }
+      &:focus-visible {
+        outline-color: var(--j1nn0-vue-modal-dialog-focus-ring-color-dark);
+      }
     }
   }
 }
@@ -492,11 +518,39 @@ defineExpose({ requestClose });
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
+  // Inline-flex centres the glyph inside the minimum target box below.
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  // WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA: at least 24x24 CSS px.
+  min-width: var(--j1nn0-vue-modal-dialog-close-size);
+  min-height: var(--j1nn0-vue-modal-dialog-close-size);
+  padding: 0;
   background: none;
   border: none;
+  border-radius: var(--j1nn0-vue-modal-dialog-close-border-radius);
   font-size: 1.25rem;
   cursor: pointer;
   line-height: 1;
+
+  &:focus-visible {
+    outline: var(--j1nn0-vue-modal-dialog-focus-ring-width) solid
+      var(--j1nn0-vue-modal-dialog-focus-ring-color);
+    outline-offset: var(--j1nn0-vue-modal-dialog-focus-ring-offset);
+  }
+}
+
+// Respect a user's reduced-motion preference. A near-zero duration is used
+// rather than `none` so `transitionend` still fires for listeners that wait
+// on it (see useDialog's deferred unmount).
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .fade-enter-active,
+  .fade-leave-active,
+  .fade-backdrop-enter-active,
+  .fade-backdrop-leave-active {
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .dialog-body {
