@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0...v1.0.1) (2026-08-20)
+
+### Chore
+
+* **deps:** bump dev dependency versions ([3daa403](https://github.com/j1nn0/vue-modal-dialog/commit/3daa4037cae6033b8a956accec8d662a1bbaf0c8))
+* ignore Playwright and Serena directories ([d15758d](https://github.com/j1nn0/vue-modal-dialog/commit/d15758d7f6414aceb35beb4f8750612a896dfbe2))
+
 ## [1.0.0](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.11...v1.0.0) (2026-08-13)
 
 ## [1.0.0-rc.11](https://github.com/j1nn0/vue-modal-dialog/compare/v1.0.0-rc.10...v1.0.0-rc.11) (2026-08-13)
