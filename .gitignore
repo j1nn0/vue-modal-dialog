@@ -34,3 +34,6 @@ storybook-static
 .env
 .sisyphus
 .omo
+
+.playwright-cli/*
+.serena/*
