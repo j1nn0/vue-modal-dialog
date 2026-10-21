@@ -123,11 +123,5 @@
     "@vueuse/integrations": "^14.3.0",
     "focus-trap": "^8.2.2",
     "vue": "^3.5.38"
-  },
-  "pnpm": {
-    "overrides": {
-      "glob": "^13.0.6",
-      "shell-quote": "^1.10.0"
-    }
   }
 }
