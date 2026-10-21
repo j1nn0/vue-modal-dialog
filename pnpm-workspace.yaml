@@ -4,3 +4,18 @@ trustPolicyExclude:
   - 'rollup@2.80.0'
   - 'chokidar@4.0.3'
   - 'semver@6.3.1'
+
+# Security floors for transitive dependencies (GHSA/advisory driven).
+# Pinned to the newest release older than minimumReleaseAge so the age gate
+# stays meaningful; bump these deliberately when a newer version matures.
+overrides:
+  brace-expansion: 5.0.12
+  fast-uri: 3.1.8
+  glob: ^13.0.6
+  ip-address: 10.7.4
+  postcss-selector-parser: 7.1.6
+  shell-quote: 1.12.0
+  source-map-js: 1.2.2
+  tinypool: 2.2.0
+  'undici@<8.0.0': 7.30.0
+  'undici@>=8.0.0': 8.11.2
