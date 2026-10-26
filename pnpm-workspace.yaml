@@ -8,15 +8,21 @@ trustPolicyExclude:
 # Security floors for transitive dependencies (GHSA/advisory driven).
 # Pinned to the newest release older than minimumReleaseAge so the age gate
 # stays meaningful; bump these deliberately when a newer version matures.
+#
+# fast-uri 3.1.9 is a deliberate one-off: four advisories (scheme spoofing, host
+# confusion, scheme injection, path equivalence) were published against 3.1.8
+# while 3.1.9 was still inside the seven-day window, so the lockfile was
+# regenerated once with `--config.minimumReleaseAge=0`. 3.1.9 matures on
+# 2026-10-26T23:05Z, after which the normal gate applies again.
 overrides:
   basic-ftp: 6.2.3
   brace-expansion: 5.0.12
-  fast-uri: 3.1.8
+  fast-uri: 3.1.9
   glob: ^13.0.6
   ip-address: 10.7.4
   postcss-selector-parser: 7.1.6
   shell-quote: 1.12.0
   source-map-js: 1.2.2
   tinypool: 2.2.0
-  'undici@<8.0.0': 7.30.0
-  'undici@>=8.0.0': 8.11.2
+  'undici@<8.0.0': 7.30.1
+  'undici@>=8.0.0': 8.12.2
